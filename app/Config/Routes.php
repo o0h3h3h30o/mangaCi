@@ -5,6 +5,10 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+// Installer (blocked after install.lock exists — checked inside controller)
+$routes->get ('install', 'Install::index');
+$routes->post('install', 'Install::run');
+
 $routes->get('/', 'Home::index');
 $routes->get('manga/(:segment)', 'Manga::detail/$1');
 $routes->get('manga/(:segment)/(:segment)', 'Manga::chapter/$1/$2');
