@@ -743,7 +743,7 @@ class Admin extends BaseController
         // Save uploaded image with ID-based filename
         if ($pendingImageFile) {
             $newName = $mangaId . '-thumb.' . $pendingImageFile->getExtension();
-            $pendingImageFile->move(FCPATH . 'images/', $newName);
+            $pendingImageFile->move(FCPATH . 'images/', $newName, true);
             $imageUrl = base_url('images/' . $newName);
             $db->table('manga')->where('id', $mangaId)->update(['image' => $imageUrl]);
         }
@@ -828,7 +828,7 @@ class Admin extends BaseController
             $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
             if (in_array($imageFile->getMimeType(), $imgTypes)) {
                 $newName = $id . '-thumb.' . $imageFile->getExtension();
-                $imageFile->move(FCPATH . 'images/', $newName);
+                $imageFile->move(FCPATH . 'images/', $newName, true);
                 $imageUrl = base_url('images/' . $newName);
                 $coverCdn = 0;
             }
@@ -845,11 +845,22 @@ class Admin extends BaseController
             'from_manga18fx' => trim($this->request->getPost('from_manga18fx') ?? ''),
             'cover'          => $coverCdn,
             'image'          => $coverCdn ? '' : $imageUrl,
+            'update_at'      => date('Y-m-d H:i:s'),
         ];
 
-        $db->table('manga')->where('id', $id)->update($row);
+        try {
+            $db->table('manga')->where('id', $id)->update($row);
+        } catch (\Exception $e) {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'DB Error: ' . $e->getMessage()]);
+            return redirect()->to("/admin/manga/{$id}/edit");
+        }
 
-        $this->syncMangaRelations($db, $id);
+        try {
+            $this->syncMangaRelations($db, $id);
+        } catch (\Exception $e) {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Manga saved but relations error: ' . $e->getMessage()]);
+            return redirect()->to("/admin/manga/{$id}/edit");
+        }
 
         session()->setFlashdata('flash', ['type' => 'success', 'msg' => 'Manga updated.']);
         return redirect()->to("/admin/manga/{$id}/edit");

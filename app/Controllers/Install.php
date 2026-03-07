@@ -183,6 +183,180 @@ class Install extends Controller
                 `value` text DEFAULT NULL,
                 PRIMARY KEY (`key`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `status` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `name` varchar(50) NOT NULL,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "INSERT IGNORE INTO `status` (`id`, `name`) VALUES (1, 'Ongoing'), (2, 'Completed')",
+
+            "CREATE TABLE IF NOT EXISTS `comictype` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `label` varchar(50) NOT NULL,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `manga` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `name` varchar(500) NOT NULL DEFAULT '',
+                `slug` varchar(500) NOT NULL DEFAULT '',
+                `otherNames` varchar(1000) DEFAULT '',
+                `summary` text DEFAULT NULL,
+                `status_id` int(11) unsigned NOT NULL DEFAULT 1,
+                `is_public` tinyint(1) NOT NULL DEFAULT 0,
+                `caution` tinyint(1) NOT NULL DEFAULT 0,
+                `from_manga18fx` varchar(1000) DEFAULT '',
+                `cover` tinyint(1) NOT NULL DEFAULT 0,
+                `image` varchar(500) DEFAULT '',
+                `views` int(11) NOT NULL DEFAULT 0,
+                `view_day` int(11) NOT NULL DEFAULT 0,
+                `view_month` int(11) NOT NULL DEFAULT 0,
+                `update_at` datetime DEFAULT NULL,
+                `chapter_1` float DEFAULT 0,
+                `chap_1_slug` varchar(255) DEFAULT '',
+                `comictype_id` int(11) unsigned DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_slug` (`slug`(191)),
+                KEY `idx_is_public` (`is_public`),
+                KEY `idx_update_at` (`update_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `chapter` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `manga_id` int(11) unsigned NOT NULL,
+                `number` float NOT NULL DEFAULT 0,
+                `slug` varchar(255) NOT NULL DEFAULT '',
+                `name` varchar(255) DEFAULT '',
+                `is_show` tinyint(1) NOT NULL DEFAULT 1,
+                `is_crawling` tinyint(1) NOT NULL DEFAULT 0,
+                `source_url` varchar(500) DEFAULT '',
+                `view` int(11) NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`),
+                KEY `idx_manga_id` (`manga_id`),
+                KEY `idx_manga_number` (`manga_id`, `number`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `page` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `chapter_id` int(11) unsigned NOT NULL,
+                `slug` int(11) NOT NULL DEFAULT 0,
+                `image` varchar(500) DEFAULT '',
+                `image_local` varchar(500) DEFAULT '',
+                `external` tinyint(1) NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`),
+                KEY `idx_chapter_id` (`chapter_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `category` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `name` varchar(100) NOT NULL DEFAULT '',
+                `slug` varchar(100) NOT NULL DEFAULT '',
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_slug` (`slug`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `category_manga` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `manga_id` int(11) unsigned NOT NULL,
+                `category_id` int(11) unsigned NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_manga_cat` (`manga_id`, `category_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `author` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `name` varchar(200) NOT NULL DEFAULT '',
+                `slug` varchar(200) DEFAULT '',
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `author_manga` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `manga_id` int(11) unsigned NOT NULL,
+                `author_id` int(11) unsigned NOT NULL,
+                `type` tinyint(1) NOT NULL DEFAULT 1,
+                PRIMARY KEY (`id`),
+                KEY `idx_manga_id` (`manga_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `tag` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `name` varchar(100) NOT NULL DEFAULT '',
+                `slug` varchar(100) DEFAULT '',
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `manga_tag` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `manga_id` int(11) unsigned NOT NULL,
+                `tag_id` int(11) unsigned NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_manga_tag` (`manga_id`, `tag_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `comments` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `comment` text NOT NULL,
+                `post_type` varchar(20) NOT NULL DEFAULT 'manga',
+                `post_id` int(11) unsigned NOT NULL,
+                `manga_id` int(11) unsigned NOT NULL DEFAULT 0,
+                `user_id` int(11) unsigned NOT NULL,
+                `parent_comment` int(11) unsigned DEFAULT NULL,
+                `created_at` datetime DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_post` (`post_type`, `post_id`),
+                KEY `idx_manga_id` (`manga_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `comment_likes` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `comment_id` int(11) unsigned NOT NULL,
+                `user_id` int(11) unsigned NOT NULL,
+                `type` varchar(10) NOT NULL DEFAULT 'like',
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_comment_user` (`comment_id`, `user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `bookmarks` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `manga_id` int(11) unsigned NOT NULL,
+                `user_id` int(11) unsigned NOT NULL,
+                `created_at` datetime DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_manga_user` (`manga_id`, `user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `notifications` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `user_id` int(11) unsigned NOT NULL,
+                `actor_id` int(11) unsigned DEFAULT NULL,
+                `type` varchar(30) NOT NULL DEFAULT '',
+                `comment_id` int(11) unsigned DEFAULT NULL,
+                `manga_id` int(11) unsigned DEFAULT NULL,
+                `manga_slug` varchar(500) DEFAULT '',
+                `manga_name` varchar(500) DEFAULT '',
+                `chapter_slug` varchar(255) DEFAULT '',
+                `preview` text DEFAULT NULL,
+                `is_read` tinyint(1) NOT NULL DEFAULT 0,
+                `created_at` datetime DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_user_read` (`user_id`, `is_read`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `chapter_reports` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `chapter_id` int(11) unsigned NOT NULL,
+                `user_id` int(11) unsigned DEFAULT NULL,
+                `reason` varchar(50) NOT NULL DEFAULT '',
+                `note` text DEFAULT NULL,
+                `ip_address` varchar(45) DEFAULT '',
+                `status` varchar(20) NOT NULL DEFAULT 'pending',
+                `created_at` datetime DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_status` (`status`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
         ];
     }
 
