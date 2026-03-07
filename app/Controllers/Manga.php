@@ -44,6 +44,7 @@ class Manga extends BaseController
 
     public function chapter(string $slug = '', string $chapterSlug = ''): string
     {
+
         $mangaModel = new MangaModel();
         $manga      = $mangaModel->getBySlug($slug);
 
@@ -62,7 +63,7 @@ class Manga extends BaseController
         $pages    = $mangaModel->getChapterPages((int) $chapter['id']);
         $chapters = $mangaModel->getChapters((int) $manga['id']);
         $pn       = $mangaModel->getPrevNextChapter((int) $manga['id'], (float) $chapter['number']);
-
+      
         $chapNum   = rtrim(rtrim(number_format((float) $chapter['number'], 1), '0'), '.');
         $chapTitle = $chapter['name'] ?: 'Chapter ' . $chapNum;
 
@@ -82,8 +83,7 @@ class Manga extends BaseController
             'categories'  => $this->categories,
             'currentUser' => $this->currentUser,
         ];
-
-        return $this->themeView('manga/chapter', $data);
+                return $this->themeView('manga/chapter', $data);
     }
 
     private function saveHistory(array $manga, string $chapSlug): void

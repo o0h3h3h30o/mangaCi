@@ -709,16 +709,15 @@ class Admin extends BaseController
 
         $slug = trim($this->request->getPost('slug') ?? '') ?: $this->slugify($name);
 
-        // Handle image upload
+        // Handle image upload — file will be saved after insert (need ID for filename)
         $coverCdn  = (int) ($this->request->getPost('cover_cdn') ?? 0);
         $imageUrl  = trim($this->request->getPost('image_url') ?? '');
         $imageFile = $this->request->getFile('image_file');
+        $pendingImageFile = null;
         if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
             $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
             if (in_array($imageFile->getMimeType(), $imgTypes)) {
-                $newName = $slug . '-thumb.' . $imageFile->getExtension();
-                $imageFile->move(FCPATH . 'images/', $newName);
-                $imageUrl = base_url('images/' . $newName);
+                $pendingImageFile = $imageFile;
                 $coverCdn = 0;
             }
         }
@@ -733,13 +732,21 @@ class Admin extends BaseController
             'caution'        => (int) ($this->request->getPost('caution') ?? 0),
             'from_manga18fx' => trim($this->request->getPost('from_manga18fx') ?? ''),
             'cover'          => $coverCdn,
-            'image'          => $coverCdn ? '' : $imageUrl,
+            'image'          => ($coverCdn || $pendingImageFile) ? '' : $imageUrl,
             'views'          => 0, 'view_day' => 0, 'view_month' => 0,
             'update_at'      => date('Y-m-d H:i:s'),
         ];
 
         $db->table('manga')->insert($row);
         $mangaId = $db->insertID();
+
+        // Save uploaded image with ID-based filename
+        if ($pendingImageFile) {
+            $newName = $mangaId . '-thumb.' . $pendingImageFile->getExtension();
+            $pendingImageFile->move(FCPATH . 'images/', $newName);
+            $imageUrl = base_url('images/' . $newName);
+            $db->table('manga')->where('id', $mangaId)->update(['image' => $imageUrl]);
+        }
 
         $this->syncMangaRelations($db, $mangaId);
 
@@ -820,7 +827,7 @@ class Admin extends BaseController
         if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
             $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
             if (in_array($imageFile->getMimeType(), $imgTypes)) {
-                $newName = $slug . '-thumb.' . $imageFile->getExtension();
+                $newName = $id . '-thumb.' . $imageFile->getExtension();
                 $imageFile->move(FCPATH . 'images/', $newName);
                 $imageUrl = base_url('images/' . $newName);
                 $coverCdn = 0;
@@ -1471,16 +1478,18 @@ class Admin extends BaseController
         // 1. Tìm nguồn ảnh: ưu tiên file local, sau đó image URL
         $imageData = null;
         $mimeType  = 'image/jpeg';
-        $slug      = $manga['slug'];
+        $mangaId   = $manga['id'];
 
-        // Thử đọc file local: images/{slug}-thumb.{ext}
-        foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
-            $localPath = FCPATH . 'images/' . $slug . '-thumb.' . $ext;
-            if (file_exists($localPath)) {
-                $imageData = file_get_contents($localPath);
-                $mimeMap   = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
-                $mimeType  = $mimeMap[$ext] ?? 'image/jpeg';
-                break;
+        // Thử đọc file local: images/{id}-thumb.{ext} (fallback: {slug}-thumb.{ext} cho file cũ)
+        foreach ([$mangaId, $manga['slug']] as $prefix) {
+            foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
+                $localPath = FCPATH . 'images/' . $prefix . '-thumb.' . $ext;
+                if (file_exists($localPath)) {
+                    $imageData = file_get_contents($localPath);
+                    $mimeMap   = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
+                    $mimeType  = $mimeMap[$ext] ?? 'image/jpeg';
+                    break 2;
+                }
             }
         }
 
@@ -1513,10 +1522,10 @@ class Admin extends BaseController
 
         // 3. Upload lên S3: ảnh gốc + ảnh thumb
         $errors = [];
-        if (!$this->s3PutObject($imageData, 'cover/' . $slug . '.jpg', $mimeType)) {
+        if (!$this->s3PutObject($imageData, 'cover/' . $mangaId . '.jpg', $mimeType)) {
             $errors[] = 'original';
         }
-        if (!$this->s3PutObject($thumbData, 'cover/' . $slug . '-thumb.jpg', 'image/jpeg')) {
+        if (!$this->s3PutObject($thumbData, 'cover/' . $mangaId . '-thumb.jpg', 'image/jpeg')) {
             $errors[] = 'thumb';
         }
         if ($errors) {
@@ -1526,7 +1535,7 @@ class Admin extends BaseController
         // 4. Cập nhật DB
         $db->table('manga')->where('id', $id)->update(['cover' => 1, 'image' => '']);
 
-        return $this->response->setJSON(['success' => true, 'cdn_url' => rtrim(env('CDN_COVER_URL', ''), '/') . '/' . $slug . '-thumb.jpg']);
+        return $this->response->setJSON(['success' => true, 'cdn_url' => rtrim(env('CDN_COVER_URL', ''), '/') . '/' . $mangaId . '-thumb.jpg']);
     }
 
     /**

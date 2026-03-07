@@ -158,7 +158,7 @@
   <link rel="preload" href="<?= base_url('fonts/afacad-flux-400.ttf') ?>" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="<?= base_url('css/app.css?id=d0cecc47a2557912eaae75ef632a75da') ?>" as="style">
   <link href="<?= base_url('css/app.css?id=d0cecc47a2557912eaae75ef632a75da') ?>" rel="stylesheet">
-
+  
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="Author" content="MangaCI" />

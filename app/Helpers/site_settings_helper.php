@@ -11,7 +11,7 @@ if (!function_exists('manga_cover_url')) {
         if (!$cdnBase) {
             $cdnBase = rtrim(env('CDN_COVER_URL', ''), '/');
         }
-        $cdnUrl = $cdnBase . '/' . ($manga['slug'] ?? '') . '-thumb.jpg';
+        $cdnUrl = $cdnBase . '/' . ($manga['id'] ?? '') . '-thumb.jpg';
         if (($manga['cover'] ?? 0) == 1) {
             return $cdnUrl;
         }
