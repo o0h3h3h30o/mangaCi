@@ -234,7 +234,7 @@ $lastChap  = !empty($chapters) ? $chapters[0] : null;
           </div>
           <div class="relative">
             <div id="pilot-content" class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden transition-all duration-500 ease-in-out" style="max-height:4.5rem;line-height:1.5rem;">
-              <?= nl2br(esc($manga['summary'])) ?>
+              <?= $manga['summary'] ?>
             </div>
             <div id="pilot-gradient" class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-fire-blue to-transparent pointer-events-none transition-opacity duration-500"></div>
             <button id="pilot-toggle" class="mt-3 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm transition-all duration-300 hover:scale-105 rounded px-2 py-1">
