@@ -111,6 +111,26 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
     </div>
   </div>
 
+  <!-- Analytics -->
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <h3 class="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Analytics
+    </h3>
+    <div>
+      <label class="block text-xs font-medium text-gray-400 mb-1.5">
+        Google Analytics Measurement ID
+        <span class="text-gray-600 font-normal ml-1">(GA4)</span>
+      </label>
+      <input type="text" name="ga_id" value="<?= esc($get('ga_id')) ?>"
+             placeholder="G-XXXXXXXXXX"
+             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors font-mono">
+      <p class="text-xs text-gray-600 mt-1">Để trống để tắt tracking. Tìm ID tại Google Analytics → Admin → Data Streams.</p>
+    </div>
+  </div>
+
   <!-- Footer -->
   <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
     <h3 class="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">

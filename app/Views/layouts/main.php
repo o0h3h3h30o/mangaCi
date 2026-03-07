@@ -192,6 +192,10 @@
     @media(min-width:768px){main{margin-top:60px}}
   </style>
   <?= $this->renderSection('head_extra') ?>
+  <?php $_ga = site_setting('ga_id'); if ($_ga): ?>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<?= esc($_ga) ?>"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','<?= esc($_ga) ?>');</script>
+  <?php endif; ?>
 </head>
 
 <?= $this->include('components/header') ?>
