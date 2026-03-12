@@ -3,49 +3,43 @@ $isEdit = !empty($item);
 $action = $isEdit ? "{$baseUrl}/{$item['id']}/edit" : "{$baseUrl}/new";
 ?>
 
-<div class="mb-5">
-  <a href="<?= $baseUrl ?>" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">← Back</a>
+<div class="a-mb-5">
+  <a href="<?= $baseUrl ?>" class="a-link-back">← Back</a>
 </div>
 
 <?php if ($flash = ($flash ?? null)): ?>
-<div class="mb-5 px-4 py-3 rounded-lg text-sm <?= $flash['type']==='success' ? 'bg-green-900/40 border border-green-700 text-green-300' : 'bg-red-900/40 border border-red-700 text-red-300' ?>">
+<div class="a-flash <?= $flash['type']==='success' ? 'a-flash-ok' : 'a-flash-err' ?>">
   <?= esc($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
-<div class="max-w-md">
-  <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-    <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">
-      <?= esc($title) ?>
-    </div>
+<div class="a-max-w-md">
+  <div class="a-panel">
+    <div class="a-panel-head"><?= esc($title) ?></div>
     <form method="post" action="<?= $action ?>">
       <?= csrf_field() ?>
-      <div class="p-5 space-y-4">
+      <div class="a-panel-body">
 
         <div>
-          <label class="block text-xs text-gray-500 mb-1.5">Name <span class="text-red-500">*</span></label>
+          <label class="a-label">Name <span class="req">*</span></label>
           <input type="text" name="name" id="tf-name" value="<?= esc($item['name'] ?? '') ?>" required
                  placeholder="Display name"
-                 class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                 class="a-input">
         </div>
 
         <?php if ($hasSlug): ?>
         <div>
-          <label class="block text-xs text-gray-500 mb-1.5">Slug <span class="text-gray-600">(auto-generated if empty)</span></label>
+          <label class="a-label">Slug <span class="hint">(auto-generated if empty)</span></label>
           <input type="text" name="slug" id="tf-slug" value="<?= esc($item['slug'] ?? '') ?>"
                  placeholder="url-friendly-name"
-                 class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors">
+                 class="a-input mono">
         </div>
         <?php endif; ?>
 
       </div>
-      <div class="px-5 pb-5 flex gap-3">
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-5 py-2.5 rounded-lg transition-colors font-medium">
-          <?= $isEdit ? 'Save Changes' : 'Create' ?>
-        </button>
-        <a href="<?= $baseUrl ?>" class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm px-5 py-2.5 rounded-lg transition-colors">
-          Cancel
-        </a>
+      <div style="padding:0 20px 20px;display:flex;gap:12px">
+        <button type="submit" class="a-btn"><?= $isEdit ? 'Save Changes' : 'Create' ?></button>
+        <a href="<?= $baseUrl ?>" class="a-btn-sec">Cancel</a>
       </div>
     </form>
   </div>

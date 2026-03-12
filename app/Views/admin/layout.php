@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,60 +10,46 @@
     .nav-link:hover { background:#374151; color:#f9fafb; }
     .nav-link.active { background:#4f46e5; color:#fff; }
     .nav-link svg { flex-shrink:0; }
-    #admin-sidebar { transition: transform .22s cubic-bezier(.4,0,.2,1); }
-    #admin-main    { transition: margin-left .22s cubic-bezier(.4,0,.2,1); }
-    #sidebar-backdrop { transition: opacity .22s; }
   </style>
-  <!-- Đặt class trước khi render để tránh flash -->
   <script>
     (function(){
       var stored = localStorage.getItem('admin-sb');
-      // Desktop mặc định open, mobile mặc định closed
       var isDesktop = window.innerWidth >= 1024;
       var open = stored !== null ? stored === '1' : isDesktop;
       if (open) document.documentElement.classList.add('sb-init-open');
     })();
   </script>
   <style>
-    /* Áp dụng ngay khi load (trước JS) */
-    html.sb-init-open #admin-sidebar { transform: translateX(0) !important; }
+    html.sb-init-open .a-sidebar { transform: translateX(0) !important; }
     @media (min-width: 1024px) {
-      html.sb-init-open #admin-main { margin-left: 224px !important; }
+      html.sb-init-open .a-main { margin-left: 224px !important; }
     }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen overflow-x-hidden">
+<body>
 
 <!-- Backdrop (mobile) -->
-<div id="sidebar-backdrop"
-     class="fixed inset-0 z-30 bg-black/60 opacity-0 pointer-events-none lg:hidden"
-     onclick="sbToggle(false)"></div>
+<div class="a-backdrop" id="sidebar-backdrop" onclick="sbToggle(false)"></div>
 
 <!-- Sidebar -->
-<aside id="admin-sidebar"
-       class="fixed inset-y-0 left-0 z-40 w-56 bg-gray-900 border-r border-gray-800 flex flex-col overflow-y-auto"
-       style="transform: translateX(-100%)">
+<aside class="a-sidebar" id="admin-sidebar">
 
-  <!-- Brand + close btn -->
-  <div class="flex items-center justify-between px-4 py-4 border-b border-gray-800 shrink-0">
-    <a href="/admin" class="flex items-center gap-2.5 text-white font-bold text-sm hover:text-indigo-300 transition-colors truncate">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 shrink-0">
+  <div class="a-sidebar-brand">
+    <a href="/admin">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8;flex-shrink:0">
         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
         <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
       </svg>
       Admin Panel
     </a>
-    <button onclick="sbToggle(false)"
-            class="lg:hidden ml-2 p-1 text-gray-500 hover:text-gray-300 hover:bg-gray-800 rounded transition-colors shrink-0">
+    <button onclick="sbToggle(false)" class="a-ghost-btn a-hide-desktop">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
   </div>
 
-  <!-- Nav -->
-  <nav class="flex-1 px-3 py-3 space-y-0.5">
-
+  <nav class="a-sidebar-nav">
     <a href="/admin" class="nav-link <?= ($activePage??'')==='dashboard' ? 'active' : '' ?>">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -71,9 +57,7 @@
       Dashboard
     </a>
 
-    <div class="pt-3 pb-1 px-2">
-      <span class="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Content</span>
-    </div>
+    <div class="a-sidebar-section">Content</div>
 
     <a href="/admin/manga" class="nav-link <?= ($activePage??'')==='manga' ? 'active' : '' ?>">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -116,13 +100,11 @@
       </svg>
       Reports
       <?php if ($pendingReports > 0): ?>
-      <span class="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center leading-none"><?= $pendingReports ?></span>
+      <span style="margin-left:auto;background:#ef4444;color:#fff;font-size:10px;font-weight:700;border-radius:9999px;padding:2px 6px;min-width:18px;text-align:center;line-height:1"><?= $pendingReports ?></span>
       <?php endif; ?>
     </a>
 
-    <div class="pt-3 pb-1 px-2">
-      <span class="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">System</span>
-    </div>
+    <div class="a-sidebar-section">System</div>
 
     <a href="/admin/users" class="nav-link <?= ($activePage??'')==='users' ? 'active' : '' ?>">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -147,49 +129,37 @@
       </svg>
       Settings
     </a>
-
   </nav>
 
-  <!-- Footer: username -->
-  <div class="px-4 py-3 border-t border-gray-800 text-xs text-gray-500 truncate shrink-0">
+  <div class="a-sidebar-footer">
     <?= esc($currentUser['username'] ?? '') ?>
   </div>
 </aside>
 
 <!-- Main area -->
-<div id="admin-main" class="flex flex-col min-h-screen" style="margin-left:0">
-
-  <!-- Top bar -->
-  <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center gap-3 sticky top-0 z-20 shrink-0">
-    <!-- Hamburger -->
-    <button onclick="sbToggle()"
-            class="p-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors shrink-0"
-            title="Toggle sidebar">
+<div class="a-main" id="admin-main">
+  <header class="a-topbar">
+    <button onclick="sbToggle()" class="a-ghost-btn" title="Toggle sidebar">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
-
-    <h1 class="text-sm font-semibold text-gray-200 flex-1 truncate"><?= esc($title ?? 'Admin') ?></h1>
-
-    <div class="flex items-center gap-4 text-xs text-gray-400 shrink-0">
-      <a href="/" class="hidden sm:inline hover:text-gray-200 transition-colors">← Site</a>
-      <span class="hidden sm:inline text-gray-700">|</span>
-      <span class="hidden sm:inline text-gray-500 truncate max-w-[100px]"><?= esc($currentUser['username'] ?? '') ?></span>
-      <a href="/logout" class="text-red-400 hover:text-red-300 transition-colors">Logout</a>
+    <span class="a-topbar-title"><?= esc($title ?? 'Admin') ?></span>
+    <div class="a-topbar-actions">
+      <a href="/" class="a-hide-mobile">← Site</a>
+      <span class="a-hide-mobile" style="color:var(--a-muted)">|</span>
+      <span class="a-hide-mobile a-truncate" style="max-width:100px;color:var(--a-txt5)"><?= esc($currentUser['username'] ?? '') ?></span>
+      <a href="/logout" class="logout">Logout</a>
     </div>
   </header>
-
-  <!-- Content -->
-  <main class="flex-1 p-4 sm:p-6 overflow-auto">
+  <main class="a-content">
     <?= $content ?>
   </main>
-
 </div>
 
 <script>
 (function () {
-  var SIDEBAR_W  = 224; // w-56 = 224px
+  var SIDEBAR_W  = 224;
   var sidebar    = document.getElementById('admin-sidebar');
   var main       = document.getElementById('admin-main');
   var backdrop   = document.getElementById('sidebar-backdrop');
@@ -198,52 +168,32 @@
   var sbOpen     = stored !== null ? stored === '1' : isDesktop();
 
   function applyState(animate) {
-    if (!animate) {
-      sidebar.style.transition = 'none';
-      main.style.transition    = 'none';
-    }
-
+    if (!animate) { sidebar.style.transition = 'none'; main.style.transition = 'none'; }
     if (sbOpen) {
       sidebar.style.transform = 'translateX(0)';
       if (isDesktop()) {
         main.style.marginLeft = SIDEBAR_W + 'px';
-        backdrop.style.opacity        = '0';
-        backdrop.style.pointerEvents  = 'none';
+        backdrop.style.opacity = '0'; backdrop.style.pointerEvents = 'none';
       } else {
-        main.style.marginLeft         = '0';
-        backdrop.style.opacity        = '1';
-        backdrop.style.pointerEvents  = 'auto';
+        main.style.marginLeft = '0';
+        backdrop.style.opacity = '1'; backdrop.style.pointerEvents = 'auto';
       }
     } else {
-      sidebar.style.transform       = 'translateX(-' + SIDEBAR_W + 'px)';
-      main.style.marginLeft         = '0';
-      backdrop.style.opacity        = '0';
-      backdrop.style.pointerEvents  = 'none';
+      sidebar.style.transform = 'translateX(-' + SIDEBAR_W + 'px)';
+      main.style.marginLeft = '0';
+      backdrop.style.opacity = '0'; backdrop.style.pointerEvents = 'none';
     }
-
-    if (!animate) {
-      // Re-enable transitions after a tick
-      requestAnimationFrame(function () {
-        sidebar.style.transition = '';
-        main.style.transition    = '';
-      });
-    }
+    if (!animate) { requestAnimationFrame(function () { sidebar.style.transition = ''; main.style.transition = ''; }); }
   }
 
   window.sbToggle = function (force) {
-    if (force === undefined) sbOpen = !sbOpen;
-    else sbOpen = !!force;
+    if (force === undefined) sbOpen = !sbOpen; else sbOpen = !!force;
     localStorage.setItem('admin-sb', sbOpen ? '1' : '0');
     applyState(true);
   };
 
-  // Remove the css pre-init class now that JS takes over
   document.documentElement.classList.remove('sb-init-open');
-
-  // Apply initial state without animation
   applyState(false);
-
-  // Handle resize
   window.addEventListener('resize', function () { applyState(true); });
 })();
 </script>

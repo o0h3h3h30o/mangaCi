@@ -43,64 +43,64 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
 
 <!-- Back -->
 <div class="mb-5">
-  <a href="/admin/manga" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">← Back to Manga</a>
+  <a href="/admin/manga" class="a-link-back">← Back to Manga</a>
   <?php if ($isEdit): ?>
-  <a href="/manga/<?= esc($manga['slug']) ?>" target="_blank" class="ml-4 text-sm text-indigo-400 hover:underline">View on site ↗</a>
+  <a href="/manga/<?= esc($manga['slug']) ?>" target="_blank" class="a-link ml-4">View on site ↗</a>
   <?php endif; ?>
 </div>
 
 <?php if ($flash = ($flash ?? null)): ?>
-<div class="mb-5 px-4 py-3 rounded-lg text-sm <?= $flash['type']==='success' ? 'bg-green-900/40 border border-green-700 text-green-300' : 'bg-red-900/40 border border-red-700 text-red-300' ?>">
+<div class="<?= $flash['type']==='success' ? 'a-flash a-flash-ok' : 'a-flash a-flash-err' ?>">
   <?= esc($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
 <form method="post" action="<?= $action ?>" enctype="multipart/form-data">
   <?= csrf_field() ?>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+  <div class="a-grid-form">
 
     <!-- ── Left 2/3 ── -->
-    <div class="lg:col-span-2 space-y-5">
+    <div class="a-space-y-5">
 
       <!-- Basic info -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Basic Info</div>
-        <div class="p-5 space-y-4">
+      <div class="a-panel">
+        <div class="a-panel-head">Basic Info</div>
+        <div class="a-panel-body">
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Title <span class="text-red-500">*</span></label>
+            <label class="a-label">Title <span class="req">*</span></label>
             <input type="text" name="name" id="mf-name" value="<?= esc($manga['name'] ?? '') ?>" required
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                   class="a-input">
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Slug <span class="text-gray-600">(auto)</span></label>
+            <label class="a-label">Slug <span class="hint">(auto)</span></label>
             <input type="text" name="slug" id="mf-slug" value="<?= esc($manga['slug'] ?? '') ?>"
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors">
+                   class="a-input mono">
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Other Names</label>
+            <label class="a-label">Other Names</label>
             <input type="text" name="otherNames" value="<?= esc($manga['otherNames'] ?? '') ?>"
                    placeholder="Alt titles separated by ;"
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                   class="a-input">
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Crawl Sources</label>
+            <label class="a-label">Crawl Sources</label>
             <textarea name="from_manga18fx" rows="2"
                       placeholder="site1.com,site2.com"
-                      class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors resize-none"><?= esc($manga['from_manga18fx'] ?? '') ?></textarea>
-            <p class="text-xs text-gray-600 mt-1">Separate multiple sources with comma</p>
+                      class="a-textarea mono"><?= esc($manga['from_manga18fx'] ?? '') ?></textarea>
+            <p class="a-hint">Separate multiple sources with comma</p>
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Summary</label>
+            <label class="a-label">Summary</label>
             <div id="mf-summary-editor" style="min-height:140px"></div>
-            <textarea name="summary" id="mf-summary" class="hidden"><?= esc($manga['summary'] ?? '') ?></textarea>
+            <textarea name="summary" id="mf-summary" style="display:none"><?= esc($manga['summary'] ?? '') ?></textarea>
           </div>
         </div>
       </div>
 
       <!-- Authors -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Authors</div>
-        <div class="p-5">
+      <div class="a-panel">
+        <div class="a-panel-head">Authors</div>
+        <div class="a-panel-body">
           <div class="th-wrap" id="th-author">
             <div class="th-chips" id="th-author-chips" onclick="document.getElementById('th-author-input').focus()">
               <input type="text" id="th-author-input" class="th-input" placeholder="Type name, Tab to add or select…" autocomplete="off">
@@ -108,14 +108,14 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
             <div class="th-dropdown" id="th-author-dd"></div>
           </div>
           <input type="hidden" name="authors_data" id="th-author-data" value="<?= esc(json_encode($mangaAuthors ?? [])) ?>">
-          <p class="text-xs text-gray-600 mt-1.5">Press Tab to add typed name (creates new if not found in DB)</p>
+          <p class="a-hint">Press Tab to add typed name (creates new if not found in DB)</p>
         </div>
       </div>
 
       <!-- Artists -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Artists</div>
-        <div class="p-5">
+      <div class="a-panel">
+        <div class="a-panel-head">Artists</div>
+        <div class="a-panel-body">
           <div class="th-wrap" id="th-artists">
             <div class="th-chips" id="th-artists-chips" onclick="document.getElementById('th-artists-input').focus()">
               <input type="text" id="th-artists-input" class="th-input" placeholder="Type name, Tab to add or select…" autocomplete="off">
@@ -123,14 +123,14 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
             <div class="th-dropdown" id="th-artists-dd"></div>
           </div>
           <input type="hidden" name="artists_data" id="th-artists-data" value="<?= esc(json_encode($mangaArtists ?? [])) ?>">
-          <p class="text-xs text-gray-600 mt-1.5">Press Tab to add typed name (creates new if not found in DB)</p>
+          <p class="a-hint">Press Tab to add typed name (creates new if not found in DB)</p>
         </div>
       </div>
 
       <!-- Tags -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Tags</div>
-        <div class="p-5">
+      <div class="a-panel">
+        <div class="a-panel-head">Tags</div>
+        <div class="a-panel-body">
           <div class="th-wrap" id="th-tags">
             <div class="th-chips" id="th-tags-chips" onclick="document.getElementById('th-tags-input').focus()">
               <input type="text" id="th-tags-input" class="th-input" placeholder="Type tag, Tab to add or select…" autocomplete="off">
@@ -138,52 +138,50 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
             <div class="th-dropdown" id="th-tags-dd"></div>
           </div>
           <input type="hidden" name="tags_data" id="th-tags-data" value="<?= esc(json_encode($mangaTags ?? [])) ?>">
-          <p class="text-xs text-gray-600 mt-1.5">Press Tab to add typed tag (creates new if not found)</p>
+          <p class="a-hint">Press Tab to add typed tag (creates new if not found)</p>
         </div>
       </div>
 
     </div>
 
     <!-- ── Right 1/3 ── -->
-    <div class="space-y-5">
+    <div class="a-space-y-5">
 
       <!-- Cover Image -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Cover Image</div>
-        <div class="p-4 space-y-3">
+      <div class="a-panel">
+        <div class="a-panel-head">Cover Image</div>
+        <div class="a-panel-body compact">
           <?php
             $cdnBase    = rtrim(env('CDN_COVER_URL', ''), '/');
             $previewSrc = $isEdit ? manga_cover_url($manga, $cdnBase) : '';
           ?>
           <!-- Preview -->
-          <div id="mf-cover-preview" class="<?= $previewSrc ? '' : 'hidden' ?>">
+          <div id="mf-cover-preview" class="<?= $previewSrc ? '' : 'a-hidden' ?>">
             <img id="mf-cover-img" src="<?= esc($previewSrc) ?>"
                  alt="Cover"
-                 class="w-full rounded-lg border border-gray-700"
-                 style="max-height:300px;object-fit:cover"
-                 onerror="this.parentNode.classList.add('hidden')">
+                 style="width:100%;border-radius:8px;border:1px solid var(--c-border);max-height:300px;object-fit:cover"
+                 onerror="this.style.display='none'">
           </div>
 
           <!-- File input -->
           <input type="file" name="image_file" id="mf-cover-file" accept="image/*"
-                 class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-600 file:cursor-pointer cursor-pointer">
+                 class="a-file-input">
 
           <!-- Hidden field to carry existing value when no new file chosen -->
           <?php $currentImage = $manga['image'] ?? ''; ?>
           <input type="hidden" name="image_url" id="mf-cover-url" value="<?= esc($currentImage) ?>">
 
           <!-- CDN flag toggle -->
-          <label class="flex items-center gap-2 cursor-pointer mt-1">
+          <label class="a-checkbox">
             <input type="checkbox" name="cover_cdn" value="1" id="mf-cover-cdn"
-                   class="w-4 h-4 accent-indigo-500"
                    <?= ($manga['cover'] ?? 0) == 1 ? 'checked' : '' ?>>
-            <span class="text-xs text-gray-400">Ảnh đã trên CDN S3 (dùng URL CDN)</span>
+            <span>Ảnh đã trên CDN S3 (dùng URL CDN)</span>
           </label>
 
           <?php if ($isEdit): ?>
           <!-- Push to S3 button -->
           <button type="button" id="mf-push-s3"
-                  class="w-full flex items-center justify-center gap-1.5 bg-sky-700/80 hover:bg-sky-600 text-white text-xs font-medium py-1.5 px-3 rounded-lg transition-colors">
+                  class="a-btn-sky a-btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
@@ -193,20 +191,20 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
 
           <!-- Remove -->
           <button type="button" id="mf-cover-remove"
-                  class="text-xs text-red-400 hover:text-red-300 transition-colors <?= $previewSrc ? '' : 'hidden' ?>">
+                  class="a-txt-red a-text-xs a-cursor-pointer <?= $previewSrc ? '' : 'a-hidden' ?>">
             Remove image
           </button>
         </div>
       </div>
 
       <!-- Status -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Status</div>
-        <div class="p-4 space-y-2">
+      <div class="a-panel">
+        <div class="a-panel-head">Status</div>
+        <div class="a-panel-body compact">
           <?php foreach ($statuses as $s): ?>
-          <label class="flex items-center gap-3 cursor-pointer px-1 py-1 rounded hover:bg-gray-800/40">
-            <input type="radio" name="status_id" value="<?= $s['id'] ?>" <?= $currentStatus===(int)$s['id']?'checked':'' ?> class="w-4 h-4 accent-indigo-500">
-            <span class="text-sm text-gray-300"><?= esc($s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id']) ?></span>
+          <label class="a-radio">
+            <input type="radio" name="status_id" value="<?= $s['id'] ?>" <?= $currentStatus===(int)$s['id']?'checked':'' ?>>
+            <span><?= esc($s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id']) ?></span>
           </label>
           <?php endforeach; ?>
         </div>
@@ -214,60 +212,57 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
 
 
       <!-- Genres -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">
+      <div class="a-panel">
+        <div class="a-panel-head">
           Genres
-          <span class="ml-1 text-xs font-normal text-gray-600"><?= count($categories) ?> total</span>
+          <span class="hint"><?= count($categories) ?> total</span>
         </div>
-        <div class="p-4 max-h-64 overflow-y-auto space-y-1">
+        <div class="a-panel-body compact" style="max-height:256px;overflow-y:auto">
           <?php foreach ($categories as $cat): ?>
-          <label class="flex items-center gap-3 cursor-pointer px-1 py-1 rounded hover:bg-gray-800/40">
+          <label class="a-checkbox">
             <input type="checkbox" name="categories[]" value="<?= $cat['id'] ?>"
-                   <?= in_array((int)$cat['id'], $mangaCats ?? [], true) ? 'checked' : '' ?>
-                   class="w-4 h-4 accent-indigo-500 rounded">
-            <span class="text-sm text-gray-300"><?= esc($cat['name']) ?></span>
+                   <?= in_array((int)$cat['id'], $mangaCats ?? [], true) ? 'checked' : '' ?>>
+            <span><?= esc($cat['name']) ?></span>
           </label>
           <?php endforeach; ?>
           <?php if (empty($categories)): ?>
-          <p class="text-xs text-gray-600">No categories yet. <a href="/admin/categories/new" class="text-indigo-400 hover:underline">Add one</a></p>
+          <p class="a-hint">No categories yet. <a href="/admin/categories/new" class="a-link">Add one</a></p>
           <?php endif; ?>
         </div>
       </div>
 
       <!-- Settings -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Settings</div>
-        <div class="p-5 space-y-4">
-          <label class="flex items-center justify-between cursor-pointer">
+      <div class="a-panel">
+        <div class="a-panel-head">Settings</div>
+        <div class="a-panel-body">
+          <div class="a-toggle-row">
             <div>
-              <div class="text-sm text-gray-200">Public</div>
-              <div class="text-xs text-gray-600">Visible to all users</div>
+              <div class="a-label" style="margin-bottom:0">Public</div>
+              <div class="a-hint" style="margin-top:0">Visible to all users</div>
             </div>
-            <div class="relative">
-              <input type="checkbox" name="is_public" value="1" id="mf-public"
-                     <?= ($manga['is_public'] ?? 0) ? 'checked' : '' ?>
-                     class="sr-only peer">
-              <div class="w-10 h-6 bg-gray-700 peer-checked:bg-indigo-600 rounded-full transition-colors cursor-pointer" onclick="document.getElementById('mf-public').click()"></div>
-              <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4 pointer-events-none"></div>
-            </div>
-          </label>
+            <label class="a-toggle">
+              <input type="checkbox" name="is_public" value="1"
+                     <?= ($manga['is_public'] ?? 0) ? 'checked' : '' ?>>
+              <div class="a-toggle-track"></div>
+              <div class="a-toggle-thumb"></div>
+            </label>
+          </div>
 
-          <label class="flex items-center justify-between cursor-pointer">
+          <div class="a-toggle-row">
             <div>
-              <div class="text-sm text-gray-200">18+ / Caution</div>
-              <div class="text-xs text-gray-600">Mark as adult content</div>
+              <div class="a-label" style="margin-bottom:0">18+ / Caution</div>
+              <div class="a-hint" style="margin-top:0">Mark as adult content</div>
             </div>
-            <div class="relative">
-              <input type="checkbox" name="caution" value="1" id="mf-caution"
-                     <?= ($manga['caution'] ?? 0) ? 'checked' : '' ?>
-                     class="sr-only peer">
-              <div class="w-10 h-6 bg-gray-700 peer-checked:bg-red-600 rounded-full transition-colors cursor-pointer" onclick="document.getElementById('mf-caution').click()"></div>
-              <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4 pointer-events-none"></div>
-            </div>
-          </label>
+            <label class="a-toggle">
+              <input type="checkbox" name="caution" value="1"
+                     <?= ($manga['caution'] ?? 0) ? 'checked' : '' ?>>
+              <div class="a-toggle-track"></div>
+              <div class="a-toggle-thumb"></div>
+            </label>
+          </div>
 
           <?php if ($isEdit): ?>
-          <div class="text-xs text-gray-600 space-y-0.5 pt-2 border-t border-gray-800">
+          <div class="a-meta">
             <div>ID: <?= $mangaId ?></div>
             <?php if (!empty($manga['update_at'])): ?>
             <div>Updated: <?= date('M d, Y', strtotime($manga['update_at'])) ?></div>
@@ -278,7 +273,7 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
         </div>
       </div>
 
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition-colors text-sm">
+      <button type="submit" class="a-btn a-btn-block a-btn-xl">
         <?= $isEdit ? 'Save Changes' : 'Create Manga' ?>
       </button>
 
@@ -500,7 +495,7 @@ Typeahead({
     var txtEl = document.getElementById('mf-push-s3-text');
     btn.disabled = true;
     txtEl.textContent = 'Đang push...';
-    btn.classList.add('opacity-70');
+    btn.style.opacity = '0.7';
 
     var fd = new FormData();
     fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
@@ -512,29 +507,27 @@ Typeahead({
     })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      btn.classList.remove('opacity-70');
+      btn.style.opacity = '1';
       if (data.success) {
         txtEl.textContent = 'Push thành công ✓';
-        btn.classList.remove('bg-sky-700/80','hover:bg-sky-600');
-        btn.classList.add('bg-green-700','cursor-default');
+        btn.style.background = '#15803d';
+        btn.style.cursor = 'default';
         document.getElementById('mf-cover-cdn').checked = true;
         document.getElementById('mf-cover-url').value = '';
-        // Cập nhật preview sang CDN URL
         var img = document.getElementById('mf-cover-img');
         if (img && data.cdn_url) {
           img.src = data.cdn_url + '?t=' + Date.now();
-          img.parentNode.classList.remove('hidden');
+          img.parentNode.classList.remove('a-hidden');
         }
       } else {
         txtEl.textContent = 'Lỗi: ' + (data.error || 'Unknown');
         btn.disabled = false;
-        btn.classList.add('bg-red-800');
-        btn.classList.remove('bg-sky-700/80');
+        btn.style.background = '#991b1b';
       }
     })
     .catch(function(){
       btn.disabled = false;
-      btn.classList.remove('opacity-70');
+      btn.style.opacity = '1';
       txtEl.textContent = 'Lỗi kết nối — thử lại';
     });
   });
@@ -557,8 +550,8 @@ Typeahead({
     var reader = new FileReader();
     reader.onload = function(e){
       img.src = e.target.result;
-      preview.classList.remove('hidden');
-      removeBtn.classList.remove('hidden');
+      preview.classList.remove('a-hidden');
+      removeBtn.classList.remove('a-hidden');
       urlInput.value = '';
     };
     reader.readAsDataURL(file);
@@ -568,8 +561,8 @@ Typeahead({
     fileInput.value = '';
     urlInput.value = '';
     img.src = '';
-    preview.classList.add('hidden');
-    removeBtn.classList.add('hidden');
+    preview.classList.add('a-hidden');
+    removeBtn.classList.add('a-hidden');
   });
 })();
 </script>

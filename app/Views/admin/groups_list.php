@@ -1,13 +1,13 @@
 <?php if ($flash = ($flash ?? null)): ?>
-<div class="mb-5 px-4 py-3 rounded-lg text-sm <?= $flash['type']==='success' ? 'bg-green-900/40 border border-green-700 text-green-300' : 'bg-red-900/40 border border-red-700 text-red-300' ?>">
+<div class="a-flash <?= $flash['type']==='success' ? 'a-flash-ok' : 'a-flash-err' ?>">
   <?= esc($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
 <!-- Toolbar -->
-<div class="flex items-center justify-between mb-5">
-  <p class="text-sm text-gray-500"><?= count($groups) ?> group<?= count($groups) !== 1 ? 's' : '' ?></p>
-  <a href="/admin/groups/new" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+<div class="a-toolbar a-items-center a-justify-between">
+  <p class="a-count"><?= count($groups) ?> group<?= count($groups) !== 1 ? 's' : '' ?></p>
+  <a href="/admin/groups/new" class="a-btn a-btn-sm">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
@@ -15,51 +15,46 @@
   </a>
 </div>
 
-<div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-  <table class="w-full text-sm">
+<div class="a-panel">
+  <table class="a-table">
     <thead>
-      <tr class="bg-gray-800/50">
-        <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">#</th>
-        <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-        <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Members</th>
-        <th class="px-5 py-3"></th>
+      <tr>
+        <th style="width:40px">#</th>
+        <th>Name</th>
+        <th>Members</th>
+        <th></th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-gray-800">
+    <tbody>
       <?php foreach ($groups as $g): ?>
-      <tr class="hover:bg-gray-800/30 transition-colors">
-        <td class="px-5 py-4 text-gray-600 text-xs"><?= $g['id'] ?></td>
-        <td class="px-5 py-4">
-          <span class="font-medium text-gray-200"><?= esc($g['name']) ?></span>
+      <tr>
+        <td class="a-txt6 a-text-xs"><?= $g['id'] ?></td>
+        <td>
+          <span class="a-font-medium a-txt2"><?= esc($g['name']) ?></span>
           <?php if ($g['name'] === 'admin'): ?>
-          <span class="ml-2 bg-indigo-900/40 text-indigo-400 text-xs px-1.5 py-0.5 rounded">admin</span>
+          <span class="a-badge a-badge-indigo" style="margin-left:8px">admin</span>
           <?php endif; ?>
         </td>
-        <td class="px-5 py-4">
-          <a href="/admin/users?group=<?= $g['id'] ?>" class="text-gray-300 hover:text-indigo-400 text-sm transition-colors">
+        <td>
+          <a href="/admin/users?group=<?= $g['id'] ?>" class="a-link-muted">
             <?= number_format((int)$g['member_count']) ?>
-            <span class="text-gray-600 text-xs">user<?= (int)$g['member_count'] !== 1 ? 's' : '' ?></span>
+            <span class="a-txt6 a-text-xs">user<?= (int)$g['member_count'] !== 1 ? 's' : '' ?></span>
           </a>
         </td>
-        <td class="px-5 py-4">
-          <div class="flex items-center justify-end gap-2">
-            <a href="/admin/groups/<?= $g['id'] ?>/edit"
-               class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-3 py-1.5 rounded-md transition-colors">
-              Edit
-            </a>
+        <td>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
+            <a href="/admin/groups/<?= $g['id'] ?>/edit" class="a-btn-sec a-btn-sm">Edit</a>
             <form method="post" action="/admin/groups/<?= $g['id'] ?>/delete"
                   onsubmit="return confirm('Delete group &quot;<?= esc($g['name']) ?>&quot;? This will remove all users from this group.')">
               <?= csrf_field() ?>
-              <button type="submit" class="bg-red-900/40 hover:bg-red-900/70 text-red-400 text-xs px-3 py-1.5 rounded-md transition-colors">
-                Delete
-              </button>
+              <button type="submit" class="a-btn-danger">Delete</button>
             </form>
           </div>
         </td>
       </tr>
       <?php endforeach; ?>
       <?php if (empty($groups)): ?>
-      <tr><td colspan="4" class="px-5 py-10 text-center text-gray-600">No groups yet. <a href="/admin/groups/new" class="text-indigo-400 hover:underline">Create one</a></td></tr>
+      <tr><td colspan="4" class="a-empty">No groups yet. <a href="/admin/groups/new" class="a-link">Create one</a></td></tr>
       <?php endif; ?>
     </tbody>
   </table>

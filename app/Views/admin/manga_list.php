@@ -5,45 +5,42 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
 ?>
 
 <?php if ($flash = ($flash ?? null)): ?>
-<div class="mb-5 px-4 py-3 rounded-lg text-sm <?= $flash['type']==='success' ? 'bg-green-900/40 border border-green-700 text-green-300' : 'bg-red-900/40 border border-red-700 text-red-300' ?>">
+<div class="a-flash <?= $flash['type']==='success' ? 'a-flash-ok' : 'a-flash-err' ?>">
   <?= esc($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
 <!-- Toolbar -->
-<div class="flex flex-wrap gap-2 mb-5">
-  <form method="get" action="/admin/manga" class="flex gap-2 flex-1 min-w-0">
-    <input type="text" name="q" value="<?= esc($q) ?>" placeholder="Search title, slug…"
-           class="flex-1 min-w-0 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500">
+<div class="a-toolbar">
+  <form method="get" action="/admin/manga" class="a-search-wrap">
+    <input type="text" name="q" value="<?= esc($q) ?>" placeholder="Search title, slug&hellip;" class="a-search-input">
     <?php if ($sf): ?><input type="hidden" name="status" value="<?= $sf ?>"><?php endif; ?>
     <?php if ($pf !== ''): ?><input type="hidden" name="pub" value="<?= esc($pf) ?>"><?php endif; ?>
-    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg transition-colors shrink-0">Search</button>
+    <button type="submit" class="a-btn a-btn-sm">Search</button>
     <?php if ($q || $sf || $pf !== ''): ?>
-    <a href="/admin/manga" class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm px-4 py-2 rounded-lg transition-colors shrink-0">Clear</a>
+    <a href="/admin/manga" class="a-btn-sec a-btn-sm">Clear</a>
     <?php endif; ?>
   </form>
 
   <!-- Status filter -->
-  <form method="get" action="/admin/manga" class="flex gap-2">
+  <form method="get" action="/admin/manga">
     <?php if ($q): ?><input type="hidden" name="q" value="<?= esc($q) ?>"><?php endif; ?>
     <?php if ($pf !== ''): ?><input type="hidden" name="pub" value="<?= esc($pf) ?>"><?php endif; ?>
-    <select name="status" onchange="this.form.submit()"
-            class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none">
+    <select name="status" onchange="this.form.submit()" class="a-select" style="width:auto">
       <option value="0">All statuses</option>
       <?php foreach ($statuses as $s): ?>
       <option value="<?= $s['id'] ?>" <?= $sf === (int)$s['id'] ? 'selected' : '' ?>><?= esc($s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id']) ?></option>
       <?php endforeach; ?>
     </select>
     <!-- Public filter -->
-    <select name="pub" onchange="this.form.submit()"
-            class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none">
+    <select name="pub" onchange="this.form.submit()" class="a-select" style="width:auto">
       <option value="">All visibility</option>
       <option value="1" <?= $pf==='1'?'selected':'' ?>>Public</option>
       <option value="0" <?= $pf==='0'?'selected':'' ?>>Hidden</option>
     </select>
   </form>
 
-  <a href="/admin/manga/new" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+  <a href="/admin/manga/new" class="a-btn a-btn-sm">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
@@ -51,80 +48,73 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
   </a>
 </div>
 
-<p class="text-xs text-gray-500 mb-3"><?= number_format($total) ?> manga found</p>
+<p class="a-count"><?= number_format($total) ?> manga found</p>
 
-<div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden mb-4">
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
+<div class="a-panel" style="margin-bottom:16px">
+  <div class="a-overflow-x">
+    <table class="a-table">
       <thead>
-        <tr class="bg-gray-800/50">
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">#</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manga</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Categories</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Authors</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Artists</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vis.</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Views</th>
-          <th class="px-4 py-3"></th>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Manga</th>
+          <th>Status</th>
+          <th class="col-hidden col-lg">Categories</th>
+          <th class="col-hidden col-lg">Authors</th>
+          <th class="col-hidden col-lg">Artists</th>
+          <th>Vis.</th>
+          <th class="col-hidden col-md">Views</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-800">
+      <tbody>
         <?php foreach ($items as $m): ?>
         <?php
           $sName  = $statusMap[$m['status_id']] ?? 'Unknown';
           $sColor = $statusColors[$m['status_id']] ?? 'gray';
           $cover  = esc(manga_cover_url($m, $cdnBase));
         ?>
-        <tr class="hover:bg-gray-800/30 transition-colors">
-          <td class="px-4 py-3 text-gray-600 text-xs"><?= $m['id'] ?></td>
-          <td class="px-4 py-3">
-            <div class="flex items-center gap-3">
-              <img src="<?= $cover ?>" alt="" loading="lazy"
-                   class="w-8 h-11 object-cover rounded shrink-0 bg-gray-800"
+        <tr>
+          <td class="a-txt6 a-text-xs"><?= $m['id'] ?></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:12px">
+              <img src="<?= $cover ?>" alt="" loading="lazy" class="a-cover-thumb"
                    onerror="this.style.display='none'">
-              <div class="min-w-0">
+              <div style="min-width:0">
                 <a href="/admin/manga/<?= $m['id'] ?>/edit"
-                   class="font-medium text-gray-200 hover:text-indigo-400 truncate max-w-xs block transition-colors"><?= esc($m['name']) ?></a>
+                   class="a-font-medium a-txt2 a-truncate a-block" style="max-width:240px"><?= esc($m['name']) ?></a>
               </div>
             </div>
           </td>
-          <td class="px-4 py-3">
-            <span class="bg-<?= $sColor ?>-900/40 text-<?= $sColor ?>-400 text-xs px-2 py-0.5 rounded-full whitespace-nowrap"><?= esc($sName) ?></span>
+          <td>
+            <span class="a-badge a-badge-<?= $sColor ?>"><?= esc($sName) ?></span>
           </td>
-          <td class="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell max-w-[180px]">
-            <span class="line-clamp-1"><?= esc($m['categories'] ?: '—') ?></span>
+          <td class="a-txt5 a-text-xs col-hidden col-lg" style="max-width:180px">
+            <span class="a-clamp-1"><?= esc($m['categories'] ?: '&mdash;') ?></span>
           </td>
-          <td class="px-4 py-3 text-gray-400 text-xs hidden lg:table-cell max-w-[140px]">
-            <span class="line-clamp-1"><?= esc($m['authors'] ?: '—') ?></span>
+          <td class="a-txt4 a-text-xs col-hidden col-lg" style="max-width:140px">
+            <span class="a-clamp-1"><?= esc($m['authors'] ?: '&mdash;') ?></span>
           </td>
-          <td class="px-4 py-3 text-gray-400 text-xs hidden lg:table-cell max-w-[140px]">
-            <span class="line-clamp-1"><?= esc($m['artists'] ?: '—') ?></span>
+          <td class="a-txt4 a-text-xs col-hidden col-lg" style="max-width:140px">
+            <span class="a-clamp-1"><?= esc($m['artists'] ?: '&mdash;') ?></span>
           </td>
-          <td class="px-4 py-3">
+          <td>
             <?php if ($m['is_public']): ?>
-              <span class="text-green-500 text-xs">●</span>
+              <span class="a-txt-green-dot">&bull;</span>
             <?php else: ?>
-              <span class="text-gray-600 text-xs">●</span>
+              <span class="a-txt-muted-dot">&bull;</span>
             <?php endif; ?>
           </td>
-          <td class="px-4 py-3 text-gray-500 text-xs hidden md:table-cell"><?= number_format((int)$m['views']) ?></td>
-          <td class="px-4 py-3 text-right">
-            <div class="flex items-center justify-end gap-2">
-              <a href="/admin/manga/<?= $m['id'] ?>/chapters"
-                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-3 py-1.5 rounded-md transition-colors">
-                Chapters
-              </a>
-              <a href="/admin/manga/<?= $m['id'] ?>/edit"
-                 class="bg-indigo-700 hover:bg-indigo-600 text-gray-200 text-xs px-3 py-1.5 rounded-md transition-colors">
-                Edit
-              </a>
+          <td class="a-txt5 a-text-xs col-hidden col-md"><?= number_format((int)$m['views']) ?></td>
+          <td class="a-text-right">
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
+              <a href="/admin/manga/<?= $m['id'] ?>/chapters" class="a-btn-sec a-btn-sm">Chapters</a>
+              <a href="/admin/manga/<?= $m['id'] ?>/edit" class="a-btn a-btn-sm">Edit</a>
             </div>
           </td>
         </tr>
         <?php endforeach; ?>
         <?php if (empty($items)): ?>
-        <tr><td colspan="9" class="px-5 py-10 text-center text-gray-600">No manga found</td></tr>
+        <tr><td colspan="9" class="a-empty">No manga found</td></tr>
         <?php endif; ?>
       </tbody>
     </table>
@@ -133,17 +123,16 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
 
 <!-- Pagination -->
 <?php if ($totalPages > 1): ?>
-<div class="flex items-center justify-center gap-1">
+<div class="a-pager">
   <?php
     $pBase = array_filter(['q'=>$q,'status'=>$sf,'pub'=>$pf], fn($v)=>$v!==''&&$v!==0&&$v!==null);
     $prev  = 0;
     $pts   = array_unique(array_filter([1,$page-1,$page,$page+1,$totalPages],fn($p)=>$p>=1&&$p<=$totalPages));
     sort($pts);
     foreach ($pts as $pt) {
-      if ($prev && $pt-$prev>1) echo '<span class="px-2 text-gray-600">…</span>';
+      if ($prev && $pt-$prev>1) echo '<span class="a-pg-dots">&hellip;</span>';
       $url = '/admin/manga?' . http_build_query(array_filter(array_merge($pBase,['page'=>$pt>1?$pt:null])));
-      $cls = $pt===$page ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700';
-      echo "<a href=\"".esc($url)."\" class=\"{$cls} w-9 h-9 flex items-center justify-center rounded-lg text-sm transition-colors\">{$pt}</a>";
+      echo '<a href="'.esc($url).'" class="a-pg'.($pt===$page ? ' active' : '').'">'.$pt.'</a>';
       $prev = $pt;
     }
   ?>

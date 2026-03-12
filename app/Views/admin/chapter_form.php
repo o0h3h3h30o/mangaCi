@@ -5,64 +5,64 @@ $action = $isEdit
     : "/admin/manga/{$manga['id']}/chapters/new";
 ?>
 
-<!-- Back -->
-<div class="flex items-center gap-3 mb-5">
-  <a href="/admin/manga" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">← Manga</a>
-  <span class="text-gray-700">/</span>
-  <a href="/admin/manga/<?= $manga['id'] ?>/chapters" class="text-sm text-indigo-400 hover:underline truncate max-w-xs"><?= esc($manga['name']) ?></a>
-  <span class="text-gray-700">/</span>
-  <span class="text-sm text-gray-400"><?= $isEdit ? 'Edit Chapter' : 'New Chapter' ?></span>
+<!-- Breadcrumb -->
+<div class="a-crumbs">
+  <a href="/admin/manga">&larr; Manga</a>
+  <span class="sep">/</span>
+  <a href="/admin/manga/<?= $manga['id'] ?>/chapters" class="accent a-truncate" style="max-width:200px"><?= esc($manga['name']) ?></a>
+  <span class="sep">/</span>
+  <span><?= $isEdit ? 'Edit Chapter' : 'New Chapter' ?></span>
 </div>
 
 <?php if ($flash = ($flash ?? null)): ?>
-<div class="mb-5 px-4 py-3 rounded-lg text-sm <?= $flash['type']==='success' ? 'bg-green-900/40 border border-green-700 text-green-300' : 'bg-red-900/40 border border-red-700 text-red-300' ?>">
+<div class="a-flash <?= $flash['type']==='success' ? 'a-flash-ok' : 'a-flash-err' ?>">
   <?= esc($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
 <form method="post" action="<?= $action ?>">
   <?= csrf_field() ?>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+  <div class="a-grid-form">
 
     <!-- Left -->
-    <div class="lg:col-span-2 space-y-5">
+    <div class="a-space-y-5">
 
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Chapter Info</div>
-        <div class="p-5 space-y-4">
+      <div class="a-panel">
+        <div class="a-panel-head">Chapter Info</div>
+        <div class="a-panel-body">
 
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Name <span class="text-gray-600">(optional)</span></label>
+            <label class="a-label">Name <span class="hint">(optional)</span></label>
             <input type="text" name="name" id="ch-name"
                    value="<?= esc($chapter['name'] ?? '') ?>"
                    placeholder="Chapter title"
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                   class="a-input">
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="a-grid-2">
             <div>
-              <label class="block text-xs text-gray-500 mb-1.5">Number <span class="text-red-500">*</span></label>
+              <label class="a-label">Number <span class="req">*</span></label>
               <input type="text" name="number" id="ch-number"
                      value="<?= esc($chapter['number'] ?? '') ?>"
                      required
                      placeholder="e.g. 1 or 1.5"
-                     class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors">
+                     class="a-input mono">
             </div>
             <div>
-              <label class="block text-xs text-gray-500 mb-1.5">Slug <span class="text-gray-600">(auto)</span></label>
+              <label class="a-label">Slug <span class="hint">(auto)</span></label>
               <input type="text" name="slug" id="ch-slug"
                      value="<?= esc($chapter['slug'] ?? '') ?>"
                      placeholder="chapter-1"
-                     class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors">
+                     class="a-input mono">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Source URL <span class="text-gray-600">(crawl source)</span></label>
+            <label class="a-label">Source URL <span class="hint">(crawl source)</span></label>
             <input type="text" name="source_url"
                    value="<?= esc($chapter['source_url'] ?? '') ?>"
                    placeholder="https://source-site.com/manga/chapter-1"
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors">
+                   class="a-input mono">
           </div>
 
         </div>
@@ -71,39 +71,37 @@ $action = $isEdit
     </div>
 
     <!-- Right -->
-    <div class="space-y-5">
+    <div class="a-space-y-5">
 
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Settings</div>
-        <div class="p-5 space-y-4">
+      <div class="a-panel">
+        <div class="a-panel-head">Settings</div>
+        <div class="a-panel-body">
 
-          <label class="flex items-center justify-between cursor-pointer">
+          <div class="a-toggle-row">
             <div>
-              <div class="text-sm text-gray-200">Visible</div>
-              <div class="text-xs text-gray-600">Show to readers</div>
+              <div class="a-label" style="margin-bottom:0">Visible</div>
+              <div class="a-hint" style="margin-top:0">Show to readers</div>
             </div>
-            <div class="relative">
-              <input type="checkbox" name="is_show" value="1" id="ch-show"
-                     <?= ($chapter['is_show'] ?? 1) ? 'checked' : '' ?>
-                     class="sr-only peer">
-              <div class="w-10 h-6 bg-gray-700 peer-checked:bg-indigo-600 rounded-full transition-colors cursor-pointer" onclick="document.getElementById('ch-show').click()"></div>
-              <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4 pointer-events-none"></div>
-            </div>
-          </label>
+            <label class="a-toggle">
+              <input type="checkbox" name="is_show" value="1"
+                     <?= ($chapter['is_show'] ?? 1) ? 'checked' : '' ?>>
+              <div class="a-toggle-track"></div>
+              <div class="a-toggle-thumb"></div>
+            </label>
+          </div>
 
           <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Crawl Status</label>
+            <label class="a-label">Crawl Status</label>
             <?php $crawling = (int)($chapter['is_crawling'] ?? 0); ?>
-            <select name="is_crawling"
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
-              <option value="0" <?= $crawling === 0 ? 'selected' : '' ?>>0 — Free / Done</option>
-              <option value="1" <?= $crawling === 1 ? 'selected' : '' ?>>1 — Crawling (locked)</option>
-              <option value="2" <?= $crawling === 2 ? 'selected' : '' ?>>2 — Urgent</option>
+            <select name="is_crawling" class="a-select">
+              <option value="0" <?= $crawling === 0 ? 'selected' : '' ?>>0 &mdash; Free / Done</option>
+              <option value="1" <?= $crawling === 1 ? 'selected' : '' ?>>1 &mdash; Crawling (locked)</option>
+              <option value="2" <?= $crawling === 2 ? 'selected' : '' ?>>2 &mdash; Urgent</option>
             </select>
           </div>
 
           <?php if ($isEdit): ?>
-          <div class="text-xs text-gray-600 space-y-0.5 pt-2 border-t border-gray-800">
+          <div class="a-meta" style="padding-top:8px;border-top:1px solid var(--a-border)">
             <div>ID: <?= $chapter['id'] ?></div>
             <div>Pages: <?= number_format((int)($chapter['page_count'] ?? 0)) ?></div>
             <div>Views: <?= number_format((int)($chapter['view'] ?? 0)) ?></div>
@@ -116,14 +114,14 @@ $action = $isEdit
         </div>
       </div>
 
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition-colors text-sm">
+      <button type="submit" class="a-btn a-btn-block a-btn-xl">
         <?= $isEdit ? 'Save Changes' : 'Create Chapter' ?>
       </button>
 
       <?php if ($isEdit): ?>
       <a href="/admin/manga/<?= $manga['id'] ?>/chapters"
-         class="w-full bg-gray-800 hover:bg-gray-700 text-gray-400 font-medium py-2.5 rounded-xl transition-colors text-sm text-center block">
-        ← Back to Chapters
+         class="a-btn-sec a-btn-block a-btn-xl a-text-center">
+        &larr; Back to Chapters
       </a>
       <?php endif; ?>
 
@@ -140,18 +138,18 @@ $action = $isEdit
       if ($isLocalUp || $isExtUrl) $pushableCount++;
   }
 ?>
-<!-- ── Pages Management ───────────────────────────────────────── -->
-<div class="mt-6">
-  <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-    <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+<!-- Pages Management -->
+<div style="margin-top:24px">
+  <div class="a-panel">
+    <div class="a-panel-head">
       <div>
-        <span class="text-sm font-semibold text-gray-300">Pages</span>
-        <span class="ml-2 text-xs text-gray-600" id="pg-pages-count"><?= count($pages ?? []) ?> pages</span>
+        <span>Pages</span>
+        <span class="a-text-xs a-txt6" id="pg-pages-count" style="margin-left:8px"><?= count($pages ?? []) ?> pages</span>
       </div>
-      <div class="flex items-center gap-2">
+      <div style="display:flex;align-items:center;gap:8px">
         <?php if (!empty($pages)): ?>
         <button type="button" id="pg-delete-all-btn" onclick="pgDeleteAll(<?= $chapter['id'] ?>)"
-                class="bg-red-900/50 hover:bg-red-700 text-red-400 hover:text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                class="a-btn-danger">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
           </svg>
@@ -160,17 +158,17 @@ $action = $isEdit
         <?php endif; ?>
         <?php if ($pushableCount > 0): ?>
         <button type="button" id="pg-push-s3-btn" onclick="pgPushAllToS3(<?= $chapter['id'] ?>)"
-                class="bg-sky-700 hover:bg-sky-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                class="a-btn-sky a-btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
             <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
           </svg>
           Push to S3
-          <span class="bg-sky-500 text-white rounded-full px-1.5 text-[9px] font-bold"><?= $pushableCount ?></span>
+          <span class="a-badge a-badge-sm" style="background:rgba(14,165,233,.5);color:#fff"><?= $pushableCount ?></span>
         </button>
         <?php endif; ?>
-        <button type="button" onclick="document.getElementById('pg-add-panel').classList.toggle('hidden')"
-                class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+        <button type="button" onclick="document.getElementById('pg-add-panel').classList.toggle('a-hidden')"
+                class="a-btn a-btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -180,64 +178,61 @@ $action = $isEdit
     </div>
 
     <!-- Add pages panel -->
-    <div id="pg-add-panel" class="hidden border-b border-gray-800">
+    <div id="pg-add-panel" class="a-hidden" style="border-bottom:1px solid var(--a-border)">
       <form method="post" action="/admin/chapters/<?= $chapter['id'] ?>/pages/add" enctype="multipart/form-data" id="pg-add-form">
         <?= csrf_field() ?>
-        <div class="p-5 space-y-4">
+        <div class="a-panel-body">
 
           <!-- Source type -->
           <div>
-            <label class="block text-xs text-gray-500 mb-2">Source type</label>
-            <div class="flex gap-3">
-              <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-indigo-500 transition-colors has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-900/20">
-                <input type="radio" name="source_type" value="cdn" class="accent-indigo-500" checked onchange="pgToggleSource(this.value)">
-                <span class="text-xs text-gray-300">CDN S3</span>
+            <label class="a-label">Source type</label>
+            <div style="display:flex;gap:12px">
+              <label class="a-radio-card">
+                <input type="radio" name="source_type" value="cdn" checked onchange="pgToggleSource(this.value)">
+                <span>CDN S3</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-orange-500 transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-900/20">
-                <input type="radio" name="source_type" value="external" class="accent-orange-500" onchange="pgToggleSource(this.value)">
-                <span class="text-xs text-gray-300">External URL</span>
+              <label class="a-radio-card orange">
+                <input type="radio" name="source_type" value="external" onchange="pgToggleSource(this.value)">
+                <span>External URL</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-green-500 transition-colors has-[:checked]:border-green-500 has-[:checked]:bg-green-900/20">
-                <input type="radio" name="source_type" value="local" class="accent-green-500" onchange="pgToggleSource(this.value)">
-                <span class="text-xs text-gray-300">Local Upload</span>
+              <label class="a-radio-card green">
+                <input type="radio" name="source_type" value="local" onchange="pgToggleSource(this.value)">
+                <span>Local Upload</span>
               </label>
             </div>
-            <p id="pg-src-hint" class="text-xs text-gray-600 mt-1.5">CDN S3: filenames (e.g. 001.jpg) — stored in image_local, served via CDN</p>
+            <p id="pg-src-hint" class="a-hint">CDN S3: filenames (e.g. 001.jpg) &mdash; stored in image_local, served via CDN</p>
           </div>
 
           <!-- URLs / paths textarea (cdn + external) -->
           <div id="pg-url-block">
-            <label class="block text-xs text-gray-500 mb-1.5">Paths / URLs <span class="text-gray-600">— one per line</span></label>
+            <label class="a-label">Paths / URLs <span class="hint">&mdash; one per line</span></label>
             <textarea name="urls" rows="6" id="pg-add-urls"
                       placeholder="001.jpg&#10;002.jpg&#10;003.jpg"
-                      class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500 transition-colors resize-y"></textarea>
+                      class="a-textarea mono" style="resize:vertical"></textarea>
           </div>
 
           <!-- File upload block (local only) -->
-          <div id="pg-file-block" class="hidden">
-            <label class="block text-xs text-gray-500 mb-1.5">Chọn ảnh <span class="text-gray-600">— hỗ trợ JPG, PNG, WebP (nhiều file)</span></label>
-            <div class="relative">
-              <input type="file" name="page_files[]" id="pg-file-input" multiple accept="image/jpeg,image/png,image/webp,image/gif"
-                     class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500">
-            </div>
-            <p id="pg-file-count" class="text-xs text-gray-600 mt-1.5">Chưa chọn file nào</p>
+          <div id="pg-file-block" class="a-hidden">
+            <label class="a-label">Choose images <span class="hint">&mdash; JPG, PNG, WebP (multiple)</span></label>
+            <input type="file" name="page_files[]" id="pg-file-input" multiple accept="image/jpeg,image/png,image/webp,image/gif"
+                   class="a-file-input">
+            <p id="pg-file-count" class="a-hint">No files selected</p>
           </div>
 
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2" id="pg-start-slug-wrap">
-              <label class="text-xs text-gray-500 whitespace-nowrap">Start slug:</label>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div id="pg-start-slug-wrap" style="display:flex;align-items:center;gap:8px">
+              <label class="a-label" style="margin-bottom:0;white-space:nowrap">Start slug:</label>
               <input type="number" name="start_slug" value="<?= count($pages ?? []) + 1 ?>" min="1"
-                     class="w-20 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500">
+                     class="a-input mono" style="width:80px">
             </div>
-            <!-- hidden fields to pass source type to controller -->
             <input type="hidden" name="is_cdn" id="pg-is-cdn" value="1">
             <input type="hidden" name="external" id="pg-external" value="0">
           </div>
 
-          <div class="flex gap-2">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg transition-colors">Add Pages</button>
-            <button type="button" onclick="document.getElementById('pg-add-panel').classList.add('hidden')"
-                    class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm px-4 py-2 rounded-lg transition-colors">Cancel</button>
+          <div style="display:flex;gap:8px">
+            <button type="submit" class="a-btn a-btn-sm">Add Pages</button>
+            <button type="button" onclick="document.getElementById('pg-add-panel').classList.add('a-hidden')"
+                    class="a-btn-sec a-btn-sm">Cancel</button>
           </div>
         </div>
       </form>
@@ -245,7 +240,7 @@ $action = $isEdit
 
     <!-- Page grid -->
     <?php if (!empty($pages)): ?>
-    <div class="p-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+    <div class="a-pages-grid">
       <?php foreach ($pages as $pg):
         if (!empty($pg['image_local'])) {
             $imgSrc  = $cdnChapterUrl . '/' . $chapter['id'] . '/' . ltrim($pg['image_local'], '/');
@@ -257,7 +252,7 @@ $action = $isEdit
             $imgSrc  = trim($pg['image'] ?? '');
             $srcType = 'local';
         }
-        $srcBadge   = ['cdn'=>['bg-blue-900/70 text-blue-300','S3'], 'external'=>['bg-orange-900/70 text-orange-300','EXT'], 'local'=>['bg-gray-700 text-gray-400','SRV']][$srcType];
+        $srcBadge   = ['cdn'=>['badge-s3','S3'], 'external'=>['badge-ext','EXT'], 'local'=>['badge-srv','SRV']][$srcType];
         $isPushable = false;
         $pushLabel  = '';
         if ($srcType === 'local' && str_starts_with($pg['image'] ?? '', '/uploads/')) {
@@ -268,30 +263,25 @@ $action = $isEdit
             $pushLabel  = basename(parse_url($pg['image'], PHP_URL_PATH) ?: $pg['image']);
         }
       ?>
-      <div class="group relative" id="pg-item-<?= $pg['id'] ?>"
+      <div class="a-page-item" id="pg-item-<?= $pg['id'] ?>"
            data-pg-id="<?= $pg['id'] ?>"
            <?= $isPushable ? 'data-pg-push="1" data-pg-file="'.esc($pushLabel).'"' : '' ?>>
-        <!-- Checkbox select -->
-        <input type="checkbox" class="pg-cb absolute top-1 right-1 z-10 w-3.5 h-3.5 accent-indigo-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity rounded"
+        <input type="checkbox" class="pg-cb"
                value="<?= $pg['id'] ?>" onchange="pgSelChange(this)">
-        <div class="aspect-[2/3] bg-gray-800 rounded overflow-hidden">
+        <div class="thumb">
           <img src="<?= esc($imgSrc) ?>" alt="p<?= $pg['slug'] ?>" loading="lazy"
-               class="w-full h-full object-cover"
                onerror="this.style.opacity='0.2'">
         </div>
-        <!-- badge -->
-        <span class="absolute top-1 left-1 text-[9px] font-bold px-1 py-0.5 rounded <?= $srcBadge[0] ?>"><?= $srcBadge[1] ?></span>
-        <!-- slug -->
-        <div class="text-center text-xs text-gray-500 mt-0.5"><?= $pg['slug'] ?></div>
-        <!-- hover actions -->
-        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-end justify-center gap-1 pb-6">
+        <span class="page-badge <?= $srcBadge[0] ?>"><?= $srcBadge[1] ?></span>
+        <div class="page-slug"><?= $pg['slug'] ?></div>
+        <div class="page-actions">
           <button type="button"
                   onclick="editPage(<?= $pg['id'] ?>,<?= (int)$pg['slug'] ?>,'<?= esc(addslashes($pg['image'] ?? '')) ?>','<?= esc(addslashes($pg['image_local'] ?? '')) ?>','<?= $srcType ?>')"
-                  class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-2 py-1 rounded transition-colors">Edit</button>
-          <form method="post" action="/admin/pages/<?= $pg['id'] ?>/delete" class="inline"
+                  class="a-btn-sec a-btn-sm">Edit</button>
+          <form method="post" action="/admin/pages/<?= $pg['id'] ?>/delete" style="display:inline"
                 onsubmit="return confirm('Delete page <?= $pg['slug'] ?>?')">
             <?= csrf_field() ?>
-            <button type="submit" class="bg-red-700 hover:bg-red-600 text-white text-xs px-2 py-1 rounded transition-colors">Del</button>
+            <button type="submit" class="a-btn-danger">Del</button>
           </form>
         </div>
       </div>
@@ -299,12 +289,12 @@ $action = $isEdit
     </div>
 
     <!-- Bulk selection bar -->
-    <div id="pg-sel-bar" class="hidden px-4 py-2.5 border-t border-gray-800 flex items-center gap-3 flex-wrap">
-      <span class="text-xs text-gray-400"><span id="pg-sel-count">0</span> selected</span>
-      <button type="button" onclick="pgSelectAll()" class="text-xs text-gray-500 hover:text-gray-200 transition-colors">Select all</button>
-      <button type="button" onclick="pgDeselectAll()" class="text-xs text-gray-500 hover:text-gray-200 transition-colors">Deselect</button>
+    <div id="pg-sel-bar" class="a-sel-bar a-hidden">
+      <span class="a-text-xs a-txt4"><span id="pg-sel-count">0</span> selected</span>
+      <button type="button" onclick="pgSelectAll()" class="a-text-xs a-txt5 a-cursor-pointer" style="background:none;border:none">Select all</button>
+      <button type="button" onclick="pgDeselectAll()" class="a-text-xs a-txt5 a-cursor-pointer" style="background:none;border:none">Deselect</button>
       <button type="button" onclick="pgBulkDelete(<?= $chapter['id'] ?>)"
-              class="ml-auto bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+              class="a-btn-danger" style="margin-left:auto">
         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
         </svg>
@@ -313,95 +303,82 @@ $action = $isEdit
     </div>
 
     <?php else: ?>
-    <div class="px-5 py-10 text-center text-gray-600 text-sm">No pages yet. Click "Add Pages" to get started.</div>
+    <div class="a-empty">No pages yet. Click "Add Pages" to get started.</div>
     <?php endif; ?>
   </div>
 </div>
 
-<!-- ── S3 Upload Progress Panel ──────────────────────────────────────── -->
-<div id="pg-s3-panel" class="fixed bottom-4 right-4 z-50 hidden w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
-  <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
-    <span class="text-sm font-semibold text-gray-200 flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-400">
+<!-- S3 Upload Progress Panel -->
+<div id="pg-s3-panel" class="a-s3-panel a-hidden">
+  <div class="a-s3-panel-head">
+    <span style="display:flex;align-items:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--a-sky)">
         <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
         <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
       </svg>
       Uploading to S3
     </span>
-    <span class="text-xs text-gray-500" id="pg-s3-counter">0 / 0</span>
+    <span class="a-text-xs a-txt5" id="pg-s3-counter">0 / 0</span>
   </div>
-  <!-- Progress bar -->
-  <div class="px-4 pt-2 pb-1">
-    <div class="bg-gray-800 rounded-full h-1.5 overflow-hidden">
-      <div id="pg-s3-bar" class="h-full bg-sky-500 transition-all duration-300" style="width:0%"></div>
+  <div class="a-s3-bar-wrap">
+    <div class="a-s3-bar-bg">
+      <div id="pg-s3-bar" class="a-s3-bar" style="width:0%"></div>
     </div>
   </div>
-  <!-- File list -->
-  <div class="overflow-y-auto max-h-56" id="pg-s3-file-list"></div>
-  <!-- Done button -->
-  <div class="px-4 py-3 hidden" id="pg-s3-done-row">
-    <button onclick="pgS3PanelClose()"
-            class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs py-2 rounded-lg transition-colors">
-      Done — Reload
+  <div class="a-s3-files" id="pg-s3-file-list"></div>
+  <div class="a-hidden" id="pg-s3-done-row" style="padding:12px 16px">
+    <button onclick="pgS3PanelClose()" class="a-btn a-btn-block a-btn-sm">
+      Done &mdash; Reload
     </button>
   </div>
 </div>
 
 <!-- Edit page modal -->
-<div id="pg-edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70">
-  <div class="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-lg mx-4">
-    <div class="px-5 py-4 border-b border-gray-800 text-sm font-semibold text-gray-300">Edit Page</div>
+<div id="pg-edit-modal" class="a-modal-overlay">
+  <div class="a-modal">
+    <div class="a-panel-head">Edit Page</div>
     <form method="post" id="pg-edit-form">
       <?= csrf_field() ?>
-      <div class="p-5 space-y-4">
+      <div class="a-panel-body">
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs text-gray-500 mb-1.5">Slug (page order)</label>
-            <input type="number" name="slug" id="pg-edit-slug" min="1"
-                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
-        <!-- Source type -->
         <div>
-          <label class="block text-xs text-gray-500 mb-2">Source type</label>
-          <div class="flex gap-2">
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-indigo-500 transition-colors has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-900/20">
-              <input type="radio" name="edit_source_type" value="cdn" id="pg-edit-src-cdn" class="accent-indigo-500" onchange="pgEditToggle('cdn')">
-              <span class="text-xs text-gray-300">CDN S3</span>
+          <label class="a-label">Slug (page order)</label>
+          <input type="number" name="slug" id="pg-edit-slug" min="1" class="a-input mono" style="width:120px">
+        </div>
+
+        <div>
+          <label class="a-label">Source type</label>
+          <div style="display:flex;gap:8px">
+            <label class="a-radio-card">
+              <input type="radio" name="edit_source_type" value="cdn" id="pg-edit-src-cdn" onchange="pgEditToggle('cdn')">
+              <span>CDN S3</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-orange-500 transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-900/20">
-              <input type="radio" name="edit_source_type" value="external" id="pg-edit-src-ext" class="accent-orange-500" onchange="pgEditToggle('external')">
-              <span class="text-xs text-gray-300">External URL</span>
+            <label class="a-radio-card orange">
+              <input type="radio" name="edit_source_type" value="external" id="pg-edit-src-ext" onchange="pgEditToggle('external')">
+              <span>External URL</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-700 hover:border-gray-400 transition-colors has-[:checked]:border-gray-400 has-[:checked]:bg-gray-800">
-              <input type="radio" name="edit_source_type" value="local" id="pg-edit-src-local" class="accent-gray-400" onchange="pgEditToggle('local')">
-              <span class="text-xs text-gray-300">Local Server</span>
+            <label class="a-radio-card green">
+              <input type="radio" name="edit_source_type" value="local" id="pg-edit-src-local" onchange="pgEditToggle('local')">
+              <span>Local Server</span>
             </label>
           </div>
         </div>
 
-        <!-- CDN S3 field -->
         <div id="pg-edit-field-cdn">
-          <label class="block text-xs text-gray-500 mb-1.5">Filename on CDN S3 <span class="text-gray-600">(image_local)</span></label>
-          <input type="text" name="image_local" id="pg-edit-local" placeholder="001.jpg"
-                 class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500">
+          <label class="a-label">Filename on CDN S3 <span class="hint">(image_local)</span></label>
+          <input type="text" name="image_local" id="pg-edit-local" placeholder="001.jpg" class="a-input mono">
         </div>
 
-        <!-- External URL / Local Server field -->
-        <div id="pg-edit-field-image" class="hidden">
-          <label class="block text-xs text-gray-500 mb-1.5" id="pg-edit-image-label">URL / path</label>
-          <input type="text" name="image" id="pg-edit-image" placeholder="https://... or /path/to/image.jpg"
-                 class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 font-mono focus:outline-none focus:border-indigo-500">
+        <div id="pg-edit-field-image" class="a-hidden">
+          <label class="a-label" id="pg-edit-image-label">URL / path</label>
+          <input type="text" name="image" id="pg-edit-image" placeholder="https://... or /path/to/image.jpg" class="a-input mono">
           <input type="hidden" name="external" id="pg-edit-external" value="0">
         </div>
 
       </div>
-      <div class="px-5 pb-5 flex gap-2">
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-5 py-2.5 rounded-lg transition-colors">Save</button>
-        <button type="button" onclick="closeEditModal()"
-                class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm px-5 py-2.5 rounded-lg transition-colors">Cancel</button>
+      <div style="padding:0 20px 20px;display:flex;gap:8px">
+        <button type="submit" class="a-btn">Save</button>
+        <button type="button" onclick="closeEditModal()" class="a-btn-sec">Cancel</button>
       </div>
     </form>
   </div>
@@ -450,7 +427,7 @@ $action = $isEdit
 var pgSrcHints = {
   cdn:      'CDN S3: filenames (e.g. 001.jpg) stored in image_local, served via CDN',
   external: 'External URL: full URL stored in image field (external=1)',
-  local:    'Local Upload: chọn file ảnh từ máy tính, sẽ lưu lên server'
+  local:    'Local Upload: choose image files from computer, will upload to server'
 };
 var pgSrcPlaceholders = {
   cdn:      '001.jpg\n002.jpg\n003.jpg',
@@ -466,23 +443,23 @@ function pgToggleSource(type) {
   document.getElementById('pg-external').value    = (type === 'external') ? '1' : '0';
 
   if (type === 'local') {
-    urlBlock.classList.add('hidden');
-    fileBlock.classList.remove('hidden');
+    urlBlock.classList.add('a-hidden');
+    fileBlock.classList.remove('a-hidden');
     urlsTA.required = false;
   } else {
-    urlBlock.classList.remove('hidden');
-    fileBlock.classList.add('hidden');
+    urlBlock.classList.remove('a-hidden');
+    fileBlock.classList.add('a-hidden');
     urlsTA.required = true;
     urlsTA.placeholder = pgSrcPlaceholders[type] || '';
   }
 }
 
-// hiển thị số file đã chọn
+// File count display
 document.getElementById('pg-file-input').addEventListener('change', function() {
   var cnt = this.files.length;
   document.getElementById('pg-file-count').textContent = cnt > 0
-    ? cnt + ' file đã chọn'
-    : 'Chưa chọn file nào';
+    ? cnt + ' file(s) selected'
+    : 'No files selected';
 });
 
 // ── Edit Page modal ─────────────────────────────────────────────
@@ -492,11 +469,11 @@ function pgEditToggle(type) {
   var imgLabel   = document.getElementById('pg-edit-image-label');
   var extInput   = document.getElementById('pg-edit-external');
   if (type === 'cdn') {
-    cdnField.classList.remove('hidden');
-    imgField.classList.add('hidden');
+    cdnField.classList.remove('a-hidden');
+    imgField.classList.add('a-hidden');
   } else {
-    cdnField.classList.add('hidden');
-    imgField.classList.remove('hidden');
+    cdnField.classList.add('a-hidden');
+    imgField.classList.remove('a-hidden');
     imgLabel.textContent = type === 'external' ? 'External URL' : 'Local Server path';
     extInput.value = type === 'external' ? '1' : '0';
   }
@@ -508,20 +485,15 @@ function editPage(id, slug, image, imageLocal, srcType) {
   document.getElementById('pg-edit-local').value = imageLocal;
   document.getElementById('pg-edit-form').action = '/admin/pages/' + id + '/edit';
 
-  // Set radio + toggle fields
   var radios = {cdn:'pg-edit-src-cdn', external:'pg-edit-src-ext', local:'pg-edit-src-local'};
   var radio  = document.getElementById(radios[srcType] || 'pg-edit-src-cdn');
   if (radio) radio.checked = true;
   pgEditToggle(srcType || 'cdn');
 
-  var modal = document.getElementById('pg-edit-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('pg-edit-modal').classList.add('open');
 }
 function closeEditModal() {
-  var modal = document.getElementById('pg-edit-modal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
+  document.getElementById('pg-edit-modal').classList.remove('open');
 }
 document.getElementById('pg-edit-modal')?.addEventListener('click', function(e){
   if (e.target === this) closeEditModal();
@@ -531,16 +503,14 @@ document.getElementById('pg-edit-modal')?.addEventListener('click', function(e){
 function pgSelChange(cb) {
   var item = document.getElementById('pg-item-' + cb.value);
   if (cb.checked) {
-    item.classList.add('ring-2', 'ring-inset', 'ring-indigo-500', 'rounded');
-    cb.classList.add('opacity-100');
+    item.classList.add('selected');
   } else {
-    item.classList.remove('ring-2', 'ring-inset', 'ring-indigo-500', 'rounded');
-    cb.classList.remove('opacity-100');
+    item.classList.remove('selected');
   }
   var checked = document.querySelectorAll('.pg-cb:checked');
   var bar     = document.getElementById('pg-sel-bar');
   document.getElementById('pg-sel-count').textContent = checked.length;
-  checked.length > 0 ? bar.classList.remove('hidden') : bar.classList.add('hidden');
+  checked.length > 0 ? bar.classList.remove('a-hidden') : bar.classList.add('a-hidden');
 }
 
 function pgSelectAll() {
@@ -563,7 +533,7 @@ function pgUpdatePageCount(delta) {
 async function pgBulkDelete(chapterId) {
   var checked = Array.from(document.querySelectorAll('.pg-cb:checked'));
   if (!checked.length) return;
-  if (!confirm('Xoá ' + checked.length + ' page đã chọn?')) return;
+  if (!confirm('Delete ' + checked.length + ' selected pages?')) return;
 
   var fd = new FormData();
   checked.forEach(function(cb) { fd.append('page_ids[]', cb.value); });
@@ -580,14 +550,14 @@ async function pgBulkDelete(chapterId) {
     pgDeselectAll();
     pgUpdatePageCount(-json.deleted);
   } else {
-    alert('Lỗi: ' + (json.error || 'unknown'));
+    alert('Error: ' + (json.error || 'unknown'));
   }
 }
 
 async function pgDeleteAll(chapterId) {
   var items = document.querySelectorAll('[id^="pg-item-"]');
   if (!items.length) return;
-  if (!confirm('Xoá TẤT CẢ ' + items.length + ' pages? Không thể hoàn tác!')) return;
+  if (!confirm('Delete ALL ' + items.length + ' pages? This cannot be undone!')) return;
 
   var fd = new FormData();
   var csrf = document.querySelector('input[name^="csrf_"]');
@@ -597,30 +567,28 @@ async function pgDeleteAll(chapterId) {
   var json = await resp.json();
   if (json.success) {
     items.forEach(function(el) { el.remove(); });
-    document.getElementById('pg-sel-bar')?.classList.add('hidden');
-    // Ẩn các button không còn cần thiết
+    document.getElementById('pg-sel-bar')?.classList.add('a-hidden');
     ['pg-delete-all-btn', 'pg-push-s3-btn'].forEach(function(id) {
       var btn = document.getElementById(id);
       if (btn) btn.remove();
     });
-    // Hiển thị empty state
-    var grid = document.querySelector('.p-4.grid');
-    if (grid) grid.outerHTML = '<div class="px-5 py-10 text-center text-gray-600 text-sm">No pages yet. Click "Add Pages" to get started.</div>';
+    var grid = document.querySelector('.a-pages-grid');
+    if (grid) grid.outerHTML = '<div class="a-empty">No pages yet. Click "Add Pages" to get started.</div>';
     pgUpdatePageCount(-json.deleted);
   } else {
-    alert('Lỗi: ' + (json.error || 'unknown'));
+    alert('Error: ' + (json.error || 'unknown'));
   }
 }
 
 // ── Push local pages to S3 ───────────────────────────────────────────
 function pgS3PanelClose() {
-  document.getElementById('pg-s3-panel').classList.add('hidden');
+  document.getElementById('pg-s3-panel').classList.add('a-hidden');
   location.reload();
 }
 
 async function pgPushAllToS3(chapterId) {
   var items = Array.from(document.querySelectorAll('[data-pg-push="1"]'));
-  if (!items.length) { alert('Không có page nào để push.'); return; }
+  if (!items.length) { alert('No pages to push.'); return; }
 
   var btn      = document.getElementById('pg-push-s3-btn');
   var panel    = document.getElementById('pg-s3-panel');
@@ -629,43 +597,37 @@ async function pgPushAllToS3(chapterId) {
   var bar      = document.getElementById('pg-s3-bar');
   var doneRow  = document.getElementById('pg-s3-done-row');
 
-  // Reset panel
   fileList.innerHTML = '';
   bar.style.width    = '0%';
-  doneRow.classList.add('hidden');
-  panel.classList.remove('hidden');
+  doneRow.classList.add('a-hidden');
+  panel.classList.remove('a-hidden');
   if (btn) btn.disabled = true;
 
   var total = items.length;
   var done  = 0;
   counter.textContent = '0 / ' + total;
 
-  // Lấy CSRF token name + value
   var csrfInput = document.querySelector('input[name^="csrf_"]');
   var csrfName  = csrfInput ? csrfInput.name  : '';
   var csrfVal   = csrfInput ? csrfInput.value : '';
 
-  // Build danh sách rows
   items.forEach(function(el) {
     var row = document.createElement('div');
-    row.className = 'flex items-center gap-2 px-4 py-2 border-b border-gray-800/60 text-xs';
+    row.className = 'a-s3-row';
     row.id = 'pg-s3-row-' + el.dataset.pgId;
-    row.innerHTML = '<span class="flex-1 text-gray-400 truncate font-mono">' + el.dataset.pgFile + '</span>'
-                  + '<span class="pg-s3-st whitespace-nowrap text-gray-600">pending</span>';
+    row.innerHTML = '<span class="a-s3-row-file">' + el.dataset.pgFile + '</span>'
+                  + '<span class="a-s3-row-status a-txt6">pending</span>';
     fileList.appendChild(row);
   });
 
-  // Upload từng file
   for (var i = 0; i < items.length; i++) {
     var el     = items[i];
     var pageId = el.dataset.pgId;
     var row    = document.getElementById('pg-s3-row-' + pageId);
-    var st     = row.querySelector('.pg-s3-st');
+    var st     = row.querySelector('.a-s3-row-status');
 
-    st.textContent = '⬆ uploading…';
-    st.className   = 'pg-s3-st whitespace-nowrap text-yellow-400';
-
-    // Scroll row vào view
+    st.textContent = 'uploading...';
+    st.style.color = 'var(--a-yellow)';
     row.scrollIntoView({ block: 'nearest' });
 
     try {
@@ -677,7 +639,6 @@ async function pgPushAllToS3(chapterId) {
         method: 'POST', body: fd
       });
 
-      // Cập nhật CSRF token từ response header (CI4 rotate)
       var newToken = resp.headers.get('X-CSRF-TOKEN');
       if (newToken && csrfName) {
         csrfVal = newToken;
@@ -688,28 +649,25 @@ async function pgPushAllToS3(chapterId) {
       var json = await resp.json();
 
       if (json.success) {
-        st.textContent = '✓ done';
-        st.className   = 'pg-s3-st whitespace-nowrap text-green-400';
-        // Cập nhật badge trên thumbnail từ SRV → S3
+        st.textContent = 'done';
+        st.style.color = 'var(--a-green)';
         var pgEl = document.getElementById('pg-item-' + pageId);
         if (pgEl) {
-          var badge = pgEl.querySelector('span.absolute');
+          var badge = pgEl.querySelector('.page-badge');
           if (badge) {
             badge.textContent = 'S3';
-            badge.className   = badge.className
-              .replace('bg-gray-700', 'bg-blue-900/70')
-              .replace('text-gray-400', 'text-blue-300');
+            badge.className   = 'page-badge badge-s3';
           }
           pgEl.removeAttribute('data-pg-push');
         }
       } else {
-        st.textContent = '✗ ' + (json.error || 'error');
-        st.className   = 'pg-s3-st whitespace-nowrap text-red-400 max-w-[140px] truncate';
+        st.textContent = 'error: ' + (json.error || 'unknown');
+        st.style.color = 'var(--a-red)';
         st.title       = json.error || '';
       }
     } catch(e) {
-      st.textContent = '✗ network error';
-      st.className   = 'pg-s3-st whitespace-nowrap text-red-400';
+      st.textContent = 'network error';
+      st.style.color = 'var(--a-red)';
     }
 
     done++;
@@ -718,6 +676,6 @@ async function pgPushAllToS3(chapterId) {
   }
 
   if (btn) btn.disabled = false;
-  doneRow.classList.remove('hidden');
+  doneRow.classList.remove('a-hidden');
 }
 </script>
