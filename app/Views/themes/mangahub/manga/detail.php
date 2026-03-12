@@ -37,6 +37,7 @@ body.light { --card-bg: var(--surface); --card-border: var(--border); }
 
 .detail-wrap {
   max-width: 1200px; margin: 0 auto; padding: 28px 16px 60px;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr 300px;
   grid-template-areas:
@@ -61,7 +62,7 @@ body.light { --card-bg: var(--surface); --card-border: var(--border); }
   box-shadow: 0 8px 32px rgba(0,0,0,.5);
 }
 .hero-cover img { width: 100%; display: block; aspect-ratio: 15/19; object-fit: cover; }
-.hero-info { flex: 1; min-width: 0; padding-top: 4px; }
+.hero-info { flex: 1; min-width: 0; padding-top: 4px; overflow: hidden; }
 
 .releasing-label {
   font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
@@ -74,7 +75,7 @@ body.light { --card-bg: var(--surface); --card-border: var(--border); }
 }
 @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
 
-.hero-title { font-size: 34px; font-weight: 900; color: var(--txt); line-height: 1.1; margin-bottom: 6px; }
+.hero-title { font-size: 34px; font-weight: 900; color: var(--txt); line-height: 1.1; margin-bottom: 6px; word-break: break-word; overflow-wrap: anywhere; }
 .hero-alt { font-size: 12.5px; color: var(--txt3); margin-bottom: 18px; line-height: 1.6; }
 
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -350,7 +351,8 @@ body.light { --card-bg: var(--surface); --card-border: var(--border); }
 .related-info { flex: 1; min-width: 0; }
 .related-title {
   font-size: 13px; font-weight: 700; color: var(--txt); margin-bottom: 3px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .15s;
+  overflow: hidden; text-overflow: ellipsis; transition: color .15s;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 .related-meta { font-size: 11.5px; color: var(--txt3); }
 
@@ -375,7 +377,8 @@ body.light { --card-bg: var(--surface); --card-border: var(--border); }
   .hero-actions { justify-content: center; }
   .stats-bar { justify-content: center; }
   .share-row { justify-content: center; }
-  .hero-title { font-size: 26px; }
+  .hero-title { font-size: 22px; }
+  .hero-alt { font-size: 11.5px; }
   .sidebar { grid-template-columns: 1fr; }
 }
 </style>

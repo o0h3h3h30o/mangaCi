@@ -15,13 +15,15 @@ $isFirstPage = empty($_GET['page']) || (int)$_GET['page'] === 1;
 // Time-ago helper
 function mangahub_time_ago($datetime) {
     if (empty($datetime)) return '';
-    $diff = time() - strtotime($datetime);
+    $ts = is_numeric($datetime) ? (int)$datetime : strtotime($datetime);
+    if (!$ts) return '';
+    $diff = time() - $ts;
     if ($diff < 0) return 'just now';
     if ($diff < 60) return $diff . 's ago';
     if ($diff < 3600) return floor($diff / 60) . 'm ago';
     if ($diff < 86400) return floor($diff / 3600) . 'h ago';
     if ($diff < 2592000) return floor($diff / 86400) . 'd ago';
-    return date('d/m/Y', strtotime($datetime));
+    return date('d/m/Y', $ts);
 }
 ?>
 
