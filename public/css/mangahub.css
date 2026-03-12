@@ -652,8 +652,8 @@ footer {
   .manga-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .manga-cover { aspect-ratio: 9/11; }
   .comments-grid { grid-template-columns: 1fr; }
+  .logo span { display: none; }
 }
 @media (max-width: 400px) {
   .manga-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .logo span { display: none; }
 }
