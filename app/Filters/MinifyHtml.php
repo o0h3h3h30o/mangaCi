@@ -13,8 +13,8 @@ class MinifyHtml implements FilterInterface
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
         // Skip admin pages (Tailwind CDN relies on unminified class scanning)
-        $uri = $request->getUri()->getPath();
-        if (str_starts_with($uri, '/admin')) {
+        $uri = ltrim($request->getUri()->getPath(), '/');
+        if (str_starts_with($uri, 'admin')) {
             return;
         }
 
