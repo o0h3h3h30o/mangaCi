@@ -19,7 +19,7 @@ $mangaId = $isEdit ? (int)$manga['id'] : 0;
 <?php // re-open php tag
 
 $statusMap = [];
-foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['title'] ?? 'Status '.$s['id'];
+foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id'];
 $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
 ?>
 <style>
@@ -206,7 +206,7 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
           <?php foreach ($statuses as $s): ?>
           <label class="flex items-center gap-3 cursor-pointer px-1 py-1 rounded hover:bg-gray-800/40">
             <input type="radio" name="status_id" value="<?= $s['id'] ?>" <?= $currentStatus===(int)$s['id']?'checked':'' ?> class="w-4 h-4 accent-indigo-500">
-            <span class="text-sm text-gray-300"><?= esc($s['name']) ?></span>
+            <span class="text-sm text-gray-300"><?= esc($s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id']) ?></span>
           </label>
           <?php endforeach; ?>
         </div>

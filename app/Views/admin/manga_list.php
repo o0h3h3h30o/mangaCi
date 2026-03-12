@@ -1,6 +1,6 @@
 <?php
 $statusMap = [];
-foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['title'] ?? 'Status '.$s['id'];
+foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id'];
 $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
 ?>
 
@@ -31,7 +31,7 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
             class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none">
       <option value="0">All statuses</option>
       <?php foreach ($statuses as $s): ?>
-      <option value="<?= $s['id'] ?>" <?= $sf === (int)$s['id'] ? 'selected' : '' ?>><?= esc($s['name']) ?></option>
+      <option value="<?= $s['id'] ?>" <?= $sf === (int)$s['id'] ? 'selected' : '' ?>><?= esc($s['name'] ?? $s['label'] ?? $s['title'] ?? 'Status '.$s['id']) ?></option>
       <?php endforeach; ?>
     </select>
     <!-- Public filter -->
