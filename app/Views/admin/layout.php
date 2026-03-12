@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= esc($title ?? 'Admin') ?> — Admin Panel</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link rel="stylesheet" href="/css/admin.css">
   <style>
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     .nav-link { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:6px; font-size:13px; transition:background .15s; color:#9ca3af; white-space:nowrap; overflow:hidden; }
     .nav-link:hover { background:#374151; color:#f9fafb; }
     .nav-link.active { background:#4f46e5; color:#fff; }
