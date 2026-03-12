@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MangaHub – Read Manga Online Free</title>
+
+  <!-- 1. Preconnect to image CDN (saves DNS + TLS handshake) -->
+  <link rel="preconnect" href="https://picsum.photos" crossorigin />
+  <link rel="dns-prefetch" href="https://picsum.photos" />
+
+  <!-- 2. Preload stylesheet (render-critical) -->
+  <link rel="preload" href="style.css" as="style" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 3. Preload LCP image – first slider cover (above the fold) -->
+  <link rel="preload" as="image" href="https://picsum.photos/seed/onepiece11/200/300" fetchpriority="high" />
+
+  <!-- 4. Inline dark mode init – prevent FOUC before CSS loads -->
+  <script>
+    (function(){
+      var s = localStorage.getItem('mangahub-theme');
+      var p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (s === 'dark' || (!s && p)) document.documentElement.classList.add('dark-early');
+    })();
+  </script>
+  <style>
+    /* Apply dark vars instantly before body renders */
+    .dark-early body, html.dark-early body {
+      background: #0b1120; color: #e8edf5;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║  HEADER                                   ║
+     ╚═══════════════════════════════════════════╝ -->
+<header>
+  <div class="wrap header-inner">
+
+    <!-- Logo -->
+    <a href="#" class="logo">
+      <div class="logo-badge">M</div>
+      <span>MangaHub<sup>v2</sup></span>
+    </a>
+
+    <!-- Center nav links -->
+    <nav class="header-links" id="headerLinks">
+      <a href="#" class="nav-link">Types</a>
+      <a href="#" class="nav-link">Genres</a>
+      <a href="#" class="nav-link">Newest</a>
+      <a href="#" class="nav-link">Updated</a>
+      <a href="#" class="nav-link">Added</a>
+      <a href="#" class="nav-link nav-link-random">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+        </svg>
+        Random
+      </a>
+    </nav>
+
+    <!-- Search -->
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search manga…" />
+    </div>
+
+    <!-- Right actions -->
+    <div class="header-actions">
+      <button class="btn-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn-login">
+        Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="dark-btn" id="darkBtn" title="Toggle dark mode">🌙</button>
+
+      <!-- Burger button – mobile only -->
+      <button class="burger-btn" id="burgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-nav">
+      <a href="#" class="mobile-link">Types</a>
+      <a href="#" class="mobile-link">Genres</a>
+      <a href="#" class="mobile-link">Newest</a>
+      <a href="#" class="mobile-link">Updated</a>
+      <a href="#" class="mobile-link">Added</a>
+      <a href="#" class="mobile-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+        </svg>
+        Random
+      </a>
+    </nav>
+    <div class="mobile-menu-footer">
+      <button class="btn-filter mobile-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn-login mobile-login">
+        Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="dark-btn mobile-dark" id="darkBtnMobile" title="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+</header>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║  MAIN                                     ║
+     ╚═══════════════════════════════════════════╝ -->
+<main>
+  <div class="wrap">
+
+    <!-- ── SPOTLIGHT SLIDER  (3-card navy style) ── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Featured</h2>
+      </div>
+
+      <div class="slider-section-bg">
+
+        <!-- Prev arrow -->
+        <button class="slider-arrow prev" id="sliderPrev">&#8249;</button>
+
+        <!-- Viewport -->
+        <div class="slider-viewport">
+          <div class="slider-track" id="sliderTrack">
+
+            <!-- Card 1 – One Piece -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">One Piece</div>
+                  <div class="slide-desc">Gol D. Roger, a man referred to as the "Pirate King," is set to be executed by the World Government...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 1176 – Vol 116</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Comedy</span>
+                    <span class="slide-genre">Shounen</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/onepiece11/200/300" alt="One Piece" width="200" height="300" fetchpriority="high" loading="eager" />
+              </div>
+            </div>
+
+            <!-- Card 2 – That Time I Got Reincarnated as a Slime -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">That Time I Got Reincarnated as a Slime</div>
+                  <div class="slide-desc">It is just another ordinary day for Satoru Mikami. The sun is shinin...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 139 – Vol 29</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Comedy</span>
+                    <span class="slide-genre">Isekai</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/slime22/200/300" alt="Slime" width="200" height="300" loading="eager" decoding="async" />
+              </div>
+            </div>
+
+            <!-- Card 3 – One-Punch Man -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">One-Punch Man (Official)</div>
+                  <div class="slide-desc">After rigorously training for three years, the ordinary Saitama has...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 264 – Vol 37</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Comedy</span>
+                    <span class="slide-genre">Parody</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/opm33/200/300" alt="One-Punch Man" width="200" height="300" loading="eager" decoding="async" />
+              </div>
+            </div>
+
+            <!-- Card 4 – Kingdom -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">Kingdom</div>
+                  <div class="slide-desc">Shin and Hyou are war-orphans in the kingdom of Qin. They dream of becoming Great Generals...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 780 – Vol 65</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Historical</span>
+                    <span class="slide-genre">Seinen</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/kingdom44/200/300" alt="Kingdom" width="200" height="300" loading="lazy" decoding="async" />
+              </div>
+            </div>
+
+            <!-- Card 5 – Blue Lock -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">Blue Lock</div>
+                  <div class="slide-desc">After a disastrous defeat at the 2018 World Cup, Japan's football association creates a program...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 290 – Vol 28</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Sports</span>
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Drama</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/bluelock55/200/300" alt="Blue Lock" width="200" height="300" loading="lazy" decoding="async" />
+              </div>
+            </div>
+
+            <!-- Card 6 – Spy x Family -->
+            <div class="slide-card">
+              <div class="slide-body">
+                <div>
+                  <div class="slide-releasing">Releasing</div>
+                  <div class="slide-title">Spy x Family</div>
+                  <div class="slide-desc">A spy on an undercover mission must build a family to infiltrate an elite school...</div>
+                </div>
+                <div>
+                  <div class="slide-meta">Chap 112 – Vol 14</div>
+                  <div class="slide-genres">
+                    <span class="slide-genre">Comedy</span>
+                    <span class="slide-genre">Action</span>
+                    <span class="slide-genre">Slice of Life</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-cover">
+                <img src="https://picsum.photos/seed/spyfam66/200/300" alt="Spy x Family" width="200" height="300" loading="lazy" decoding="async" />
+              </div>
+            </div>
+
+          </div><!-- /slider-track -->
+        </div><!-- /slider-viewport -->
+
+        <!-- Next arrow -->
+        <button class="slider-arrow next" id="sliderNext">&#8250;</button>
+
+      </div><!-- /slider-section-bg -->
+    </section>
+
+    <!-- ── LATEST MANGA ───────────────────────── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Latest Manga</h2>
+        <a href="#" class="see-all">See all →</a>
+      </div>
+      <div class="manga-grid">
+
+        <!-- Row 1 -->
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc1/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.1</span>
+            <span class="new-badge">NEW</span>
+          </div>
+          <div class="manga-name">Ao no Miburo</div>
+          <div class="manga-ch"><span>Chapter 1</span><span class="manga-time">2m ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc2/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.2</span>
+          </div>
+          <div class="manga-name">Zero & Hack: The Digital Underground</div>
+          <div class="manga-ch"><span>Chapter 2</span><span class="manga-time">15m ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc3/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.5</span>
+          </div>
+          <div class="manga-name">Kakkou's Strange Battle</div>
+          <div class="manga-ch"><span>Chapter 5</span><span class="manga-time">1h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc4/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.3</span>
+          </div>
+          <div class="manga-name">Major 2nd</div>
+          <div class="manga-ch"><span>Chapter 3</span><span class="manga-time">2h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc5/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.8</span>
+          </div>
+          <div class="manga-name">Dungeon Gift: Heroes Never Die</div>
+          <div class="manga-ch"><span>Chapter 8</span><span class="manga-time">3h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc6/200/300" alt="" width="200" height="300" loading="eager" decoding="async" />
+            <span class="ch-badge">Ch.4</span>
+            <span class="new-badge">NEW</span>
+          </div>
+          <div class="manga-name">Magic Academy Reborn</div>
+          <div class="manga-ch"><span>Chapter 4</span><span class="manga-time">5h ago</span></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc7/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.12</span>
+          </div>
+          <div class="manga-name">Buzz Shoppers</div>
+          <div class="manga-ch"><span>Chapter 12</span><span class="manga-time">6h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc8/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.7</span>
+          </div>
+          <div class="manga-name">Parade Knights of the Iron Throne</div>
+          <div class="manga-ch"><span>Chapter 7</span><span class="manga-time">8h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc9/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.15</span>
+          </div>
+          <div class="manga-name">Tiger & Dragon</div>
+          <div class="manga-ch"><span>Chapter 15</span><span class="manga-time">10h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc10/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.9</span>
+          </div>
+          <div class="manga-name">Kagurai: The Last Demon Slayer</div>
+          <div class="manga-ch"><span>Chapter 9</span><span class="manga-time">12h ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc11/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.21</span>
+          </div>
+          <div class="manga-name">Zombie Idol Wars</div>
+          <div class="manga-ch"><span>Chapter 21</span><span class="manga-time">1d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc12/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.6</span>
+          </div>
+          <div class="manga-name">Red School Battle</div>
+          <div class="manga-ch"><span>Chapter 6</span><span class="manga-time">1d ago</span></div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc13/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.117</span>
+          </div>
+          <div class="manga-name">MAO Chronicles</div>
+          <div class="manga-ch"><span>Chapter 117</span><span class="manga-time">1d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc14/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.14</span>
+          </div>
+          <div class="manga-name">Tropical Hawaii Days</div>
+          <div class="manga-ch"><span>Chapter 14</span><span class="manga-time">2d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc15/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.46</span>
+          </div>
+          <div class="manga-name">Mizumaro: The Lost Journey</div>
+          <div class="manga-ch"><span>Chapter 46</span><span class="manga-time">2d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc16/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.33</span>
+          </div>
+          <div class="manga-name">Kakumata Rising</div>
+          <div class="manga-ch"><span>Chapter 33</span><span class="manga-time">3d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc17/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.48</span>
+          </div>
+          <div class="manga-name">Red vs Blue: Color War Clash</div>
+          <div class="manga-ch"><span>Chapter 48</span><span class="manga-time">3d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc18/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.87</span>
+          </div>
+          <div class="manga-name">Tomimuki & Today</div>
+          <div class="manga-ch"><span>Chapter 87</span><span class="manga-time">4d ago</span></div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc19/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.10</span>
+          </div>
+          <div class="manga-name">Three Kingdoms: Eternal Tale</div>
+          <div class="manga-ch"><span>Chapter 10</span><span class="manga-time">5d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc20/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.22</span>
+            <span class="new-badge">NEW</span>
+          </div>
+          <div class="manga-name">Flower Notes</div>
+          <div class="manga-ch"><span>Chapter 22</span><span class="manga-time">5d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc21/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.19</span>
+          </div>
+          <div class="manga-name">Silver Mountain</div>
+          <div class="manga-ch"><span>Chapter 19</span><span class="manga-time">6d ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc22/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.31</span>
+          </div>
+          <div class="manga-name">Young Tea Master: Path of Leaves</div>
+          <div class="manga-ch"><span>Chapter 31</span><span class="manga-time">1w ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc23/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.2</span>
+          </div>
+          <div class="manga-name">Nails Detective</div>
+          <div class="manga-ch"><span>Chapter 2</span><span class="manga-time">1w ago</span></div>
+        </div>
+
+        <div class="manga-card">
+          <div class="manga-cover">
+            <img src="https://picsum.photos/seed/mc24/200/300" alt="" width="200" height="300" loading="lazy" decoding="async" />
+            <span class="ch-badge">Ch.18</span>
+          </div>
+          <div class="manga-name">Furi Pass</div>
+          <div class="manga-ch"><span>Chapter 18</span><span class="manga-time">1w ago</span></div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <a href="#" class="page-btn page-prev" aria-label="Previous">&#8249;</a>
+        <a href="#" class="page-btn active">1</a>
+        <a href="#" class="page-btn">2</a>
+        <a href="#" class="page-btn">3</a>
+        <a href="#" class="page-btn">4</a>
+        <a href="#" class="page-btn">5</a>
+        <span class="page-dots">…</span>
+        <a href="#" class="page-btn">24</a>
+        <a href="#" class="page-btn page-next" aria-label="Next">&#8250;</a>
+      </div>
+    </section>
+
+    <!-- ── LATEST COMMENTS ───────────────────── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Latest Comments</h2>
+      </div>
+      <div class="comments-grid">
+
+        <div class="comment-card">
+          <div class="comment-thumb">
+            <img src="https://picsum.photos/seed/ct1/100/130" alt="" />
+          </div>
+          <div class="comment-body">
+            <div class="comment-manga">Blue Lock</div>
+            <div class="comment-text">This chapter was absolutely insane! The way Isagi keeps evolving his spatial awareness is mind-blowing. The author really knows how to build tension.</div>
+            <div class="comment-meta"><span>@mangafan</span> · 2 hours ago</div>
+          </div>
+        </div>
+
+        <div class="comment-card">
+          <div class="comment-thumb">
+            <img src="https://picsum.photos/seed/ct2/100/130" alt="" />
+          </div>
+          <div class="comment-body">
+            <div class="comment-manga">Ao no Box</div>
+            <div class="comment-text">Finally a wholesome sports romance! The chemistry between the two leads is so natural and heartwarming. One of my favorites of the year.</div>
+            <div class="comment-meta"><span>@sakura_reads</span> · 4 hours ago</div>
+          </div>
+        </div>
+
+        <div class="comment-card">
+          <div class="comment-thumb">
+            <img src="https://picsum.photos/seed/ct3/100/130" alt="" />
+          </div>
+          <div class="comment-body">
+            <div class="comment-manga">Kingdom</div>
+            <div class="comment-text">The battle strategies in this arc are some of the most brilliant I've ever seen in manga. Hara's research into ancient warfare really shows throughout the story.</div>
+            <div class="comment-meta"><span>@historybuff</span> · 6 hours ago</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── POPULAR MANGA ──────────────────────── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Popular Manga</h2>
+      </div>
+      <div class="popular-grid">
+
+        <div class="pop-item">
+          <div class="pop-rank gold">1</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp1/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Kingdom</div>
+            <div class="pop-genres">Action · Adventure · Historical</div>
+            <div class="pop-ch">Ch. 780</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank silver">2</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp2/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Spy x Family</div>
+            <div class="pop-genres">Comedy · Action · Slice of Life</div>
+            <div class="pop-ch">Ch. 112</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank bronze">3</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp3/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">One Piece</div>
+            <div class="pop-genres">Action · Adventure · Fantasy</div>
+            <div class="pop-ch">Ch. 1113</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">4</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp4/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Dungeon Meshi</div>
+            <div class="pop-genres">Fantasy · Adventure · Comedy</div>
+            <div class="pop-ch">Ch. 97</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">5</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp5/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Witch Hat Atelier</div>
+            <div class="pop-genres">Fantasy · Magic · Drama</div>
+            <div class="pop-ch">Ch. 79</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">6</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp6/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Solo Leveling</div>
+            <div class="pop-genres">Action · Fantasy · Manhwa</div>
+            <div class="pop-ch">Ch. 200</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">7</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp7/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Blue Lock</div>
+            <div class="pop-genres">Sports · Action · Drama</div>
+            <div class="pop-ch">Ch. 290</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">8</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp8/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Ao no Box</div>
+            <div class="pop-genres">Romance · Sports · School</div>
+            <div class="pop-ch">Ch. 164</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">9</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp9/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Vagabond</div>
+            <div class="pop-genres">Action · Historical · Seinen</div>
+            <div class="pop-ch">Ch. 327</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">10</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp10/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Level-Up Isekai Hero</div>
+            <div class="pop-genres">Fantasy · Action · Comedy</div>
+            <div class="pop-ch">Ch. 58</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">11</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp11/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">My Hero Academia</div>
+            <div class="pop-genres">Action · School · Superhero</div>
+            <div class="pop-ch">Ch. 430</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">12</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp12/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Vinland Saga</div>
+            <div class="pop-genres">Action · Historical · Drama</div>
+            <div class="pop-ch">Ch. 212</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">13</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp13/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Ao no Exorcist</div>
+            <div class="pop-genres">Action · Fantasy · School</div>
+            <div class="pop-ch">Ch. 151</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">14</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp14/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Golden Kamuy</div>
+            <div class="pop-genres">Adventure · Historical · Action</div>
+            <div class="pop-ch">Ch. 314</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">15</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp15/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Hellsing Ultimate</div>
+            <div class="pop-genres">Horror · Action · Supernatural</div>
+            <div class="pop-ch">Ch. 110</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">16</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp16/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Hunter x Hunter</div>
+            <div class="pop-genres">Action · Fantasy · Adventure</div>
+            <div class="pop-ch">Ch. 400</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">17</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp17/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Doraemon Classic</div>
+            <div class="pop-genres">Comedy · Sci-fi · Kids</div>
+            <div class="pop-ch">Vol. 45</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">18</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp18/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Nausicaä of the Valley</div>
+            <div class="pop-genres">Sci-fi · Adventure · Drama</div>
+            <div class="pop-ch">Ch. 88</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">19</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp19/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Black Clover</div>
+            <div class="pop-genres">Action · Fantasy · Magic</div>
+            <div class="pop-ch">Ch. 372</div>
+          </div>
+        </div>
+
+        <div class="pop-item">
+          <div class="pop-rank">20</div>
+          <div class="pop-thumb"><img src="https://picsum.photos/seed/pp20/100/130" alt="" /></div>
+          <div class="pop-info">
+            <div class="pop-title">Nana</div>
+            <div class="pop-genres">Romance · Drama · Music</div>
+            <div class="pop-ch">Ch. 84</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── GENRES ─────────────────────────────── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Genres</h2>
+      </div>
+      <div class="genre-wrap">
+        <a href="#" class="genre-tag">Gag · Comedy <span class="genre-cnt">101</span></a>
+        <a href="#" class="genre-tag">Fantasy <span class="genre-cnt">116</span></a>
+        <a href="#" class="genre-tag">Romance <span class="genre-cnt">89</span></a>
+        <a href="#" class="genre-tag">Battle · Action <span class="genre-cnt">134</span></a>
+        <a href="#" class="genre-tag">Niche <span class="genre-cnt">24</span></a>
+        <a href="#" class="genre-tag">Lifestyle <span class="genre-cnt">47</span></a>
+        <a href="#" class="genre-tag">Horror <span class="genre-cnt">31</span></a>
+        <a href="#" class="genre-tag">Historical <span class="genre-cnt">68</span></a>
+        <a href="#" class="genre-tag">Young Adults <span class="genre-cnt">78</span></a>
+        <a href="#" class="genre-tag">Sci-fi <span class="genre-cnt">53</span></a>
+        <a href="#" class="genre-tag">Mystery <span class="genre-cnt">45</span></a>
+        <a href="#" class="genre-tag">Sports <span class="genre-cnt">72</span></a>
+        <a href="#" class="genre-tag">Psychology <span class="genre-cnt">38</span></a>
+        <a href="#" class="genre-tag">Drama <span class="genre-cnt">95</span></a>
+        <a href="#" class="genre-tag">School <span class="genre-cnt">84</span></a>
+        <a href="#" class="genre-tag">Supernatural <span class="genre-cnt">61</span></a>
+        <a href="#" class="genre-tag">Mecha <span class="genre-cnt">22</span></a>
+        <a href="#" class="genre-tag">Thriller <span class="genre-cnt">33</span></a>
+        <a href="#" class="genre-tag">Music <span class="genre-cnt">18</span></a>
+        <a href="#" class="genre-tag">Martial Arts <span class="genre-cnt">43</span></a>
+        <a href="#" class="genre-tag">Love Comedy <span class="genre-cnt">29</span></a>
+        <a href="#" class="genre-tag">Full Color <span class="genre-cnt">9</span></a>
+        <a href="#" class="genre-tag">Anthology <span class="genre-cnt">16</span></a>
+        <a href="#" class="genre-tag">Mature 18+</a>
+      </div>
+    </section>
+
+    <!-- ── POPULAR GENRES ────────────────────── -->
+    <section>
+      <div class="sec-head">
+        <h2 class="sec-title">Popular Genres</h2>
+      </div>
+      <div class="pop-genre-wrap">
+        <a href="#" class="pop-genre-link">Gag · Comedy</a>
+        <a href="#" class="pop-genre-link">Fantasy</a>
+        <a href="#" class="pop-genre-link">Battle · Action</a>
+        <a href="#" class="pop-genre-link">Romance</a>
+        <a href="#" class="pop-genre-link">Sports</a>
+        <a href="#" class="pop-genre-link">Mystery</a>
+        <a href="#" class="pop-genre-link">Sci-fi</a>
+        <a href="#" class="pop-genre-link">Drama</a>
+        <a href="#" class="pop-genre-link">Historical</a>
+        <a href="#" class="pop-genre-link">Horror</a>
+        <a href="#" class="pop-genre-link">School Life</a>
+        <a href="#" class="pop-genre-link">Supernatural</a>
+      </div>
+    </section>
+
+  </div><!-- /.wrap -->
+</main>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║  FOOTER                                   ║
+     ╚═══════════════════════════════════════════╝ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Site Info</h5>
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">Sitemap</a>
+        <a href="#">Advertise</a>
+      </div>
+      <div class="footer-col">
+        <h5>Browse</h5>
+        <a href="#">All Manga</a>
+        <a href="#">Latest Updates</a>
+        <a href="#">Popular</a>
+        <a href="#">New Releases</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#">FAQ</a>
+        <a href="#">Report Issue</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      MangaHub © 2026 · Read manga online for free · All titles belong to their respective authors and publishers.
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── Dark mode (sync cả 2 nút + lưu localStorage) ── */
+  const darkBtns = [document.getElementById('darkBtn'), document.getElementById('darkBtnMobile')];
+
+  function applyTheme(isDark) {
+    document.body.classList.toggle('dark', isDark);
+    darkBtns.forEach(b => { if (b) b.textContent = isDark ? '☀️' : '🌙'; });
+  }
+
+  function toggleDark() {
+    const isDark = !document.body.classList.contains('dark');
+    applyTheme(isDark);
+    localStorage.setItem('mangahub-theme', isDark ? 'dark' : 'light');
+  }
+
+  // Khôi phục theme đã lưu khi load trang
+  const saved = localStorage.getItem('mangahub-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved ? saved === 'dark' : prefersDark);
+
+  darkBtns.forEach(b => { if (b) b.addEventListener('click', toggleDark); });
+
+  /* ── Burger / Mobile menu ── */
+  const burgerBtn  = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  burgerBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    burgerBtn.classList.toggle('open', isOpen);
+    burgerBtn.setAttribute('aria-expanded', isOpen);
+  });
+
+  /* Close menu when a mobile link is clicked */
+  mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      burgerBtn.classList.remove('open');
+    });
+  });
+
+  /* Close menu when clicking outside */
+  document.addEventListener('click', (e) => {
+    if (!burgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove('open');
+      burgerBtn.classList.remove('open');
+    }
+  });
+
+  /* ── 3-Card Slider (drag + swipe) ── */
+  (function () {
+    const INTERVAL = 4000;
+
+    const wrap    = document.getElementById('sliderTrack').closest('.slider-section-bg');
+    const track   = document.getElementById('sliderTrack');
+    const prevBtn = document.getElementById('sliderPrev');
+    const nextBtn = document.getElementById('sliderNext');
+    const TOTAL   = track.querySelectorAll('.slide-card').length;
+
+    function visibleCount() {
+      if (window.innerWidth <= 580) return 1;
+      if (window.innerWidth <= 900) return 2;
+      return 3;
+    }
+    function stepSize() {
+      return (track.parentElement.offsetWidth + 14) / visibleCount();
+    }
+    function clamp(n) { return Math.max(0, Math.min(n, TOTAL - visibleCount())); }
+
+    let offset  = 0;
+    let timer   = null;
+    let isDrag  = false;
+    let startX  = 0;
+    let dragDx  = 0;
+
+    /* Snap to position (animated) */
+    function moveTo(n) {
+      offset = clamp(n);
+      track.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1)';
+      track.style.transform  = `translateX(-${offset * stepSize()}px)`;
+      updateArrows();
+    }
+
+    function updateArrows() {
+      prevBtn.style.opacity = offset <= 0                    ? '0.3' : '1';
+      nextBtn.style.opacity = offset >= TOTAL - visibleCount() ? '0.3' : '1';
+    }
+
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        moveTo(offset >= TOTAL - visibleCount() ? 0 : offset + 1);
+      }, INTERVAL);
+    }
+
+    /* ── Arrows & keyboard ── */
+    prevBtn.addEventListener('click', () => { moveTo(offset - 1); startAuto(); });
+    nextBtn.addEventListener('click', () => { moveTo(offset + 1); startAuto(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  { moveTo(offset - 1); startAuto(); }
+      if (e.key === 'ArrowRight') { moveTo(offset + 1); startAuto(); }
+    });
+
+    /* ── Touch drag (real-time follow) ── */
+    function onDragStart(x) {
+      isDrag = true; startX = x; dragDx = 0;
+      clearInterval(timer);
+      track.style.transition = 'none'; // disable snap while dragging
+    }
+
+    function onDragMove(x) {
+      if (!isDrag) return;
+      dragDx = x - startX;
+      track.style.transform = `translateX(${-offset * stepSize() + dragDx}px)`;
+    }
+
+    function onDragEnd() {
+      if (!isDrag) return;
+      isDrag = false;
+      const threshold = stepSize() * 0.2; // 20% of card width triggers slide
+      if (dragDx < -threshold)      moveTo(offset + 1);
+      else if (dragDx > threshold)  moveTo(offset - 1);
+      else                          moveTo(offset); // snap back
+      startAuto();
+    }
+
+    /* Touch events */
+    track.addEventListener('touchstart', e => onDragStart(e.touches[0].clientX),      { passive: true });
+    track.addEventListener('touchmove',  e => onDragMove(e.touches[0].clientX),        { passive: true });
+    track.addEventListener('touchend',   () => onDragEnd());
+    track.addEventListener('touchcancel',() => onDragEnd());
+
+    /* Mouse drag (desktop) */
+    track.addEventListener('mousedown',  e => { onDragStart(e.clientX); track.style.cursor = 'grabbing'; });
+    window.addEventListener('mousemove', e => { if (isDrag) onDragMove(e.clientX); });
+    window.addEventListener('mouseup',   ()  => { if (isDrag) { onDragEnd(); track.style.cursor = 'grab'; } });
+    track.style.cursor = 'grab';
+
+    /* Prevent click on cards after drag */
+    track.addEventListener('click', e => { if (Math.abs(dragDx) > 5) e.preventDefault(); }, true);
+
+    /* Hover pause */
+    wrap.addEventListener('mouseenter', () => clearInterval(timer));
+    wrap.addEventListener('mouseleave', () => { if (!isDrag) startAuto(); });
+
+    /* Resize */
+    window.addEventListener('resize', () => moveTo(clamp(offset)));
+
+    moveTo(0);
+    startAuto();
+  })();
+</script>
+
+<button class="fab-top" id="fabTop" title="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+<script>
+  const fabTop = document.getElementById('fabTop');
+  window.addEventListener('scroll', () => {
+    fabTop.classList.toggle('show', window.scrollY > 400);
+  }, { passive: true });
+  fabTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+
+</body>
+</html>

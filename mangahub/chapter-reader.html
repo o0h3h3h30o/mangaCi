@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Piece – Chapter 777 | MangaHub</title>
+
+  <link rel="preconnect" href="https://picsum.photos" crossorigin />
+  <link rel="dns-prefetch" href="https://picsum.photos" />
+  <link rel="preload" href="style.css" as="style" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- LCP: first manga page -->
+  <link rel="preload" as="image" href="https://picsum.photos/seed/rp1/800/1200" fetchpriority="high" />
+
+  <script>
+    (function(){
+      var s = localStorage.getItem('mangahub-theme');
+      var p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (s === 'dark' || (!s && p)) document.documentElement.classList.add('dark-early');
+    })();
+  </script>
+  <style>
+    .dark-early body, html.dark-early body { background: #0b1120; color: #e8edf5; }
+  </style>
+  <style>
+    /* ══════════════════════════════════════════════════
+       READER PAGE OVERRIDES
+    ══════════════════════════════════════════════════ */
+    body { overflow-x: hidden; }
+
+    /* ── Breadcrumb bar ── */
+    .reader-breadcrumb {
+      background: var(--header); border-bottom: 1px solid var(--border);
+      padding: 8px 0; font-size: 12px; color: var(--txt3);
+    }
+    .reader-breadcrumb .wrap {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .reader-breadcrumb a { color: var(--txt2); text-decoration: none; transition: color .18s; }
+    .reader-breadcrumb a:hover { color: var(--accent); }
+    .reader-breadcrumb .sep { color: var(--txt3); }
+    .reader-breadcrumb .current { color: var(--txt); font-weight: 600; }
+
+    /* ── Reader toolbar (not sticky) ── */
+    .reader-toolbar {
+      background: var(--header); border-bottom: 1px solid var(--border);
+      padding: 0; box-shadow: var(--shadow);
+      transition: background .3s;
+    }
+
+    /* ── Back-to-top FAB ── */
+    .fab-top {
+      position: fixed; bottom: 24px; right: 20px; z-index: 600;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(232,25,44,.45);
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+    }
+    .fab-top.show {
+      opacity: 1; transform: translateY(0); pointer-events: auto;
+    }
+    .fab-top:hover { background: var(--accent2); }
+    .reader-toolbar-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 16px;
+      height: 52px; display: flex; align-items: center; gap: 12px;
+    }
+
+    /* Back button */
+    .reader-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--txt2);
+      background: none; border: none; cursor: pointer;
+      padding: 6px 10px; border-radius: 7px;
+      transition: background .18s, color .18s; white-space: nowrap;
+    }
+    .reader-back:hover { background: var(--border); color: var(--txt); }
+
+    .reader-divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+
+    /* Chapter selector */
+    .reader-chapter-nav {
+      display: flex; align-items: center; gap: 6px; flex: 1;
+      justify-content: center;
+    }
+    .ch-nav-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 7px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--txt2); cursor: pointer; font-size: 16px;
+      transition: all .18s; flex-shrink: 0;
+    }
+    .ch-nav-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .ch-nav-btn:disabled { opacity: .35; pointer-events: none; }
+
+    .chapter-select-wrap { position: relative; }
+    .chapter-select {
+      appearance: none; -webkit-appearance: none;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--txt); font-size: 13px; font-weight: 600;
+      padding: 6px 32px 6px 12px; border-radius: 8px;
+      cursor: pointer; transition: border-color .18s;
+      min-width: 160px; text-align: center;
+    }
+    .chapter-select:hover { border-color: var(--accent); }
+    .chapter-select-wrap::after {
+      content: '▾'; position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%); font-size: 11px;
+      color: var(--txt3); pointer-events: none;
+    }
+
+    /* Page counter */
+    .reader-page-info {
+      font-size: 12px; color: var(--txt3); white-space: nowrap;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .reader-page-info strong { color: var(--txt); font-weight: 700; }
+
+    /* Right toolbar actions */
+    .reader-actions { display: flex; align-items: center; gap: 6px; }
+    .reader-icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px;
+      background: none; border: 1px solid var(--border);
+      color: var(--txt2); cursor: pointer; font-size: 16px;
+      transition: all .18s;
+    }
+    .reader-icon-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--card); }
+    .reader-icon-btn.active { color: var(--accent); border-color: var(--accent); background: var(--card); }
+
+    /* ── Settings dropdown ── */
+    .settings-dropdown {
+      position: fixed; top: auto; right: 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: var(--shadow-h);
+      padding: 16px; min-width: 220px; z-index: 500;
+      display: none;
+    }
+    .settings-dropdown.open { display: block; }
+    .settings-label { font-size: 11px; font-weight: 700; color: var(--txt3);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+    .settings-row { display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; }
+    .settings-row:last-child { margin-bottom: 0; }
+    .settings-row span { font-size: 13px; color: var(--txt); }
+    .settings-btns { display: flex; gap: 4px; }
+    .s-btn {
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--card); color: var(--txt2);
+      cursor: pointer; transition: all .18s;
+    }
+    .s-btn.active, .s-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,25,44,.08); }
+    .width-slider { width: 100px; accent-color: var(--accent); cursor: pointer; }
+
+    /* ── Reader main area ── */
+    .reader-main {
+      display: flex; gap: 0;
+      background: var(--bg); min-height: calc(100vh - 104px);
+      transition: background .3s;
+    }
+
+    /* Pages column */
+    .pages-column {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 20px 16px 48px;
+    }
+    .manga-page-wrap {
+      width: 100%; max-width: 720px;
+      margin-bottom: 3px; position: relative;
+    }
+    .manga-page-wrap img {
+      width: 100%; display: block;
+      filter: var(--page-filter, none);
+      box-shadow: 0 2px 16px rgba(0,0,0,.35);
+    }
+    .page-number-badge {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(0,0,0,.55); color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 5px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Chapter list panel ── */
+    .chapter-panel {
+      width: 0; overflow: hidden; flex-shrink: 0;
+      transition: width .3s cubic-bezier(.4,0,.2,1);
+      background: var(--surface); border-left: 1px solid var(--border);
+    }
+    .chapter-panel.open { width: 260px; }
+    .panel-inner { width: 260px; padding: 16px; height: 100%; overflow-y: auto; }
+    .panel-title {
+      font-size: 13px; font-weight: 700; color: var(--txt);
+      margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+    }
+    .panel-manga-name { font-size: 11.5px; color: var(--txt3); margin-bottom: 14px; }
+    .panel-search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px; margin-bottom: 12px;
+    }
+    .panel-search svg { color: var(--txt3); flex-shrink: 0; }
+    .panel-search input {
+      background: none; border: none; outline: none; flex: 1;
+      font-size: 12.5px; color: var(--txt);
+    }
+    .panel-search input::placeholder { color: var(--txt3); }
+    .ch-list { display: flex; flex-direction: column; gap: 2px; }
+    .ch-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      transition: background .15s; text-decoration: none;
+    }
+    .ch-item:hover { background: var(--bg); }
+    .ch-item.current { background: rgba(232,25,44,.1); }
+    .ch-item-left { display: flex; flex-direction: column; gap: 2px; }
+    .ch-item-num { font-size: 13px; font-weight: 600; color: var(--txt); }
+    .ch-item.current .ch-item-num { color: var(--accent); }
+    .ch-item-title { font-size: 11px; color: var(--txt3); }
+    .ch-item-date { font-size: 11px; color: var(--txt3); white-space: nowrap; }
+
+    /* ── Bottom navigation ── */
+    .reader-bottom {
+      background: var(--header); border-top: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .reader-bottom-inner {
+      max-width: 720px; margin: 0 auto; padding: 0 16px;
+      display: flex; align-items: center; gap: 12px; justify-content: space-between;
+    }
+    .bottom-ch-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 9px; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--card); color: var(--txt);
+      transition: all .18s; text-decoration: none;
+    }
+    .bottom-ch-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .bottom-ch-btn.primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .bottom-ch-btn.primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    .bottom-ch-btn:disabled { opacity: .4; pointer-events: none; }
+    .back-top-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 16px; border-radius: 9px; font-size: 12.5px;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: var(--card); color: var(--txt2);
+      transition: all .18s;
+    }
+    .back-top-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Comments section ── */
+    .reader-comments {
+      max-width: 720px; margin: 0 auto; padding: 32px 16px 48px;
+    }
+    .comments-title { font-size: 15px; font-weight: 700; color: var(--txt); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px; }
+    .comment-count { font-size: 12px; font-weight: 600; color: var(--accent);
+      background: rgba(232,25,44,.1); padding: 2px 8px; border-radius: 20px; }
+    .comment-input-wrap {
+      display: flex; gap: 10px; margin-bottom: 20px;
+    }
+    .comment-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent); color: #fff; font-size: 13px;
+      font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .comment-box {
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; font-size: 13px;
+      color: var(--txt3); cursor: pointer;
+      transition: border-color .18s;
+    }
+    .comment-box:hover { border-color: var(--accent); }
+    .comment-item {
+      display: flex; gap: 10px; margin-bottom: 16px;
+    }
+    .ci-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0; margin-top: 2px;
+    }
+    .ci-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .ci-body { flex: 1; }
+    .ci-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .ci-name { font-size: 12.5px; font-weight: 700; color: var(--txt); }
+    .ci-time { font-size: 11px; color: var(--txt3); }
+    .ci-spoiler {
+      font-size: 10px; font-weight: 700; color: #f59e0b;
+      background: rgba(245,158,11,.12); padding: 1px 6px; border-radius: 4px;
+    }
+    .ci-text { font-size: 13px; color: var(--txt2); line-height: 1.6; margin-bottom: 6px; }
+    .ci-actions { display: flex; gap: 14px; }
+    .ci-act-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11.5px; color: var(--txt3); cursor: pointer;
+      background: none; border: none; padding: 0; transition: color .15s;
+    }
+    .ci-act-btn:hover { color: var(--accent); }
+
+    /* ══════════════════════════════════════════════════
+       MOBILE TOOLBAR COMPONENT
+    ══════════════════════════════════════════════════ */
+    .reader-toolbar-mobile { display: none; }
+
+    .rtm-row {
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .rtm-row:last-child { border-bottom: none; }
+
+    /* Row 1 – Manga title */
+    .rtm-title-row {
+      justify-content: center; gap: 8px;
+      padding: 10px 16px;
+      color: var(--txt3);
+    }
+    .rtm-manga-name {
+      font-size: 15px; font-weight: 700; color: var(--txt);
+    }
+
+    /* Row 2 – 50% chapter + 25% bookmark + 25% settings */
+    .rtm-chapter-row { display: grid; grid-template-columns: 1fr 1fr; }
+    .rtm-chapter-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      grid-column: 1; padding: 13px 16px;
+      background: none; border: none; border-right: 1px solid var(--border);
+      font-size: 14px; font-weight: 700; color: var(--txt);
+      cursor: pointer; transition: background .15s;
+      text-align: center;
+    }
+    .rtm-chapter-btn:hover { background: var(--bg); }
+    .rtm-chapter-btn svg { color: var(--txt3); flex-shrink: 0; }
+    .rtm-actions {
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-column: 2;
+    }
+    .rtm-icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 48px;
+      background: none; border: none; border-left: 1px solid var(--border);
+      color: var(--txt2); cursor: pointer; font-size: 18px;
+      transition: color .15s, background .15s;
+    }
+    .rtm-icon-btn:hover { color: var(--accent); background: var(--bg); }
+
+    /* Row 3 – 50% PREV + 50% NEXT */
+    .rtm-nav-row { display: grid; grid-template-columns: 1fr 1fr; }
+    .rtm-nav-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 14px 16px;
+      background: none; border: none;
+      font-size: 13px; font-weight: 700; letter-spacing: .5px;
+      color: var(--txt2); cursor: pointer;
+      transition: color .15s, background .15s;
+    }
+    .rtm-nav-btn:first-child { border-right: 1px solid var(--border); }
+    .rtm-nav-btn:hover { color: var(--accent); background: var(--bg); }
+
+    /* ══════════════════════════════════════════════════
+       RESPONSIVE – MOBILE
+    ══════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* Breadcrumb: ẩn */
+      .reader-breadcrumb { display: none; }
+
+      /* Ẩn desktop toolbar, hiện mobile toolbar */
+      .reader-toolbar-inner { display: none; }
+      .reader-toolbar-mobile { display: block; }
+
+      /* Pages: full width */
+      .pages-column { padding: 8px 0 40px; }
+      .manga-page-wrap { max-width: 100%; margin-bottom: 2px; }
+
+      /* Chapter panel → fixed overlay */
+      .chapter-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 0 !important; height: 100vh; z-index: 400;
+        box-shadow: none; border-left: none;
+        transition: width .3s cubic-bezier(.4,0,.2,1), box-shadow .3s;
+      }
+      .chapter-panel.open {
+        width: 80vw !important; max-width: 300px !important;
+        box-shadow: -8px 0 32px rgba(0,0,0,.45);
+      }
+      .panel-inner { width: 100%; min-width: 0; }
+
+      /* Backdrop */
+      .panel-backdrop {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,.55); z-index: 399;
+        backdrop-filter: blur(2px);
+      }
+      .panel-backdrop.show { display: block; }
+
+      /* Settings → bottom sheet */
+      .settings-dropdown {
+        position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+        border-radius: 16px 16px 0 0;
+        min-width: 0; width: 100%;
+        padding: 20px 20px 32px;
+        box-shadow: 0 -8px 32px rgba(0,0,0,.35);
+        z-index: 500;
+      }
+      .settings-dropdown::before {
+        content: ''; display: block; width: 36px; height: 4px;
+        background: var(--border); border-radius: 2px;
+        margin: 0 auto 16px;
+      }
+
+      /* Bottom nav */
+      .reader-bottom-inner { padding: 0 12px; gap: 8px; }
+      .bottom-ch-btn { padding: 10px 14px; font-size: 12.5px; }
+      .back-top-btn { padding: 10px 12px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════════════════╗
+     ║  HEADER                                   ║
+     ╚═══════════════════════════════════════════╝ -->
+<header>
+  <div class="wrap header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-badge">M</div>
+      <span>MangaHub<sup>v2</sup></span>
+    </a>
+    <nav class="header-links">
+      <a href="#" class="nav-link">Types</a>
+      <a href="#" class="nav-link">Genres</a>
+      <a href="#" class="nav-link">Newest</a>
+      <a href="#" class="nav-link">Updated</a>
+      <a href="#" class="nav-link">Added</a>
+      <a href="#" class="nav-link nav-link-random">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+        </svg>
+        Random
+      </a>
+    </nav>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search manga…" />
+    </div>
+    <div class="header-actions">
+      <button class="btn-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn-login">Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="dark-btn" id="darkBtn" title="Toggle dark mode">🌙</button>
+      <button class="burger-btn" id="burgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-nav">
+      <a href="#" class="mobile-link">Types</a>
+      <a href="#" class="mobile-link">Genres</a>
+      <a href="#" class="mobile-link">Newest</a>
+      <a href="#" class="mobile-link">Updated</a>
+      <a href="#" class="mobile-link">Added</a>
+    </nav>
+    <div class="mobile-menu-footer">
+      <button class="btn-filter mobile-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn-login mobile-login">Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="dark-btn mobile-dark" id="darkBtnMobile" title="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Breadcrumb -->
+<div class="reader-breadcrumb">
+  <div class="wrap">
+    <a href="index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="manga-detail.html">One Piece</a>
+    <span class="sep">›</span>
+    <span class="current">Chapter 777 – Smile</span>
+  </div>
+</div>
+
+<!-- ── Reader Toolbar ── -->
+<div class="reader-toolbar">
+
+  <!-- ══ MOBILE TOOLBAR (≤ 768px) ══ -->
+  <div class="reader-toolbar-mobile">
+
+    <!-- Row 1: Manga title -->
+    <div class="rtm-row rtm-title-row">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      <span class="rtm-manga-name">One Piece</span>
+    </div>
+
+    <!-- Row 2: Chapter btn + Bookmark + Settings -->
+    <div class="rtm-row rtm-chapter-row">
+      <button class="rtm-chapter-btn" id="mobileChapterBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+          <line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+        Chapter 777
+      </button>
+      <div class="rtm-actions">
+        <button class="rtm-icon-btn" title="Jump to comments" onclick="document.getElementById('commentsSection').scrollIntoView({behavior:'smooth'})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+        <button class="rtm-icon-btn" id="settingsBtnMobile" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Row 3: Prev / Next chapter -->
+    <div class="rtm-row rtm-nav-row">
+      <button class="rtm-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="19 20 9 12 19 4"/><line x1="5" y1="19" x2="5" y2="5"/>
+        </svg>
+        PREV
+      </button>
+      <button class="rtm-nav-btn rtm-nav-next">
+        NEXT
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="5 4 15 12 5 20"/><line x1="19" y1="4" x2="19" y2="20"/>
+        </svg>
+      </button>
+    </div>
+
+  </div><!-- /reader-toolbar-mobile -->
+
+  <!-- Settings dropdown – shared, outside both toolbars so always in DOM -->
+  <div class="settings-dropdown" id="settingsDropdown">
+    <div class="settings-label">Reading settings</div>
+    <div class="settings-row">
+      <span>Page width</span>
+      <input type="range" class="width-slider" id="widthSlider" min="50" max="100" value="75" />
+    </div>
+    <div class="settings-row">
+      <span>Background</span>
+      <div class="settings-btns">
+        <button class="s-btn active" data-bg="default">Default</button>
+        <button class="s-btn" data-bg="black">Black</button>
+        <button class="s-btn" data-bg="white">White</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span>Page tint</span>
+      <div class="settings-btns">
+        <button class="s-btn active" data-filter="none">Normal</button>
+        <button class="s-btn" data-filter="grayscale(100%)">B&W</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DESKTOP TOOLBAR ══ -->
+  <div class="reader-toolbar-inner">
+
+    <!-- Back to manga -->
+    <button class="reader-back" onclick="history.back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>Back</span>
+    </button>
+
+    <div class="reader-divider"></div>
+
+    <!-- Chapter navigation -->
+    <div class="reader-chapter-nav">
+      <button class="ch-nav-btn" id="prevChBtn" title="Previous chapter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <div class="chapter-select-wrap">
+        <select class="chapter-select" id="chapterSelect">
+          <option>Chapter 780 – The Final War</option>
+          <option>Chapter 779 – Dawn of Freedom</option>
+          <option>Chapter 778 – Brothers</option>
+          <option selected>Chapter 777 – Smile</option>
+          <option>Chapter 776 – The Promise</option>
+          <option>Chapter 775 – Crying Skies</option>
+          <option>Chapter 774 – Red Shore</option>
+          <option>Chapter 773 – Ghost Island</option>
+          <option>Chapter 772 – Iron Will</option>
+          <option>Chapter 771 – Reunion</option>
+        </select>
+      </div>
+
+      <button class="ch-nav-btn" id="nextChBtn" title="Next chapter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Page counter -->
+    <div class="reader-page-info" id="pageInfo">
+      Page <strong id="curPage">1</strong> / <strong>20</strong>
+    </div>
+
+    <!-- Right actions -->
+    <div class="reader-actions">
+      <!-- Comment icon -->
+      <button class="reader-icon-btn" title="Comments" onclick="document.getElementById('commentsSection').scrollIntoView({behavior:'smooth'})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+
+      <!-- Settings -->
+      <button class="reader-icon-btn" id="settingsBtn" title="Reading settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+      </button>
+
+      <!-- Chapter list panel toggle -->
+      <button class="reader-icon-btn" id="panelToggleBtn" title="Chapter list">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+          <line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Main reader area ── -->
+<div class="reader-main" id="readerMain">
+
+  <!-- Pages -->
+  <div class="pages-column" id="pagesColumn">
+
+    <div class="manga-page-wrap" data-page="1">
+      <img src="https://picsum.photos/seed/rp1/800/1200" alt="Page 1" width="800" height="1200" fetchpriority="high" loading="eager" />
+      <span class="page-number-badge">1</span>
+    </div>
+    <div class="manga-page-wrap" data-page="2">
+      <img src="https://picsum.photos/seed/rp2/800/1150" alt="Page 2" width="800" height="1150" loading="eager" decoding="async" />
+      <span class="page-number-badge">2</span>
+    </div>
+    <div class="manga-page-wrap" data-page="3">
+      <img src="https://picsum.photos/seed/rp3/800/1200" alt="Page 3" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">3</span>
+    </div>
+    <div class="manga-page-wrap" data-page="4">
+      <img src="https://picsum.photos/seed/rp4/800/1170" alt="Page 4" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">4</span>
+    </div>
+    <div class="manga-page-wrap" data-page="5">
+      <img src="https://picsum.photos/seed/rp5/800/1200" alt="Page 5" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">5</span>
+    </div>
+    <div class="manga-page-wrap" data-page="6">
+      <img src="https://picsum.photos/seed/rp6/800/1190" alt="Page 6" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">6</span>
+    </div>
+    <div class="manga-page-wrap" data-page="7">
+      <img src="https://picsum.photos/seed/rp7/800/1200" alt="Page 7" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">7</span>
+    </div>
+    <div class="manga-page-wrap" data-page="8">
+      <img src="https://picsum.photos/seed/rp8/800/1155" alt="Page 8" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">8</span>
+    </div>
+    <div class="manga-page-wrap" data-page="9">
+      <img src="https://picsum.photos/seed/rp9/800/1200" alt="Page 9" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">9</span>
+    </div>
+    <div class="manga-page-wrap" data-page="10">
+      <img src="https://picsum.photos/seed/rp10/800/1200" alt="Page 10" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">10</span>
+    </div>
+    <div class="manga-page-wrap" data-page="11">
+      <img src="https://picsum.photos/seed/rp11/800/1180" alt="Page 11" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">11</span>
+    </div>
+    <div class="manga-page-wrap" data-page="12">
+      <img src="https://picsum.photos/seed/rp12/800/1200" alt="Page 12" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">12</span>
+    </div>
+    <div class="manga-page-wrap" data-page="13">
+      <img src="https://picsum.photos/seed/rp13/800/1165" alt="Page 13" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">13</span>
+    </div>
+    <div class="manga-page-wrap" data-page="14">
+      <img src="https://picsum.photos/seed/rp14/800/1200" alt="Page 14" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">14</span>
+    </div>
+    <div class="manga-page-wrap" data-page="15">
+      <img src="https://picsum.photos/seed/rp15/800/1200" alt="Page 15" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">15</span>
+    </div>
+    <div class="manga-page-wrap" data-page="16">
+      <img src="https://picsum.photos/seed/rp16/800/1175" alt="Page 16" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">16</span>
+    </div>
+    <div class="manga-page-wrap" data-page="17">
+      <img src="https://picsum.photos/seed/rp17/800/1200" alt="Page 17" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">17</span>
+    </div>
+    <div class="manga-page-wrap" data-page="18">
+      <img src="https://picsum.photos/seed/rp18/800/1190" alt="Page 18" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">18</span>
+    </div>
+    <div class="manga-page-wrap" data-page="19">
+      <img src="https://picsum.photos/seed/rp19/800/1200" alt="Page 19" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">19</span>
+    </div>
+    <div class="manga-page-wrap" data-page="20">
+      <img src="https://picsum.photos/seed/rp20/800/1200" alt="Page 20" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="page-number-badge">20</span>
+    </div>
+
+    <!-- Comments section -->
+    <div class="reader-comments" id="commentsSection">
+      <div class="comments-title">
+        Comments <span class="comment-count">142</span>
+      </div>
+
+      <div class="comment-input-wrap">
+        <div class="comment-avatar">U</div>
+        <div class="comment-box">Leave a comment about this chapter…</div>
+      </div>
+
+      <!-- Comment items -->
+      <div class="comment-item">
+        <div class="ci-avatar"><img src="https://picsum.photos/seed/u1/40/40" alt="" /></div>
+        <div class="ci-body">
+          <div class="ci-meta">
+            <span class="ci-name">LuffyFan99</span>
+            <span class="ci-time">2 hours ago</span>
+            <span class="ci-spoiler">SPOILER</span>
+          </div>
+          <div class="ci-text">That last spread was absolutely insane!! Oda really outdid himself this chapter, the detail on every panel is just breathtaking.</div>
+          <div class="ci-actions">
+            <button class="ci-act-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              248
+            </button>
+            <button class="ci-act-btn">Reply</button>
+            <button class="ci-act-btn">Report</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="comment-item">
+        <div class="ci-avatar"><img src="https://picsum.photos/seed/u2/40/40" alt="" /></div>
+        <div class="ci-body">
+          <div class="ci-meta">
+            <span class="ci-name">ZoroSwordsman</span>
+            <span class="ci-time">5 hours ago</span>
+          </div>
+          <div class="ci-text">Chapter was okay but felt a bit rushed compared to last week. Still excited to see what happens next though!</div>
+          <div class="ci-actions">
+            <button class="ci-act-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              91
+            </button>
+            <button class="ci-act-btn">Reply</button>
+            <button class="ci-act-btn">Report</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="comment-item">
+        <div class="ci-avatar"><img src="https://picsum.photos/seed/u3/40/40" alt="" /></div>
+        <div class="ci-body">
+          <div class="ci-meta">
+            <span class="ci-name">NamiNavigator</span>
+            <span class="ci-time">1 day ago</span>
+          </div>
+          <div class="ci-text">Been reading One Piece since 2005, never gets old. The smile theme in this arc hits different on a re-read.</div>
+          <div class="ci-actions">
+            <button class="ci-act-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              174
+            </button>
+            <button class="ci-act-btn">Reply</button>
+            <button class="ci-act-btn">Report</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /reader-comments -->
+
+  </div><!-- /pages-column -->
+
+  <!-- Backdrop for mobile panel -->
+  <div class="panel-backdrop" id="panelBackdrop"></div>
+
+  <!-- Chapter list panel -->
+  <div class="chapter-panel" id="chapterPanel">
+    <div class="panel-inner">
+      <div class="panel-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        Chapter List
+      </div>
+      <div class="panel-manga-name">One Piece · 780 chapters</div>
+
+      <div class="panel-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Search chapter…" />
+      </div>
+
+      <div class="ch-list">
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 780</span>
+            <span class="ch-item-title">The Final War</span>
+          </div>
+          <span class="ch-item-date">2d ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 779</span>
+            <span class="ch-item-title">Dawn of Freedom</span>
+          </div>
+          <span class="ch-item-date">1w ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 778</span>
+            <span class="ch-item-title">Brothers</span>
+          </div>
+          <span class="ch-item-date">2w ago</span>
+        </a>
+        <a href="#" class="ch-item current">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 777</span>
+            <span class="ch-item-title">Smile</span>
+          </div>
+          <span class="ch-item-date">3w ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 776</span>
+            <span class="ch-item-title">The Promise</span>
+          </div>
+          <span class="ch-item-date">1mo ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 775</span>
+            <span class="ch-item-title">Crying Skies</span>
+          </div>
+          <span class="ch-item-date">1mo ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 774</span>
+            <span class="ch-item-title">Red Shore</span>
+          </div>
+          <span class="ch-item-date">2mo ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 773</span>
+            <span class="ch-item-title">Ghost Island</span>
+          </div>
+          <span class="ch-item-date">2mo ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 772</span>
+            <span class="ch-item-title">Iron Will</span>
+          </div>
+          <span class="ch-item-date">3mo ago</span>
+        </a>
+        <a href="#" class="ch-item">
+          <div class="ch-item-left">
+            <span class="ch-item-num">Chapter 771</span>
+            <span class="ch-item-title">Reunion</span>
+          </div>
+          <span class="ch-item-date">3mo ago</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /reader-main -->
+
+<!-- ── Bottom navigation ── -->
+<div class="reader-bottom">
+  <div class="reader-bottom-inner">
+    <a href="#" class="bottom-ch-btn" id="bottomPrevCh">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>Chapter 776</span>
+    </a>
+
+    <button class="back-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"/>
+      </svg>
+      Back to top
+    </button>
+
+    <a href="#" class="bottom-ch-btn primary" id="bottomNextCh">
+      <span>Chapter 778</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="wrap">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Site Info</h5>
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">Sitemap</a>
+        <a href="#">Advertise</a>
+      </div>
+      <div class="footer-col">
+        <h5>Browse</h5>
+        <a href="#">All Manga</a>
+        <a href="#">Latest Updates</a>
+        <a href="#">Popular</a>
+        <a href="#">New Releases</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#">FAQ</a>
+        <a href="#">Report Issue</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      MangaHub © 2026 · Read manga online for free · All titles belong to their respective authors and publishers.
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── Dark mode ── */
+  const darkBtns = [document.getElementById('darkBtn'), document.getElementById('darkBtnMobile')];
+  function applyTheme(isDark) {
+    document.body.classList.toggle('dark', isDark);
+    darkBtns.forEach(b => { if (b) b.textContent = isDark ? '☀️' : '🌙'; });
+  }
+  function toggleDark() {
+    const isDark = !document.body.classList.contains('dark');
+    applyTheme(isDark);
+    localStorage.setItem('mangahub-theme', isDark ? 'dark' : 'light');
+  }
+  const saved = localStorage.getItem('mangahub-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved ? saved === 'dark' : prefersDark);
+  darkBtns.forEach(b => { if (b) b.addEventListener('click', toggleDark); });
+
+  /* ── Burger menu ── */
+  const burgerBtn  = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burgerBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    burgerBtn.classList.toggle('open', isOpen);
+  });
+  mobileMenu.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+    mobileMenu.classList.remove('open'); burgerBtn.classList.remove('open');
+  }));
+  document.addEventListener('click', e => {
+    if (!burgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove('open'); burgerBtn.classList.remove('open');
+    }
+  });
+
+  /* ── Chapter panel toggle ── */
+  const panelBtn      = document.getElementById('panelToggleBtn');
+  const panel         = document.getElementById('chapterPanel');
+  const panelBackdrop = document.getElementById('panelBackdrop');
+
+  function openPanel() {
+    panel.classList.add('open');
+    panelBtn.classList.add('active');
+    panelBackdrop.classList.add('show');
+    document.body.style.overflow = window.innerWidth <= 768 ? 'hidden' : '';
+  }
+  function closePanel() {
+    panel.classList.remove('open');
+    panelBtn.classList.remove('active');
+    panelBackdrop.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  panelBtn.addEventListener('click', () => panel.classList.contains('open') ? closePanel() : openPanel());
+  panelBackdrop.addEventListener('click', closePanel);
+
+  /* Mobile chapter button → open panel */
+  const mobileChBtn = document.getElementById('mobileChapterBtn');
+  if (mobileChBtn) mobileChBtn.addEventListener('click', () => panel.classList.contains('open') ? closePanel() : openPanel());
+
+  /* ── Settings dropdown ── */
+  const settingsBtn       = document.getElementById('settingsBtn');
+  const settingsBtnMobile = document.getElementById('settingsBtnMobile');
+  const settingsDropdown  = document.getElementById('settingsDropdown');
+
+  function openSettings(triggerBtn) {
+    const rect = triggerBtn.getBoundingClientRect();
+    if (window.innerWidth <= 768) {
+      // bottom sheet on mobile — CSS handles position
+      settingsDropdown.style.top = '';
+      settingsDropdown.style.right = '';
+    } else {
+      // anchor below the trigger button on desktop
+      settingsDropdown.style.top   = (rect.bottom + 8) + 'px';
+      settingsDropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    }
+    settingsDropdown.classList.toggle('open');
+  }
+
+  if (settingsBtn)       settingsBtn.addEventListener('click', e => { e.stopPropagation(); openSettings(settingsBtn); });
+  if (settingsBtnMobile) settingsBtnMobile.addEventListener('click', e => { e.stopPropagation(); openSettings(settingsBtnMobile); });
+
+  document.addEventListener('click', e => {
+    const inDropdown = settingsDropdown.contains(e.target);
+    const inBtn      = (settingsBtn && settingsBtn.contains(e.target)) ||
+                       (settingsBtnMobile && settingsBtnMobile.contains(e.target));
+    if (!inDropdown && !inBtn) settingsDropdown.classList.remove('open');
+  });
+
+  /* Page width slider */
+  const widthSlider  = document.getElementById('widthSlider');
+  const pagesColumn  = document.getElementById('pagesColumn');
+  widthSlider.addEventListener('input', () => {
+    pagesColumn.querySelectorAll('.manga-page-wrap').forEach(p => {
+      p.style.maxWidth = widthSlider.value + '%';
+    });
+  });
+
+  /* Background & filter settings */
+  document.querySelectorAll('[data-bg]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-bg]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const bg = btn.dataset.bg;
+      const readerMain = document.getElementById('readerMain');
+      if (bg === 'black') readerMain.style.background = '#000';
+      else if (bg === 'white') readerMain.style.background = '#fff';
+      else readerMain.style.background = '';
+    });
+  });
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.manga-page-wrap img').forEach(img => {
+        img.style.filter = btn.dataset.filter === 'none' ? '' : btn.dataset.filter;
+      });
+    });
+  });
+
+  /* ── Page counter (IntersectionObserver) ── */
+  const curPageEl = document.getElementById('curPage');
+  const pageWraps = document.querySelectorAll('.manga-page-wrap[data-page]');
+  const observer  = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        curPageEl.textContent = entry.target.dataset.page;
+      }
+    });
+  }, { threshold: 0.4 });
+  pageWraps.forEach(p => observer.observe(p));
+
+</script>
+
+<!-- Back-to-top FAB (phải đặt trước script để getElementById tìm thấy) -->
+<button class="fab-top" id="fabTop" title="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+
+<script>
+  /* ── Back-to-top FAB ── */
+  const fabTop = document.getElementById('fabTop');
+  window.addEventListener('scroll', () => {
+    fabTop.classList.toggle('show', window.scrollY > 400);
+  }, { passive: true });
+  fabTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+
+</body>
+</html>

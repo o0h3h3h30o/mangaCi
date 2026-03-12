@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Action Manga – MangaHub</title>
+
+  <link rel="preconnect" href="https://picsum.photos" crossorigin />
+  <link rel="dns-prefetch" href="https://picsum.photos" />
+  <link rel="preload" href="style.css" as="style" />
+  <link rel="stylesheet" href="style.css" />
+
+  <script>
+    (function(){
+      var s = localStorage.getItem('mangahub-theme');
+      var p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (s === 'dark' || (!s && p)) document.documentElement.classList.add('dark-early');
+    })();
+  </script>
+  <style>
+    .dark-early body, html.dark-early body { background: #0b1120; color: #e8edf5; }
+  </style>
+
+  <style>
+  /* ══════════════════════════════════════════════════
+     SEARCH PAGE
+  ══════════════════════════════════════════════════ */
+
+  /* ── Page header ── */
+  .search-page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+    padding: 24px 0 16px;
+  }
+  .search-page-title {
+    font-size: 22px; font-weight: 800; color: var(--txt);
+    letter-spacing: -.3px;
+  }
+  .search-page-count {
+    font-size: 12.5px; color: var(--txt3);
+    background: var(--card); border: 1px solid var(--border);
+    padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    padding: 14px 16px; margin-bottom: 20px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .filter-search {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px;
+    flex: 1; min-width: 140px; max-width: 200px;
+  }
+  .filter-search svg { color: var(--txt3); flex-shrink: 0; }
+  .filter-search input {
+    background: none; border: none; outline: none;
+    font-size: 13px; color: var(--txt); width: 100%;
+  }
+  .filter-search input::placeholder { color: var(--txt3); }
+
+  .filter-select {
+    appearance: none; -webkit-appearance: none;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--txt); font-size: 12.5px;
+    padding: 7px 28px 7px 11px; border-radius: 8px;
+    cursor: pointer; transition: border-color .18s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238898b0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    white-space: nowrap;
+  }
+  .filter-select:hover, .filter-select:focus { border-color: var(--accent); outline: none; }
+  .filter-select.active { border-color: var(--accent); color: var(--accent); }
+
+  .filter-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700;
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    transition: background .18s; white-space: nowrap; margin-left: auto;
+  }
+  .filter-btn:hover { background: var(--accent2); }
+  .filter-divider { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+  /* ── Results grid (reuse shared .manga-grid from style.css) ── */
+  .search-results { margin-bottom: 32px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .filter-bar { gap: 6px; }
+    .filter-search { max-width: 100%; flex: 1 1 100%; }
+    .search-page-title { font-size: 18px; }
+  }
+  @media (max-width: 480px) {
+    .filter-select { font-size: 12px; padding: 6px 24px 6px 9px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ╔════════════════════════ HEADER ════════════════════════╗ -->
+<header>
+  <div class="wrap header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-badge">M</div>
+      <span>MangaHub<sup>v2</sup></span>
+    </a>
+    <nav class="header-links" id="headerLinks">
+      <a href="#" class="nav-link">Types</a>
+      <a href="#" class="nav-link">Genres</a>
+      <a href="#" class="nav-link">Newest</a>
+      <a href="#" class="nav-link">Updated</a>
+      <a href="#" class="nav-link">Added</a>
+      <a href="#" class="nav-link nav-link-random">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+        </svg>
+        Random
+      </a>
+    </nav>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search manga…" />
+    </div>
+    <div class="header-actions">
+      <button class="btn-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn-login">Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="dark-btn" id="darkBtn" title="Toggle dark mode">🌙</button>
+      <button class="burger-btn" id="burgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <nav class="mobile-nav">
+      <a href="#" class="mobile-link">Types</a>
+      <a href="#" class="mobile-link">Genres</a>
+      <a href="#" class="mobile-link">Newest</a>
+      <a href="#" class="mobile-link">Updated</a>
+      <a href="#" class="mobile-link">Added</a>
+    </nav>
+    <div class="mobile-menu-footer">
+      <button class="btn-filter mobile-filter">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Filter
+      </button>
+      <button class="btn-login mobile-login">Login
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="dark-btn mobile-dark" id="darkBtnMobile">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ╔════════════════════════ MAIN ════════════════════════╗ -->
+<main>
+<div class="wrap">
+
+  <!-- Page title -->
+  <div class="search-page-header">
+    <h1 class="search-page-title">Action Manga</h1>
+    <span class="search-page-count">11,707 mangas</span>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search…" />
+    </div>
+
+    <select class="filter-select">
+      <option value="">Type</option>
+      <option>Manga</option>
+      <option>Manhwa</option>
+      <option>Manhua</option>
+    </select>
+
+    <select class="filter-select active">
+      <option selected>Action</option>
+      <option>Adventure</option>
+      <option>Comedy</option>
+      <option>Drama</option>
+      <option>Fantasy</option>
+      <option>Horror</option>
+      <option>Romance</option>
+      <option>Sci-Fi</option>
+      <option>Slice of Life</option>
+      <option>Sports</option>
+      <option>Supernatural</option>
+      <option>Thriller</option>
+    </select>
+
+    <select class="filter-select">
+      <option value="">Status</option>
+      <option>Ongoing</option>
+      <option>Completed</option>
+      <option>Hiatus</option>
+    </select>
+
+    <select class="filter-select">
+      <option value="">Language</option>
+      <option>English</option>
+      <option>Japanese</option>
+      <option>Korean</option>
+      <option>Chinese</option>
+    </select>
+
+    <select class="filter-select">
+      <option value="">Year</option>
+      <option>2026</option><option>2025</option><option>2024</option>
+      <option>2023</option><option>2022</option><option>2021</option>
+      <option>2020</option><option>2019</option><option>2018</option>
+    </select>
+
+    <select class="filter-select">
+      <option value="">Length</option>
+      <option>Short (&lt;50)</option>
+      <option>Medium (50–200)</option>
+      <option>Long (&gt;200)</option>
+    </select>
+
+    <div class="filter-divider"></div>
+
+    <select class="filter-select">
+      <option>Recently updated</option>
+      <option>Most popular</option>
+      <option>Highest rated</option>
+      <option>Newest added</option>
+      <option>A–Z</option>
+    </select>
+
+    <button class="filter-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+      </svg>
+      Filter
+    </button>
+  </div>
+
+  <!-- Search results -->
+  <div class="manga-grid search-results">
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr1/300/400" alt="Kaiju No. 8" width="300" height="400" loading="eager" fetchpriority="high" decoding="async" />
+      </div>
+      <div class="manga-name">Kaiju Jiu You Wangzhe Zhanghao (Color Version)</div>
+      <div class="manga-ch"><span>Chap 535</span><span class="manga-time">39m ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr2/300/400" alt="Nakama wo Mamotte" width="300" height="400" loading="eager" decoding="async" />
+      </div>
+      <div class="manga-name">Nakama wo Mamotte Shindara 20-nen Tatte Isekai</div>
+      <div class="manga-ch"><span>Chap 21</span><span class="manga-time">1h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr3/300/400" alt="High School Queen" width="300" height="400" loading="eager" decoding="async" />
+      </div>
+      <div class="manga-name">High School Queen</div>
+      <div class="manga-ch"><span>Chap 82</span><span class="manga-time">2h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr4/300/400" alt="Omniscient Reader" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Omniscient Reader's Viewpoint</div>
+      <div class="manga-ch"><span>Chap 304</span><span class="manga-time">2h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr5/300/400" alt="Club Knights" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Club Knights</div>
+      <div class="manga-ch"><span>Chap 23</span><span class="manga-time">3h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr6/300/400" alt="Hero Girl × Healer Boy" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Hero Girl × Healer Boy: Touch or Death</div>
+      <div class="manga-ch"><span>Chap 88</span><span class="manga-time">3h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr7/300/400" alt="Choujin X" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Choujin X</div>
+      <div class="manga-ch"><span>Chap 70.2</span><span class="manga-time">3h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr8/300/400" alt="Switch" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">[Switch]</div>
+      <div class="manga-ch"><span>Chap 146</span><span class="manga-time">5h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr9/300/400" alt="Kubera" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Kubera</div>
+      <div class="manga-ch"><span>Chap 708</span><span class="manga-time">5h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr10/300/400" alt="Hajime no Ippo" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Hajime no Ippo</div>
+      <div class="manga-ch"><span>Chap 1511</span><span class="manga-time">5h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr11/300/400" alt="Dragon Eye" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Dragon Eye</div>
+      <div class="manga-ch"><span>Chap 315</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr12/300/400" alt="Just a Cat" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Just a Cat</div>
+      <div class="manga-ch"><span>Chap 51</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr13/300/400" alt="A High School Girl is a God" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">A High School Girl is a God, But I'm the Only One Who Knows</div>
+      <div class="manga-ch"><span>Chap 81</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr14/300/400" alt="Manager Kim" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Manager Kim</div>
+      <div class="manga-ch"><span>Chap 233</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr15/300/400" alt="Jungle Juice" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Jungle Juice</div>
+      <div class="manga-ch"><span>Chap 194</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr16/300/400" alt="The Undefeatable Swordsman" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">The Undefeatable Swordsman</div>
+      <div class="manga-ch"><span>Chap 294</span><span class="manga-time">6h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr17/300/400" alt="Halfblood" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Halfblood</div>
+      <div class="manga-ch"><span>Chap 41</span><span class="manga-time">7h ago</span></div>
+    </a>
+
+    <a href="manga-detail.html" class="manga-card">
+      <div class="manga-cover">
+        <img src="https://picsum.photos/seed/sr18/300/400" alt="Last Boss Shoujo Akari" width="300" height="400" loading="lazy" decoding="async" />
+      </div>
+      <div class="manga-name">Last Boss Shoujo Akari – Watashi Yori Tsuyoi</div>
+      <div class="manga-ch"><span>Chap 90</span><span class="manga-time">7h ago</span></div>
+    </a>
+
+  </div><!-- /search-results -->
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <a href="#" class="page-btn page-prev">&#8249;</a>
+    <a href="#" class="page-btn active">1</a>
+    <a href="#" class="page-btn">2</a>
+    <a href="#" class="page-btn">3</a>
+    <a href="#" class="page-btn">4</a>
+    <a href="#" class="page-btn">5</a>
+    <span class="page-dots">…</span>
+    <a href="#" class="page-btn">978</a>
+    <a href="#" class="page-btn page-next">&#8250;</a>
+  </div>
+
+</div><!-- /wrap -->
+</main>
+
+<!-- ╔════════════════════════ FOOTER ════════════════════════╗ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Site Info</h5>
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">Sitemap</a>
+        <a href="#">Advertise</a>
+      </div>
+      <div class="footer-col">
+        <h5>Browse</h5>
+        <a href="#">All Manga</a>
+        <a href="#">Latest Updates</a>
+        <a href="#">Popular</a>
+        <a href="#">New Releases</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#">FAQ</a>
+        <a href="#">Report Issue</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      MangaHub © 2026 · Read manga online for free · All titles belong to their respective authors and publishers.
+    </div>
+  </div>
+</footer>
+
+<button class="fab-top" id="fabTop" title="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+
+<script>
+  /* ── Dark mode ── */
+  const darkBtns = [document.getElementById('darkBtn'), document.getElementById('darkBtnMobile')];
+  function applyTheme(isDark) {
+    document.body.classList.toggle('dark', isDark);
+    darkBtns.forEach(b => { if (b) b.textContent = isDark ? '☀️' : '🌙'; });
+  }
+  function toggleDark() {
+    const isDark = !document.body.classList.contains('dark');
+    applyTheme(isDark);
+    localStorage.setItem('mangahub-theme', isDark ? 'dark' : 'light');
+  }
+  const saved = localStorage.getItem('mangahub-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved ? saved === 'dark' : prefersDark);
+  darkBtns.forEach(b => { if (b) b.addEventListener('click', toggleDark); });
+
+  /* ── Burger menu ── */
+  const burgerBtn  = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burgerBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    burgerBtn.classList.toggle('open', isOpen);
+  });
+  mobileMenu.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+    mobileMenu.classList.remove('open'); burgerBtn.classList.remove('open');
+  }));
+  document.addEventListener('click', e => {
+    if (!burgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove('open'); burgerBtn.classList.remove('open');
+    }
+  });
+
+  /* ── Back to top FAB ── */
+  const fabTop = document.getElementById('fabTop');
+  window.addEventListener('scroll', () => {
+    fabTop.classList.toggle('show', window.scrollY > 400);
+  }, { passive: true });
+  fabTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+</script>
+
+</body>
+</html>
