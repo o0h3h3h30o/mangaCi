@@ -17,8 +17,8 @@
   <?php endif; ?>
 
   <!-- Mangahub stylesheet (preload + load) -->
-  <link rel="preload" href="<?= base_url('css/mangahub.css') ?>" as="style">
-  <link rel="stylesheet" href="<?= base_url('css/mangahub.css') ?>">
+  <link rel="preload" href="<?= base_url('css/mangahub.css') ?>?v=<?= time() ?>" as="style">
+  <link rel="stylesheet" href="<?= base_url('css/mangahub.css') ?>?v=<?= time() ?>">
 
   <!-- SEO meta -->
   <meta name="robots" content="index, follow">
