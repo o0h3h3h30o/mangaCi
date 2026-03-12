@@ -1,6 +1,6 @@
 <?php
 $statusMap = [];
-foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'];
+foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['title'] ?? 'Status '.$s['id'];
 $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
 ?>
 

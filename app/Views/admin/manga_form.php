@@ -19,7 +19,7 @@ $mangaId = $isEdit ? (int)$manga['id'] : 0;
 <?php // re-open php tag
 
 $statusMap = [];
-foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'];
+foreach ($statuses as $s) $statusMap[(int)$s['id']] = $s['name'] ?? $s['title'] ?? 'Status '.$s['id'];
 $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
 ?>
 <style>
