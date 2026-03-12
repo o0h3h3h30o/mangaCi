@@ -35,12 +35,15 @@ class Search extends BaseController
             }
         }
 
+        $filterStatus = $this->request->getGet('status') ?? '';
+
         $results = $mangaModel->applySearchFilters([
             'filter_name'   => $filterName,
             'filter_artist' => $filterArtist,
             'sort'          => $sort,
             'accept_genres' => $acceptGenres,
             'reject_genres' => $rejectGenres,
+            'status'        => $filterStatus,
         ])->paginate(24);
 
         // Dynamic title / description

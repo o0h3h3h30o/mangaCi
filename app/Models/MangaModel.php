@@ -151,6 +151,32 @@ class MangaModel extends Model
     }
 
     /**
+     * Get related manga by shared category, sorted by views.
+     */
+    public function getRelatedByCategory(int $mangaId, int $categoryId, int $limit = 5): array
+    {
+        $mangaIds = array_column(
+            $this->db->table('category_manga')
+                ->select('manga_id')
+                ->where('category_id', $categoryId)
+                ->where('manga_id !=', $mangaId)
+                ->get()
+                ->getResultArray(),
+            'manga_id'
+        );
+
+        if (empty($mangaIds)) {
+            return [];
+        }
+
+        return $this->where('is_public', 1)
+            ->whereIn('id', $mangaIds)
+            ->orderBy('views', 'DESC')
+            ->limit($limit)
+            ->find();
+    }
+
+    /**
      * Apply search filters and return $this for chaining with paginate().
      */
     public function applySearchFilters(array $f): static
@@ -212,6 +238,11 @@ class MangaModel extends Model
                     $this->whereNotIn('id', $ids);
                 }
             }
+        }
+
+        // Status filter
+        if (!empty($f['status'])) {
+            $this->where('status_id', (int) $f['status']);
         }
 
         $sortMap = [

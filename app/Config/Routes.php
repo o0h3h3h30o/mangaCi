@@ -13,6 +13,7 @@ $routes->get('/', 'Home::index');
 $routes->get('manga/(:segment)', 'Manga::detail/$1');
 $routes->get('manga/(:segment)/(:segment)', 'Manga::chapter/$1/$2');
 $routes->get('search', 'Search::index');
+$routes->get('api/me', 'ApiMeController::index');
 $routes->get('api/search', 'Search::liveSearch');
 $routes->get('history', 'History::index');
 $routes->get('bookmarks', 'Bookmarks::index');
@@ -29,6 +30,10 @@ $routes->get('logout', 'Auth::logout');
 
 // Bookmark API
 $routes->post('api/bookmark/toggle', 'BookmarkController::toggle');
+
+// Rating API
+$routes->post('api/rating',            'RatingController::rate');
+$routes->get ('api/rating/(:num)',     'RatingController::stats/$1');
 
 // Admin
 $routes->group('admin', function ($routes) {

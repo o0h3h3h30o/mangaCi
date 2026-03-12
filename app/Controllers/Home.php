@@ -25,7 +25,7 @@ class Home extends BaseController
             'topMonth' => $mangaModel->getTopMonth(10),
             'topAll' => $mangaModel->getTopAll(10),
             'categories'     => $this->categories,
-            'currentUser'    => $this->currentUser,
+            'currentUser'    => null,
             'recentComments' => $commentModel->getRecentComments(15),
         ];
         return $this->themeView('home/index', $data);

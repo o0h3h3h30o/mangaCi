@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Models\BookmarkModel;
 use App\Models\MangaModel;
+use App\Models\RatingModel;
 
 class Manga extends BaseController
 {
@@ -19,11 +19,9 @@ class Manga extends BaseController
 
         $id = (int) $manga['id'];
 
-        $isBookmarked = false;
-        if ($this->currentUser) {
-            $bookmarkModel = new BookmarkModel();
-            $isBookmarked  = $bookmarkModel->isBookmarked($this->currentUser['id'], $id);
-        }
+        $ratingModel = new RatingModel();
+        $ratingStats = $ratingModel->getStats($id);
+        $myRating    = $ratingModel->findByIp($id, $this->request->getIPAddress());
 
         $data = [
             'title'        => $manga['name'],
@@ -31,12 +29,16 @@ class Manga extends BaseController
                               ?: 'Read ' . $manga['name'] . ' manga online for free',
             'manga'        => $manga,
             'chapters'     => $mangaModel->getChapters($id),
-            'mangaCats'    => $mangaModel->getCategories($id),
+            'mangaCats'    => $mangaCats = $mangaModel->getCategories($id),
             'authors'      => $mangaModel->getAuthors($id),
-            'recommended'  => $mangaModel->getHotToday(6),
+            'recommended'  => !empty($mangaCats)
+                ? $mangaModel->getRelatedByCategory($id, (int) $mangaCats[0]['id'], 5)
+                : $mangaModel->getHotToday(5),
             'categories'   => $this->categories,
-            'currentUser'  => $this->currentUser,
-            'isBookmarked' => $isBookmarked,
+            'currentUser'  => null,
+            'ratingAvg'    => $ratingStats['avg'],
+            'ratingVotes'  => $ratingStats['votes'],
+            'myRating'     => $myRating ? (int) $myRating['score'] : 0,
         ];
 
         return $this->themeView('manga/detail', $data);
@@ -81,7 +83,7 @@ class Manga extends BaseController
             'prevChapter' => $pn['prev'],
             'nextChapter' => $pn['next'],
             'categories'  => $this->categories,
-            'currentUser' => $this->currentUser,
+            'currentUser' => null,
         ];
                 return $this->themeView('manga/chapter', $data);
     }

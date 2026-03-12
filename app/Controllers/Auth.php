@@ -12,7 +12,7 @@ class Auth extends BaseController
             return redirect()->to('/');
         }
 
-        return $this->themeView('auth/login');
+        return $this->themeView('auth/login', ['title' => 'Login']);
     }
 
     public function loginPost(): \CodeIgniter\HTTP\RedirectResponse
@@ -50,7 +50,10 @@ class Auth extends BaseController
         if ($this->request->getPost('remember')) {
             $mac   = hash_hmac('sha256', $user['id'] . '|' . $user['password'], env('encryption.key', 'fallback-secret'));
             $value = base64_encode($user['id'] . '|' . $mac);
-            setcookie('_rm', $value, time() + 7 * 24 * 3600, '/', '', false, true);
+
+            return redirect()->to(session()->get('redirect_back') ?: '/')
+                ->with('success', 'Welcome back!')
+                ->setCookie('_rm', $value, 7 * 24 * 3600);
         }
 
         return redirect()->to(session()->get('redirect_back') ?: '/')->with('success', 'Welcome back!');
@@ -62,7 +65,7 @@ class Auth extends BaseController
             return redirect()->to('/');
         }
 
-        return $this->themeView('auth/register');
+        return $this->themeView('auth/register', ['title' => 'Register']);
     }
 
     public function registerPost(): \CodeIgniter\HTTP\RedirectResponse
@@ -130,7 +133,8 @@ class Auth extends BaseController
     public function logout(): \CodeIgniter\HTTP\RedirectResponse
     {
         session()->destroy();
-        setcookie('_rm', '', time() - 3600, '/', '', false, true);
-        return redirect()->to('/');
+
+        return redirect()->to('/')
+            ->deleteCookie('_rm');
     }
 }
