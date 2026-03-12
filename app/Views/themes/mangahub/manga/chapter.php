@@ -432,7 +432,7 @@ body { overflow-x: hidden; }
     <div class="settings-label">Reading settings</div>
     <div class="settings-row">
       <span>Page width</span>
-      <input type="range" class="width-slider" id="widthSlider" min="50" max="100" value="90" />
+      <input type="range" class="width-slider" id="widthSlider" min="50" max="100" value="100" />
     </div>
     <div class="settings-row">
       <span>Background</span>
@@ -826,7 +826,7 @@ body { overflow-x: hidden; }
 
   /* Restore saved settings */
   var saved = loadSettings();
-  applyWidth(saved.width || 90);
+  applyWidth(saved.width || 100);
   applyBg(saved.bg || 'default');
   applyFilter(saved.filter || 'none');
   applyGap(saved.gap != null ? saved.gap : 0);
