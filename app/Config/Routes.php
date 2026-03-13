@@ -138,3 +138,9 @@ $routes->post('api/comments/(:num)/react',        'CommentController::react/$1')
 
 // Chapter Report API
 $routes->post('api/chapters/(:num)/report',       'ChapterReportController::report/$1');
+
+// Sitemap & RSS Feed
+$routes->get('sitemap.xml',           'SitemapController::index');
+$routes->get('sitemap-manga.xml',    'SitemapController::manga');
+$routes->get('sitemap-chapters.xml', 'SitemapController::chapters');
+$routes->get('feed',                 'SitemapController::feed');
