@@ -211,6 +211,23 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
       </div>
 
 
+      <!-- Comic Type -->
+      <?php if (!empty($comictypes)): ?>
+      <div class="a-panel">
+        <div class="a-panel-head">Comic Type</div>
+        <div class="a-panel-body compact">
+          <select name="type_id" class="a-input">
+            <option value="">— None —</option>
+            <?php foreach ($comictypes as $ct): ?>
+            <option value="<?= $ct['id'] ?>" <?= (($manga['type_id'] ?? '') == $ct['id']) ? 'selected' : '' ?>>
+              <?= esc($ct['label'] ?? $ct['name'] ?? 'Type '.$ct['id']) ?>
+            </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <?php endif; ?>
+
       <!-- Genres -->
       <div class="a-panel">
         <div class="a-panel-head">

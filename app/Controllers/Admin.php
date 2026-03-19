@@ -678,7 +678,10 @@ class Admin extends BaseController
 
         $categories = $db->table('category')->orderBy('name')->get()->getResultArray();
 
-        return compact('statuses', 'categories');
+        try { $comictypes = $db->table('comictype')->orderBy('id')->get()->getResultArray(); }
+        catch (\Exception $e) { $comictypes = []; }
+
+        return compact('statuses', 'categories', 'comictypes');
     }
 
     public function newManga(): ResponseInterface
@@ -733,6 +736,7 @@ class Admin extends BaseController
             'from_manga18fx' => trim($this->request->getPost('from_manga18fx') ?? ''),
             'cover'          => $coverCdn,
             'image'          => ($coverCdn || $pendingImageFile) ? '' : $imageUrl,
+            'type_id'        => ($t = $this->request->getPost('type_id')) ? (int) $t : null,
             'views'          => 0, 'view_day' => 0, 'view_month' => 0,
             'update_at'      => date('Y-m-d H:i:s'),
         ];
@@ -845,6 +849,7 @@ class Admin extends BaseController
             'from_manga18fx' => trim($this->request->getPost('from_manga18fx') ?? ''),
             'cover'          => $coverCdn,
             'image'          => $coverCdn ? '' : $imageUrl,
+            'type_id'        => ($t = $this->request->getPost('type_id')) ? (int) $t : null,
             'update_at'      => date('Y-m-d H:i:s'),
         ];
 
