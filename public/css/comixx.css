@@ -1451,6 +1451,7 @@ button {
 
   .mobile-search-btn {
     display: flex;
+    margin-left: auto;
   }
 
   .header-actions {
