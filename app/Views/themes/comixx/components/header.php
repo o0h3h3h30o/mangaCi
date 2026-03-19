@@ -39,7 +39,13 @@
         <a href="/login" class="login-btn">LOGIN</a>
         <?php endif; ?>
       </div>
+      <button class="mobile-search-btn" id="mobileSearchBtn"><i class="fas fa-search"></i></button>
       <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+    </div>
+    <!-- Mobile Search Bar (toggleable) -->
+    <div class="mobile-search-bar" id="mobileSearchBar">
+      <input type="text" placeholder="Search comic..." autocomplete="off" id="mobileSearchInput">
+      <div class="search-dropdown" id="mobileSearchDropdown"></div>
     </div>
   </header>
 
@@ -135,6 +141,47 @@
   document.addEventListener('click',function(e){
     if(!e.target.closest('.search-bar'))dropdown.classList.remove('open');
   });
+})();
+
+// Mobile search toggle
+(function(){
+  var btn=document.getElementById('mobileSearchBtn');
+  var bar=document.getElementById('mobileSearchBar');
+  var input=document.getElementById('mobileSearchInput');
+  var dropdown=document.getElementById('mobileSearchDropdown');
+  if(!btn||!bar)return;
+  btn.addEventListener('click',function(){
+    var open=bar.classList.toggle('open');
+    if(open&&input){input.focus();}
+  });
+  // Search autocomplete for mobile
+  if(input&&dropdown){
+    var timer=null;
+    input.addEventListener('input',function(){
+      clearTimeout(timer);
+      var q=input.value.trim();
+      if(q.length<2){dropdown.classList.remove('open');dropdown.innerHTML='';return;}
+      timer=setTimeout(function(){
+        fetch('/api/search?q='+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(d){
+          if(!d.results||!d.results.length){dropdown.classList.remove('open');return;}
+          dropdown.innerHTML=d.results.slice(0,5).map(function(m){
+            var chLabel=m.latest_chapter?m.latest_chapter.name:'';
+            return '<a href="/manga/'+m.slug+'" class="search-result-item">'
+              +'<div class="search-result-thumb"><img src="'+(m.cover_full_url||'')+'" width="40" height="56" alt=""></div>'
+              +'<div class="search-result-info"><h4>'+m.name+'</h4>'+(chLabel?'<span>'+chLabel+'</span>':'')+'</div>'
+              +'</a>';
+          }).join('');
+          dropdown.classList.add('open');
+        }).catch(function(){});
+      },300);
+    });
+    input.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();window.location.href='/search?filter[name]='+encodeURIComponent(input.value.trim());}
+    });
+    document.addEventListener('click',function(e){
+      if(!e.target.closest('.mobile-search-bar'))dropdown.classList.remove('open');
+    });
+  }
 })();
 
 // Mobile menu
