@@ -238,7 +238,12 @@ class Install extends Controller
                 `image` varchar(256) DEFAULT NULL,
                 PRIMARY KEY (`id`),
                 KEY `manga_slug_index` (`slug`(191)),
-                KEY `manga_status_id_foreign` (`status_id`)
+                KEY `manga_status_id_foreign` (`status_id`),
+                KEY `idx_public_viewday` (`is_public`, `view_day`),
+                KEY `idx_public_viewmonth` (`is_public`, `view_month`),
+                KEY `idx_public_views` (`is_public`, `views`),
+                KEY `idx_public_updateat` (`is_public`, `update_at`),
+                KEY `idx_public_id` (`is_public`, `id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
 
             "CREATE TABLE IF NOT EXISTS `chapter` (

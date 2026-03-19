@@ -8,11 +8,20 @@ if (!function_exists('manga_cover_url')) {
      */
     function manga_cover_url(array $manga, string $cdnBase = ''): string
     {
-        if (!$cdnBase) {
-            $cdnBase = rtrim(env('CDN_COVER_URL', ''), '/');
+        static $cachedCdnBase = null;
+        static $cachedCoverDir = null;
+        static $coverFileCache = [];
+
+        if ($cachedCdnBase === null) {
+            $cachedCdnBase = rtrim(env('CDN_COVER_URL', ''), '/');
         }
+        if ($cachedCoverDir === null) {
+            $cachedCoverDir = rtrim(env('COVER_SAVE_DIR', FCPATH . 'cover'), '/') . '/';
+        }
+
+        $base = $cdnBase ?: $cachedCdnBase;
         $id = $manga['id'] ?? '';
-        $cdnUrl = $cdnBase . '/' . $id . '-thumb.jpg';
+        $cdnUrl = $base . '/' . $id . '-thumb.jpg';
 
         if (($manga['cover'] ?? 0) == 1) {
             return $cdnUrl;
@@ -21,16 +30,22 @@ if (!function_exists('manga_cover_url')) {
             return $manga['image'];
         }
 
-        // Check local cover dir
-        $coverDir = rtrim(env('COVER_SAVE_DIR', FCPATH . 'cover'), '/') . '/';
+        // Check local cover dir with cache
+        if (isset($coverFileCache[$id])) {
+            return $coverFileCache[$id];
+        }
+
         foreach (['-thumb', ''] as $suffix) {
-            foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
-                if (is_file($coverDir . $id . $suffix . '.' . $ext)) {
-                    return base_url('cover/' . $id . $suffix . '.' . $ext);
+            foreach (['jpg', 'png', 'webp'] as $ext) {
+                if (is_file($cachedCoverDir . $id . $suffix . '.' . $ext)) {
+                    $url = base_url('cover/' . $id . $suffix . '.' . $ext);
+                    $coverFileCache[$id] = $url;
+                    return $url;
                 }
             }
         }
 
+        $coverFileCache[$id] = $cdnUrl;
         return $cdnUrl;
     }
 }

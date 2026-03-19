@@ -12,16 +12,18 @@ class Home extends BaseController
         $mangaModel  = new MangaModel();
         $commentModel = new CommentModel();
 
+        $hotToday = $mangaModel->getHotToday(12);
+
         $data = [
             'title'       => '',
             'description' => '',
             'newestManga' => $mangaModel->getNewestManga(24),
-            'hotToday' => $mangaModel->getHotToday(12),
+            'hotToday' => $hotToday,
             'recentlyUpdated' => $mangaModel->where('is_public', 1)
                 ->orderBy('update_at', 'DESC')
                 ->paginate(28),
             'pager' => $mangaModel->pager,
-            'topDay' => $mangaModel->getHotToday(10),
+            'topDay' => array_slice($hotToday, 0, 10),
             'topMonth' => $mangaModel->getTopMonth(10),
             'topAll' => $mangaModel->getTopAll(10),
             'comictypeMap'   => $this->getComictypeMap(),
