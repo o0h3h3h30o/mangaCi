@@ -36,6 +36,11 @@ class BookmarkModel extends Model
         return true;
     }
 
+    public function getMangaBookmarkCount(int $mangaId): int
+    {
+        return (int) $this->where('manga_id', $mangaId)->countAllResults();
+    }
+
     public function getUserBookmarksCount(int $userId): int
     {
         return (int) $this->db->table('bookmarks b')
@@ -48,7 +53,7 @@ class BookmarkModel extends Model
     public function getUserBookmarks(int $userId, int $limit = 0, int $offset = 0): array
     {
         $builder = $this->db->table('bookmarks b')
-            ->select('m.id, m.name, m.slug, m.chapter_1, m.chap_1_slug, m.update_at, b.created_at AS bookmarked_at')
+            ->select('m.id, m.name, m.slug, m.cover, m.image, m.chapter_1, m.chap_1_slug, m.update_at, b.created_at AS bookmarked_at')
             ->join('manga m', 'm.id = b.manga_id')
             ->where('b.user_id', $userId)
             ->where('m.is_public', 1)

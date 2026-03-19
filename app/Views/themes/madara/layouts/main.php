@@ -174,7 +174,8 @@
   <?php if ($_kw): ?><meta name="keywords" content="<?= esc($_kw) ?>"><?php endif; ?>
   <meta property="og:title" content="<?= esc($title ?? '') ?>">
   <meta property="og:description" content="<?= esc($_desc) ?>">
-  <meta property="og:image" content="<?= base_url('dcncc.jpg') ?>">
+  <?php $_ogimg = !empty($og_image) ? $og_image : base_url('dcncc.jpg'); ?>
+  <meta property="og:image" content="<?= esc($_ogimg) ?>">
   <meta property="og:url" content="<?= current_url() ?>">
   <meta property="og:type" content="website">
 

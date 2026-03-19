@@ -26,6 +26,7 @@ class Pager extends BaseConfig
         'default_head'   => 'CodeIgniter\Pager\Views\default_head',
         'mangahub_full'  => 'App\Views\themes\mangahub\pager\mangahub',
         'mangahub_light' => 'App\Views\themes\mangahub\pager\tailwind',
+        'comixx_full'    => 'App\Views\themes\comixx\pager\comixx',
     ];
 
     /**

@@ -130,6 +130,18 @@ class MangaModel extends Model
             ->select('a.id, a.name, a.slug')
             ->join('author_manga am', 'a.id = am.author_id')
             ->where('am.manga_id', $mangaId)
+            ->where('am.type', 1)
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getArtists(int $mangaId): array
+    {
+        return $this->db->table('author a')
+            ->select('a.id, a.name, a.slug')
+            ->join('author_manga am', 'a.id = am.author_id')
+            ->where('am.manga_id', $mangaId)
+            ->where('am.type', 2)
             ->get()
             ->getResultArray();
     }

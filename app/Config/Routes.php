@@ -30,6 +30,8 @@ $routes->get('logout', 'Auth::logout');
 
 // Bookmark API
 $routes->post('api/bookmark/toggle', 'BookmarkController::toggle');
+$routes->post('api/content-like',   'ContentLikeController::toggle');
+$routes->get ('api/content-like',   'ContentLikeController::get');
 
 // Rating API
 $routes->post('api/rating',            'RatingController::rate');

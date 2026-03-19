@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\MangaModel;
 use App\Models\RatingModel;
+use App\Models\BookmarkModel;
 
 class Manga extends BaseController
 {
@@ -27,18 +28,24 @@ class Manga extends BaseController
             'title'        => $manga['name'],
             'description'  => mb_strimwidth(strip_tags($manga['summary'] ?? ''), 0, 160, '...')
                               ?: 'Read ' . $manga['name'] . ' manga online for free',
+            'og_image'     => manga_cover_url($manga),
             'manga'        => $manga,
             'chapters'     => $mangaModel->getChapters($id),
             'mangaCats'    => $mangaCats = $mangaModel->getCategories($id),
             'authors'      => $mangaModel->getAuthors($id),
+            'artists'      => $mangaModel->getArtists($id),
             'recommended'  => !empty($mangaCats)
                 ? $mangaModel->getRelatedByCategory($id, (int) $mangaCats[0]['id'], 5)
                 : $mangaModel->getHotToday(5),
             'categories'   => $this->categories,
-            'currentUser'  => null,
+            'currentUser'  => $this->currentUser,
             'ratingAvg'    => $ratingStats['avg'],
             'ratingVotes'  => $ratingStats['votes'],
             'myRating'     => $myRating ? (int) $myRating['score'] : 0,
+            'isBookmarked' => $this->currentUser
+                ? ($bm = new BookmarkModel())->isBookmarked((int) $this->currentUser['id'], $id)
+                : false,
+            'followCount'  => (isset($bm) ? $bm : new BookmarkModel())->getMangaBookmarkCount($id),
         ];
 
         return $this->themeView('manga/detail', $data);
@@ -71,9 +78,13 @@ class Manga extends BaseController
 
         $this->saveHistory($manga, $chapterSlug);
 
+        $id = (int) $manga['id'];
+        $bm = new BookmarkModel();
+
         $data = [
             'title'       => $manga['name'] . ' - ' . $chapTitle,
             'description' => 'Read ' . $manga['name'] . ' ' . $chapTitle . ' online',
+            'og_image'    => manga_cover_url($manga),
             'slug'        => $slug,
             'manga'       => $manga,
             'chapter'     => $chapter,
@@ -83,7 +94,10 @@ class Manga extends BaseController
             'prevChapter' => $pn['prev'],
             'nextChapter' => $pn['next'],
             'categories'  => $this->categories,
-            'currentUser' => null,
+            'currentUser' => $this->currentUser,
+            'isBookmarked' => $this->currentUser
+                ? $bm->isBookmarked((int) $this->currentUser['id'], $id)
+                : false,
         ];
                 return $this->themeView('manga/chapter', $data);
     }

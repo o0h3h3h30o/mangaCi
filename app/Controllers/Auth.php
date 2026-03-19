@@ -110,6 +110,8 @@ class Auth extends BaseController
             'password'   => password_hash($password, PASSWORD_BCRYPT),
             'ip_address' => $this->request->getIPAddress(),
             'created_on' => time(),
+            'created_at' => $now,
+            'updated_at' => $now,
             'last_login' => $now,
             'active'     => 1,
         ]);
