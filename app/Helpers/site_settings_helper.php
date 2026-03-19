@@ -11,11 +11,28 @@ if (!function_exists('manga_cover_url')) {
         if (!$cdnBase) {
             $cdnBase = rtrim(env('CDN_COVER_URL', ''), '/');
         }
-        $cdnUrl = $cdnBase . '/' . ($manga['id'] ?? '') . '-thumb.jpg';
+        $id = $manga['id'] ?? '';
+        $cdnUrl = $cdnBase . '/' . $id . '-thumb.jpg';
+
         if (($manga['cover'] ?? 0) == 1) {
             return $cdnUrl;
         }
-        return !empty($manga['image']) ? $manga['image'] : $cdnUrl;
+        if (!empty($manga['image'])) {
+            return $manga['image'];
+        }
+
+        // Check local cover dir
+        $coverDir = rtrim(env('COVER_SAVE_DIR', FCPATH . 'cover'), '/') . '/';
+        foreach (['-thumb', ''] as $suffix) {
+            foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
+                if (is_file($coverDir . $id . $suffix . '.' . $ext)) {
+                    $webPath = str_replace(FCPATH, '', $coverDir);
+                    return base_url($webPath . $id . $suffix . '.' . $ext);
+                }
+            }
+        }
+
+        return $cdnUrl;
     }
 }
 

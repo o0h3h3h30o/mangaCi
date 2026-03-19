@@ -12,6 +12,14 @@ class Admin extends BaseController
         return \Config\Database::connect();
     }
 
+    /** Cover save directory from env, fallback to public/cover/ */
+    private function coverDir(): string
+    {
+        $dir = rtrim(env('COVER_SAVE_DIR', FCPATH . 'cover'), '/') . '/';
+        if (!is_dir($dir)) @mkdir($dir, 0755, true);
+        return $dir;
+    }
+
     /** Returns null if user is admin, or redirect/403 response if not */
     private function guard(): ?ResponseInterface
     {
@@ -745,24 +753,23 @@ class Admin extends BaseController
         $mangaId = $db->insertID();
 
         // Save uploaded image with ID-based filename
+        $coverDir = $this->coverDir();
         if ($pendingImageFile) {
-            $newName = $mangaId . '-thumb.' . $pendingImageFile->getExtension();
-            $pendingImageFile->move(FCPATH . 'images/', $newName, true);
-            $imageUrl = base_url('images/' . $newName);
-            $db->table('manga')->where('id', $mangaId)->update(['image' => $imageUrl]);
+            $ext = $pendingImageFile->getExtension();
+            $pendingImageFile->move($coverDir, $mangaId . '.' . $ext, true);
+            @copy($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
+            $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
         }
 
         // Move fetched tmp image
         $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
         if ($tmpFile && !$pendingImageFile) {
-            $tmpPath = FCPATH . 'images/tmp/' . basename($tmpFile);
+            $tmpPath = $coverDir . 'tmp/' . basename($tmpFile);
             if (is_file($tmpPath)) {
                 $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
-                $newName = $mangaId . '-thumb.' . $ext;
-                $destDir = FCPATH . 'images/';
-                if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                rename($tmpPath, $destDir . $newName);
-                $db->table('manga')->where('id', $mangaId)->update(['image' => base_url('images/' . $newName)]);
+                rename($tmpPath, $coverDir . $mangaId . '.' . $ext);
+                @copy($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
+                $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
             }
         }
 
@@ -842,12 +849,14 @@ class Admin extends BaseController
         $coverCdn  = (int) ($this->request->getPost('cover_cdn') ?? 0);
         $imageUrl  = trim($this->request->getPost('image_url') ?? '');
         $imageFile = $this->request->getFile('image_file');
+        $coverDir = $this->coverDir();
         if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
             $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
             if (in_array($imageFile->getMimeType(), $imgTypes)) {
-                $newName = $id . '-thumb.' . $imageFile->getExtension();
-                $imageFile->move(FCPATH . 'images/', $newName, true);
-                $imageUrl = base_url('images/' . $newName);
+                $ext = $imageFile->getExtension();
+                $imageFile->move($coverDir, $id . '.' . $ext, true);
+                @copy($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
+                $imageUrl = '';
                 $coverCdn = 0;
             }
         }
@@ -870,14 +879,12 @@ class Admin extends BaseController
         // Move fetched tmp image
         $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
         if ($tmpFile) {
-            $tmpPath = FCPATH . 'images/tmp/' . basename($tmpFile);
+            $tmpPath = $coverDir . 'tmp/' . basename($tmpFile);
             if (is_file($tmpPath)) {
                 $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
-                $newName = $id . '-thumb.' . $ext;
-                $destDir = FCPATH . 'images/';
-                if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                rename($tmpPath, $destDir . $newName);
-                $row['image'] = base_url('images/' . $newName);
+                rename($tmpPath, $coverDir . $id . '.' . $ext);
+                @copy($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
+                $row['image'] = '';
                 $row['cover'] = 0;
             }
         }
@@ -910,13 +917,10 @@ class Admin extends BaseController
         $name = $manga['name'];
 
         // 1. Delete cover images (local files)
+        $coverDir = $this->coverDir();
         foreach (['', '-thumb'] as $suffix) {
             foreach (['jpg', 'jpeg', 'png', 'gif', 'webp'] as $ext) {
-                $path = FCPATH . "images/{$id}{$suffix}.{$ext}";
-                if (is_file($path)) @unlink($path);
-            }
-            foreach (['jpg', 'jpeg', 'png', 'gif', 'webp'] as $ext) {
-                $path = FCPATH . "cover/{$id}{$suffix}.{$ext}";
+                $path = $coverDir . "{$id}{$suffix}.{$ext}";
                 if (is_file($path)) @unlink($path);
             }
         }
@@ -1612,14 +1616,17 @@ class Admin extends BaseController
             return $this->response->setJSON(['success' => false, 'error' => 'Not a valid image (mime: ' . $mime . ')']);
         }
 
-        // Save to tmp
-        $tmpDir = FCPATH . 'images/tmp/';
+        // Save to tmp inside cover dir
+        $coverDir = $this->coverDir();
+        $tmpDir = $coverDir . 'tmp/';
         if (!is_dir($tmpDir)) mkdir($tmpDir, 0755, true);
 
-        $filename = ($id > 0 ? $id : 'new_' . time()) . '-thumb.' . $ext;
+        $filename = ($id > 0 ? $id : 'new_' . time()) . '.' . $ext;
         file_put_contents($tmpDir . $filename, $data);
 
-        $localUrl = base_url('images/tmp/' . $filename);
+        // Build URL - determine web-accessible path
+        $coverWebPath = str_replace(FCPATH, '', $coverDir);
+        $localUrl = base_url($coverWebPath . 'tmp/' . $filename);
 
         return $this->response->setJSON([
             'success'   => true,
@@ -1645,16 +1652,19 @@ class Admin extends BaseController
         $mimeType  = 'image/jpeg';
         $mangaId   = $manga['id'];
 
-        // Thử đọc file local: images/{id}-thumb.{ext} (fallback: {slug}-thumb.{ext} cho file cũ)
+        // Thử đọc file local từ cover dir
+        $coverDir = $this->coverDir();
         foreach ([$mangaId, $manga['slug']] as $prefix) {
+            foreach (['-thumb', ''] as $suffix) {
             foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
-                $localPath = FCPATH . 'images/' . $prefix . '-thumb.' . $ext;
+                $localPath = $coverDir . $prefix . $suffix . '.' . $ext;
                 if (file_exists($localPath)) {
                     $imageData = file_get_contents($localPath);
                     $mimeMap   = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
                     $mimeType  = $mimeMap[$ext] ?? 'image/jpeg';
-                    break 2;
+                    break 3;
                 }
+            }
             }
         }
 
