@@ -157,7 +157,7 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
           ?>
           <!-- Preview -->
           <div id="mf-cover-preview" class="<?= $previewSrc ? '' : 'a-hidden' ?>">
-            <img id="mf-cover-img" src="<?= esc($previewSrc) ?>"
+            <img id="mf-cover-img" src="<?= esc($previewSrc) ?><?= $previewSrc ? '?t=' . time() : '' ?>"
                  alt="Cover"
                  style="width:100%;border-radius:8px;border:1px solid var(--c-border);max-height:300px;object-fit:cover"
                  onerror="this.style.display='none'">
