@@ -70,7 +70,7 @@ function comixx_time_ago($datetime) {
             </div>
             <div class="card-meta">
               <?php if (!empty($manga['chapter_1'])): ?>
-              <span class="meta-tag"><?= esc($manga['chapter_1']) ?></span>
+              <span class="meta-tag">Ch. <?= esc($manga['chapter_1']) ?></span>
               <?php endif; ?>
               <?php if (!empty($manga['update_at'])): ?>
               <span class="meta-time"><?= comixx_time_ago($manga['update_at']) ?></span>
@@ -102,7 +102,7 @@ function comixx_time_ago($datetime) {
           <div class="result-card-image"><img src="<?= manga_cover_url($manga) ?>" alt="<?= esc($manga['name']) ?>" loading="lazy"></div>
           <div class="result-card-meta">
             <?php if (!empty($manga['chapter_1'])): ?>
-            <span class="ch-tag"><?= esc($manga['chapter_1']) ?></span>
+            <span class="ch-tag">Ch. <?= esc($manga['chapter_1']) ?></span>
             <?php endif; ?>
             <?php if (!empty($manga['update_at'])): ?>
             <span><?= comixx_time_ago($manga['update_at']) ?></span>
@@ -202,7 +202,7 @@ function comixx_time_ago($datetime) {
             <h4><?= esc($manga['name']) ?></h4>
             <div class="sidebar-meta">
               <?php if (!empty($manga['chapter_1'])): ?>
-              <span><?= esc($manga['chapter_1']) ?></span>
+              <span>Ch. <?= esc($manga['chapter_1']) ?></span>
               <?php endif; ?>
               <?php if (!empty($manga['update_at'])): ?>
               <span><?= comixx_time_ago($manga['update_at']) ?></span>
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
           + '<div class="sidebar-info">'
           + '<span class="sidebar-type ' + typeCls + '">' + typeLabel.toUpperCase() + '</span>'
           + '<h4>' + m.name + '</h4>'
-          + '<div class="sidebar-meta"><span>' + (m.chapter_1 || '') + '</span></div>'
+          + '<div class="sidebar-meta"><span>' + (m.chapter_1 ? 'Ch. ' + m.chapter_1 : '') + '</span></div>'
           + '</div></a>';
       }).join('');
     });
