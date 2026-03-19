@@ -176,10 +176,12 @@ class Admin extends BaseController
         $db = $this->db();
 
         $stats = [
-            'users'    => (int) $db->table('users')->countAllResults(),
-            'manga'    => (int) $db->table('manga')->countAllResults(),
-            'comments' => (int) $db->table('comments')->countAllResults(),
-            'groups'   => (int) $db->table('groups')->countAllResults(),
+            'users'        => (int) $db->table('users')->countAllResults(),
+            'manga'        => (int) $db->table('manga')->countAllResults(),
+            'comments'     => (int) $db->table('comments')->countAllResults(),
+            'groups'       => (int) $db->table('groups')->countAllResults(),
+            'chapters'     => (int) $db->table('chapter')->countAllResults(),
+            'chapters_pub' => (int) $db->table('chapter')->where('is_show', 1)->countAllResults(),
         ];
 
         $recentUsers = $db->table('users')
