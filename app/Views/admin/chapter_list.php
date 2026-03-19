@@ -43,6 +43,7 @@
         <th class="col-hidden col-md">Pages</th>
         <th>Show</th>
         <th class="col-hidden col-md">Views</th>
+        <th class="col-hidden col-md">Created</th>
         <th></th>
       </tr>
     </thead>
@@ -70,6 +71,7 @@
           </label>
         </td>
         <td class="a-txt5 a-text-xs col-hidden col-md"><?= number_format((int)($c['view'] ?? 0)) ?></td>
+        <td class="a-txt6 a-text-xs col-hidden col-md"><?= !empty($c['created_at']) ? date('d/m/y H:i', strtotime($c['created_at'])) : '—' ?></td>
         <td class="a-text-right">
           <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
             <a href="/admin/chapters/<?= $c['id'] ?>/edit" class="a-btn-sec a-btn-sm">Edit</a>
@@ -84,7 +86,7 @@
       <?php endforeach; ?>
       <?php if (empty($items)): ?>
       <tr>
-        <td colspan="8" class="a-empty">
+        <td colspan="9" class="a-empty">
           No chapters yet. <a href="/admin/manga/<?= $manga['id'] ?>/chapters/new" class="a-link">Add first chapter</a>
         </td>
       </tr>
