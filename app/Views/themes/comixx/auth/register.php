@@ -280,8 +280,8 @@
 <div class="auth-wrapper">
   <div class="auth-card">
     <div class="auth-tabs">
-      <a href="<?= base_url('login') ?>" class="auth-tab" data-panel="login">LOGIN</a>
-      <a href="<?= base_url('register') ?>" class="auth-tab active" data-panel="register">REGISTER</a>
+      <a href="<?= base_url('login') ?>" class="auth-tab" data-panel="login">INICIAR SESIÓN</a>
+      <a href="<?= base_url('register') ?>" class="auth-tab active" data-panel="register">REGISTRARSE</a>
     </div>
 
     <div class="auth-body">
@@ -312,58 +312,58 @@
           <?= csrf_field() ?>
 
           <div class="auth-form-group">
-            <label class="auth-label">Display Name</label>
+            <label class="auth-label">Nombre</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-id-card"></i>
-              <input type="text" name="name" class="auth-input" placeholder="Your display name" value="<?= old('name') ?>" required>
+              <input type="text" name="name" class="auth-input" placeholder="Tu nombre" value="<?= old('name') ?>" required>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Username</label>
+            <label class="auth-label">Usuario</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-user"></i>
-              <input type="text" name="login" class="auth-input" placeholder="Choose a username" value="<?= old('login') ?>" required>
+              <input type="text" name="login" class="auth-input" placeholder="Elige un usuario" value="<?= old('login') ?>" required>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Email Address</label>
+            <label class="auth-label">Correo Electrónico</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-envelope"></i>
-              <input type="email" name="email" class="auth-input" placeholder="Enter your email" value="<?= old('email') ?>" required>
+              <input type="email" name="email" class="auth-input" placeholder="Ingresa tu correo" value="<?= old('email') ?>" required>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Password</label>
+            <label class="auth-label">Contraseña</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-lock"></i>
-              <input type="password" name="password" class="auth-input auth-password" placeholder="Create a password" required>
-              <button type="button" class="auth-password-toggle" title="Toggle password"><i class="far fa-eye"></i></button>
+              <input type="password" name="password" class="auth-input auth-password" placeholder="Crea una contraseña" required>
+              <button type="button" class="auth-password-toggle" title="Mostrar contraseña"><i class="far fa-eye"></i></button>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Confirm Password</label>
+            <label class="auth-label">Confirmar Contraseña</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-lock"></i>
-              <input type="password" name="confirm_password" class="auth-input auth-password" placeholder="Confirm your password" required>
-              <button type="button" class="auth-password-toggle" title="Toggle password"><i class="far fa-eye"></i></button>
+              <input type="password" name="confirm_password" class="auth-input auth-password" placeholder="Confirma tu contraseña" required>
+              <button type="button" class="auth-password-toggle" title="Mostrar contraseña"><i class="far fa-eye"></i></button>
             </div>
           </div>
 
-          <button type="submit" class="auth-submit">REGISTER</button>
+          <button type="submit" class="auth-submit">REGISTRARSE</button>
         </form>
 
-        <div class="auth-divider">or continue with</div>
+        <div class="auth-divider">o continuar con</div>
         <div class="auth-social-buttons">
           <button class="auth-social-btn"><i class="fab fa-google"></i> Google</button>
           <button class="auth-social-btn"><i class="fab fa-discord"></i> Discord</button>
         </div>
 
         <div class="auth-footer-text">
-          Already have an account? <a href="<?= base_url('login') ?>">Login</a>
+          ¿Ya tienes una cuenta? <a href="<?= base_url('login') ?>">Inicia Sesión</a>
         </div>
       </div>
     </div>

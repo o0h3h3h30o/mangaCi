@@ -280,8 +280,8 @@
 <div class="auth-wrapper">
   <div class="auth-card">
     <div class="auth-tabs">
-      <a href="<?= base_url('login') ?>" class="auth-tab active" data-panel="login">LOGIN</a>
-      <a href="<?= base_url('register') ?>" class="auth-tab" data-panel="register">REGISTER</a>
+      <a href="<?= base_url('login') ?>" class="auth-tab active" data-panel="login">INICIAR SESIÓN</a>
+      <a href="<?= base_url('register') ?>" class="auth-tab" data-panel="register">REGISTRARSE</a>
     </div>
 
     <div class="auth-body">
@@ -312,40 +312,40 @@
           <?= csrf_field() ?>
 
           <div class="auth-form-group">
-            <label class="auth-label">Username or Email</label>
+            <label class="auth-label">Usuario o Correo</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-user"></i>
-              <input type="text" name="login" class="auth-input" placeholder="Enter username or email" value="<?= old('login') ?>" required>
+              <input type="text" name="login" class="auth-input" placeholder="Ingresa tu usuario o correo" value="<?= old('login') ?>" required>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Password</label>
+            <label class="auth-label">Contraseña</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-lock"></i>
-              <input type="password" name="password" class="auth-input auth-password" placeholder="Enter password" required>
-              <button type="button" class="auth-password-toggle" title="Toggle password"><i class="far fa-eye"></i></button>
+              <input type="password" name="password" class="auth-input auth-password" placeholder="Ingresa tu contraseña" required>
+              <button type="button" class="auth-password-toggle" title="Mostrar contraseña"><i class="far fa-eye"></i></button>
             </div>
           </div>
 
           <div class="auth-options">
             <label class="auth-remember">
-              <input type="checkbox" name="remember"> Remember me
+              <input type="checkbox" name="remember"> Recuérdame
             </label>
-            <a href="<?= base_url('forgot-password') ?>" class="auth-forgot">Forgot password?</a>
+            <a href="<?= base_url('forgot-password') ?>" class="auth-forgot">¿Olvidaste tu contraseña?</a>
           </div>
 
-          <button type="submit" class="auth-submit">LOGIN</button>
+          <button type="submit" class="auth-submit">INICIAR SESIÓN</button>
         </form>
 
-        <div class="auth-divider">or continue with</div>
+        <div class="auth-divider">o continuar con</div>
         <div class="auth-social-buttons">
           <button class="auth-social-btn"><i class="fab fa-google"></i> Google</button>
           <button class="auth-social-btn"><i class="fab fa-discord"></i> Discord</button>
         </div>
 
         <div class="auth-footer-text">
-          Don't have an account? <a href="<?= base_url('register') ?>">Register</a>
+          ¿No tienes una cuenta? <a href="<?= base_url('register') ?>">Regístrate</a>
         </div>
       </div>
     </div>

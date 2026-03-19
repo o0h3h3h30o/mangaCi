@@ -3,8 +3,8 @@
 <?= $this->section('content') ?>
 
 <?php
-$statusMap = [1 => 'Ongoing', 2 => 'Completed'];
-$statusLabel = $statusMap[$manga['status_id'] ?? 0] ?? 'Unknown';
+$statusMap = [1 => 'En Curso', 2 => 'Completado'];
+$statusLabel = $statusMap[$manga['status_id'] ?? 0] ?? 'Desconocido';
 
 $firstChapterLink = '#';
 if (!empty($chapters)) {
@@ -35,7 +35,7 @@ $shareText = esc($manga['name']);
           <p class="detail-alt-titles"><?= esc($manga['otherNames']) ?></p>
         <?php endif; ?>
         <div class="detail-actions">
-          <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> START READING</a>
+          <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> EMPEZAR A LEER</a>
           <button class="detail-icon-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="<?= !empty($isBookmarked) ? 'fas' : 'far' ?> fa-bookmark"></i></button>
           <button class="detail-icon-btn"><i class="fas fa-flag"></i></button>
         </div>
@@ -45,7 +45,7 @@ $shareText = esc($manga['name']);
         </div>
         <div class="detail-synopsis clamped" id="synopsisBox">
           <p><?= $manga['summary'] ?? '' ?></p>
-          <a href="javascript:void(0)" class="detail-more-link" id="synopsisToggle">[+more]</a>
+          <a href="javascript:void(0)" class="detail-more-link" id="synopsisToggle">[+más]</a>
         </div>
         <div class="detail-share">
           <span class="detail-share-count"><?= number_format($manga['views'] ?? 0) ?></span>
@@ -76,16 +76,16 @@ $shareText = esc($manga['name']);
         <div class="detail-score"><?= number_format($ratingAvg, 1) ?></div>
         <div class="detail-stats-list">
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Followed</span>
-            <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> users</span>
+            <span class="detail-stat-label">Seguidores</span>
+            <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> usuarios</span>
           </div>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Score</span>
-            <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> by <?= number_format($ratingVotes) ?> users</span>
+            <span class="detail-stat-label">Puntuación</span>
+            <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> por <?= number_format($ratingVotes) ?> usuarios</span>
           </div>
           <?php if (!empty($authors)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Authors</span>
+              <span class="detail-stat-label">Autores</span>
               <span class="detail-stat-value">
                 <?php
                 $authorNames = array_map(function ($a) {
@@ -98,7 +98,7 @@ $shareText = esc($manga['name']);
           <?php endif; ?>
           <?php if (!empty($artists)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Artists</span>
+              <span class="detail-stat-label">Artistas</span>
               <span class="detail-stat-value">
                 <?php
                 $artistNames = array_map(function ($a) {
@@ -111,7 +111,7 @@ $shareText = esc($manga['name']);
           <?php endif; ?>
           <?php if (!empty($mangaCats)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Genres</span>
+              <span class="detail-stat-label">Géneros</span>
               <span class="detail-stat-value detail-genres">
                 <?php foreach ($mangaCats as $idx => $cat): ?>
                   <?php if ($idx > 0): ?>, <?php endif; ?>
@@ -128,20 +128,20 @@ $shareText = esc($manga['name']);
     <section class="detail-chapter-section">
       <div class="detail-chapter-header">
         <div class="detail-chapter-search">
-          <input type="text" id="chapterSearchInput" placeholder="Go to chap..">
+          <input type="text" id="chapterSearchInput" placeholder="Ir al cap..">
         </div>
         <div class="detail-chapter-controls">
           <button class="detail-view-btn active"><i class="fas fa-list"></i></button>
           <button class="detail-view-btn"><i class="fas fa-th"></i></button>
-          <button class="detail-filter-dropdown">All <i class="fas fa-chevron-down"></i></button>
+          <button class="detail-filter-dropdown">Todos <i class="fas fa-chevron-down"></i></button>
         </div>
       </div>
 
       <div class="detail-chapter-table">
         <div class="detail-chapter-table-header">
-          <span class="detail-col-chapter"><i class="fas fa-sort-down"></i> Chapter</span>
-          <span class="detail-col-views"><i class="fas fa-eye"></i> Views</span>
-          <span class="detail-col-updated"><i class="fas fa-clock"></i> Date</span>
+          <span class="detail-col-chapter"><i class="fas fa-sort-down"></i> Capítulo</span>
+          <span class="detail-col-views"><i class="fas fa-eye"></i> Vistas</span>
+          <span class="detail-col-updated"><i class="fas fa-clock"></i> Fecha</span>
         </div>
 
         <?php if (!empty($chapters)): ?>
@@ -154,7 +154,7 @@ $shareText = esc($manga['name']);
           <?php endforeach; ?>
         <?php else: ?>
           <div class="detail-chapter-row">
-            <span class="detail-col-chapter">No chapters available yet.</span>
+            <span class="detail-col-chapter">Aún no hay capítulos disponibles.</span>
           </div>
         <?php endif; ?>
       </div>
@@ -169,24 +169,24 @@ $shareText = esc($manga['name']);
     <section class="detail-comments" id="dc-section">
       <div class="detail-comments-warning">
         <i class="fas fa-exclamation-triangle"></i>
-        <span>Note: Please take a moment to read the comment rules before posting.</span>
+        <span>Nota: Por favor, tómate un momento para leer las reglas de comentarios antes de publicar.</span>
       </div>
       <div class="detail-comments-header">
-        <span class="detail-comments-count">Comments <span id="dc-count"></span></span>
+        <span class="detail-comments-count">Comentarios <span id="dc-count"></span></span>
         <div class="tab-buttons">
-          <button class="tab-btn active" data-dc-order="newest">NEW</button>
-          <button class="tab-btn" data-dc-order="oldest">OLDER</button>
+          <button class="tab-btn active" data-dc-order="newest">NUEVO</button>
+          <button class="tab-btn" data-dc-order="oldest">ANTERIOR</button>
           <button class="tab-btn" data-dc-order="top">TOP</button>
         </div>
       </div>
 
       <?php if (empty($currentUser)): ?>
-      <p class="detail-comment-login"><a href="/login">Login</a> or <a href="/register">Register</a> to join the conversation</p>
+      <p class="detail-comment-login"><a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para unirte a la conversación</p>
       <?php else: ?>
       <form id="dc-form" class="detail-comment-form">
-        <textarea id="dc-input" rows="3" maxlength="1000" placeholder="Write a comment..."></textarea>
+        <textarea id="dc-input" rows="3" maxlength="1000" placeholder="Escribe un comentario..."></textarea>
         <div id="dc-captcha-box" class="dc-captcha" style="display:none">
-          <p class="dc-captcha-label">You just commented. Solve the captcha to continue:</p>
+          <p class="dc-captcha-label">Acabas de comentar. Resuelve el captcha para continuar:</p>
           <div class="dc-captcha-row">
             <span id="dc-captcha-q"></span>
             <span>= ?</span>
@@ -195,13 +195,13 @@ $shareText = esc($manga['name']);
         </div>
         <div class="detail-comment-form-footer">
           <span id="dc-char" class="dc-char-count">0 / 1000</span>
-          <button type="submit" class="dc-submit-btn">Post comment</button>
+          <button type="submit" class="dc-submit-btn">Publicar comentario</button>
         </div>
       </form>
       <?php endif; ?>
 
       <div id="dc-list" class="detail-comment-list">
-        <p class="dc-loading">Loading...</p>
+        <p class="dc-loading">Cargando...</p>
       </div>
       <div id="dc-pg" class="dc-pagination"></div>
     </section>
@@ -227,16 +227,16 @@ $shareText = esc($manga['name']);
       <div class="detail-score"><?= number_format($ratingAvg, 1) ?></div>
       <div class="detail-stats-list">
         <div class="detail-stat-row">
-          <span class="detail-stat-label">Followed</span>
-          <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> users</span>
+          <span class="detail-stat-label">Seguidores</span>
+          <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> usuarios</span>
         </div>
         <div class="detail-stat-row">
-          <span class="detail-stat-label">Score</span>
-          <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> by <?= number_format($ratingVotes) ?> users</span>
+          <span class="detail-stat-label">Puntuación</span>
+          <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> por <?= number_format($ratingVotes) ?> usuarios</span>
         </div>
         <?php if (!empty($authors)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Authors</span>
+            <span class="detail-stat-label">Autores</span>
             <span class="detail-stat-value">
               <?php
               $authorLinks = array_map(function ($a) {
@@ -249,7 +249,7 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <?php if (!empty($artists)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Artists</span>
+            <span class="detail-stat-label">Artistas</span>
             <span class="detail-stat-value">
               <?php
               $artistLinks = array_map(function ($a) {
@@ -262,7 +262,7 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <?php if (!empty($mangaCats)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Genres</span>
+            <span class="detail-stat-label">Géneros</span>
             <span class="detail-stat-value detail-genres">
               <?php foreach ($mangaCats as $idx => $cat): ?>
                 <?php if ($idx > 0): ?>, <?php endif; ?>
@@ -278,7 +278,7 @@ $shareText = esc($manga['name']);
     <?php if (!empty($recommended)): ?>
       <div class="detail-recommendations">
         <div class="section-header">
-          <h2>Recommendations</h2>
+          <h2>Recomendados</h2>
           <div class="section-nav">
             <button class="nav-arrow"><i class="fas fa-chevron-left"></i></button>
             <button class="nav-arrow"><i class="fas fa-chevron-right"></i></button>
@@ -317,10 +317,10 @@ $shareText = esc($manga['name']);
   btn.addEventListener('click', function() {
     if (box.classList.contains('clamped')) {
       box.classList.remove('clamped');
-      btn.textContent = '[-less]';
+      btn.textContent = '[-menos]';
     } else {
       box.classList.add('clamped');
-      btn.textContent = '[+more]';
+      btn.textContent = '[+más]';
     }
   });
 })();
@@ -359,10 +359,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     bookmarkBtn.classList.remove('active');
                 }
                 followEls.forEach(function(el) {
-                    if (el.textContent.indexOf('users') !== -1 && el.closest('.detail-stat-row') && el.closest('.detail-stat-row').querySelector('.detail-stat-label') && el.closest('.detail-stat-row').querySelector('.detail-stat-label').textContent.trim() === 'Followed') {
+                    if (el.textContent.indexOf('usuarios') !== -1 && el.closest('.detail-stat-row') && el.closest('.detail-stat-row').querySelector('.detail-stat-label') && el.closest('.detail-stat-row').querySelector('.detail-stat-label').textContent.trim() === 'Seguidores') {
                         var n = parseInt(el.textContent.replace(/\D/g, '')) || 0;
                         n = data.bookmarked ? n + 1 : Math.max(0, n - 1);
-                        el.textContent = n.toLocaleString() + ' users';
+                        el.textContent = n.toLocaleString() + ' usuarios';
                     }
                 });
             })
@@ -447,9 +447,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update showing text
         if (total === 0) {
-            showingEl.textContent = 'No chapters found';
+            showingEl.textContent = 'No se encontraron capítulos';
         } else {
-            showingEl.textContent = 'Showing ' + (start + 1) + ' to ' + end + ' of ' + total + ' chapters';
+            showingEl.textContent = 'Mostrando ' + (start + 1) + ' a ' + end + ' de ' + total + ' capítulos';
         }
 
         // Build pagination buttons
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       }
     })
-    .catch(function(err) { alert('Rating failed'); });
+    .catch(function(err) { alert('Error al calificar'); });
   }
 
   function highlightStars(starsEls, n) {
@@ -772,11 +772,11 @@ document.addEventListener('DOMContentLoaded', function () {
   function timeAgo(str){
     var d=new Date(str.replace(' ','T'));
     var diff=Math.floor((Date.now()-d.getTime())/1000);
-    if(diff<60) return diff+'s ago';
-    if(diff<3600) return Math.floor(diff/60)+'m ago';
-    if(diff<86400) return Math.floor(diff/3600)+'h ago';
-    if(diff<604800) return Math.floor(diff/86400)+'d ago';
-    return Math.floor(diff/604800)+'w ago';
+    if(diff<60) return 'hace '+diff+'s';
+    if(diff<3600) return 'hace '+Math.floor(diff/60)+'m';
+    if(diff<86400) return 'hace '+Math.floor(diff/3600)+'h';
+    if(diff<604800) return 'hace '+Math.floor(diff/86400)+'d';
+    return 'hace '+Math.floor(diff/604800)+'sem';
   }
 
   function avatar(name, username, uid, size){
@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderReply(c, topParentId){
     var name=c.user_name||c.user_username||'?';
     var replyBtn=(CURRENT_UID>0&&topParentId)
-      ? '<button class="dc-reply-btn" data-id="'+topParentId+'" data-reply-to="'+c.id+'" data-name="'+esc(name)+'">Reply</button>'
+      ? '<button class="dc-reply-btn" data-id="'+topParentId+'" data-reply-to="'+c.id+'" data-name="'+esc(name)+'">Responder</button>'
       : '';
     return '<div class="dc-item" data-id="'+c.id+'">'+
       '<div class="dc-item-body">'+
@@ -821,24 +821,24 @@ document.addEventListener('DOMContentLoaded', function () {
       '<input type="hidden" class="dc-reply-to-id" value="'+(replyToId||0)+'">'+
       '<textarea class="dc-reply-input" rows="2" maxlength="1000">@'+esc(parentName)+' </textarea>'+
       '<div class="dc-rf-captcha-box dc-captcha" style="display:none">'+
-      '<p class="dc-captcha-label">You just commented. Solve the captcha to continue:</p>'+
+      '<p class="dc-captcha-label">Acabas de comentar. Resuelve el captcha para continuar:</p>'+
       '<div class="dc-captcha-row"><span class="dc-rf-captcha-q"></span><span>= ?</span>'+
       '<input class="dc-rf-captcha-ans" type="number" min="0" max="99" placeholder="0"></div></div>'+
       '<div class="dc-reply-form-actions">'+
-      '<button class="dc-reply-cancel-btn dc-reply-cancel" data-parent="'+parentId+'">Cancel</button>'+
-      '<button class="dc-reply-submit-btn dc-reply-submit" data-parent="'+parentId+'">Reply</button>'+
+      '<button class="dc-reply-cancel-btn dc-reply-cancel" data-parent="'+parentId+'">Cancelar</button>'+
+      '<button class="dc-reply-submit-btn dc-reply-submit" data-parent="'+parentId+'">Responder</button>'+
       '</div></div>';
   }
 
   function fetchReplies(commentId, btn){
     var container=document.getElementById('dc-replies-'+commentId);
     if(!container) return;
-    if(btn){btn.disabled=true;btn.textContent='Loading...';}
+    if(btn){btn.disabled=true;btn.textContent='Cargando...';}
     fetch('/api/comments/'+commentId+'/replies')
       .then(function(r){return r.json();})
       .then(function(d){
         if(!d.replies||!d.replies.length){
-          if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=cnt+' repl'+(parseInt(cnt)===1?'y':'ies');}
+          if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}
           return;
         }
         var LIMIT=5,visible=d.replies.slice(0,LIMIT),hidden=d.replies.slice(LIMIT);
@@ -846,14 +846,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if(hidden.length>0){
           var mBtn=document.createElement('button');
           mBtn.className='dc-show-more';
-          mBtn.textContent='Show '+hidden.length+' more repl'+(hidden.length===1?'y':'ies')+'...';
+          mBtn.textContent='Mostrar '+hidden.length+' respuesta'+(hidden.length===1?'':'s')+' más...';
           mBtn.onclick=function(){mBtn.remove();container.insertAdjacentHTML('beforeend',hidden.map(function(r){return renderReply(r,commentId);}).join(''));};
           container.appendChild(mBtn);
         }
-        if(btn){btn.textContent='Hide';btn.disabled=false;btn.dataset.open='1';}
+        if(btn){btn.textContent='Ocultar respuestas';btn.disabled=false;btn.dataset.open='1';}
       })
       .catch(function(){
-        if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=cnt+' repl'+(parseInt(cnt)===1?'y':'ies');}
+        if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}
       });
   }
 
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var name=c.user_name||c.user_username||'?';
     var replyBtn='';
     if(CURRENT_UID>0){
-      replyBtn='<button class="dc-reply-btn" data-id="'+c.id+'" data-name="'+esc(name)+'">Reply</button>';
+      replyBtn='<button class="dc-reply-btn" data-id="'+c.id+'" data-name="'+esc(name)+'">Responder</button>';
     }
     var chapterTag='';
     if(c.chapter_slug){
@@ -870,7 +870,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var replyCount=parseInt(c.reply_count||0);
     var repliesToggle='';
     if(replyCount>0){
-      repliesToggle='<button class="dc-reply-btn dc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">'+replyCount+' repl'+(replyCount===1?'y':'ies')+'</button>';
+      repliesToggle='<button class="dc-reply-btn dc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">Ver '+replyCount+' respuesta'+(replyCount===1?'':'s')+'</button>';
     }
     return '<div class="dc-item" data-id="'+c.id+'">'+
       '<div class="dc-item-body">'+
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if(countEl) countEl.textContent=data.total>0?'('+data.total+')':'';
         totalPages=data.total>0?Math.ceil(data.total/10):1;
         list.innerHTML=(!data.comments||!data.comments.length)
-          ?'<p class="dc-loading">No comments yet. Be the first!</p>'
+          ?'<p class="dc-loading">Sin comentarios aún. ¡Sé el primero!</p>'
           :data.comments.map(renderCmt).join('');
         if(data.comments) data.comments.forEach(function(c){
           if(parseInt(c.reply_count||0)>0) fetchReplies(c.id,null);
@@ -1007,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var countEl=document.getElementById('dc-count');
           if(countEl){var cur=parseInt((countEl.textContent||'').replace(/\D/g,''))||0;countEl.textContent='('+(cur+1)+')';}
         })
-        .catch(function(){alert('Something went wrong, please try again.');});
+        .catch(function(){alert('Algo salió mal, por favor intenta de nuevo.');});
     });
   }
 
@@ -1046,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', function () {
         container.innerHTML='';
         target.dataset.open='0';
         var cnt=target.dataset.count;
-        target.textContent=cnt+' repl'+(parseInt(cnt)===1?'y':'ies');
+        target.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');
       } else {
         fetchReplies(parseInt(cid),target);
       }
@@ -1089,7 +1089,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var captchaAns=rf.querySelector('.dc-rf-captcha-ans');
         if(!captchaAns||!captchaAns.value.trim()){captchaAns&&captchaAns.focus();return;}
       }
-      target.disabled=true;target.textContent='Sending...';
+      target.disabled=true;target.textContent='Enviando...';
       var replyToInput=rf.querySelector('.dc-reply-to-id');
       var fd=new FormData();
       fd.append('manga_id',MANGA_ID);
@@ -1112,10 +1112,10 @@ document.addEventListener('DOMContentLoaded', function () {
               if(q) q.textContent=d.question;
               if(ans){ans.value='';ans.focus();}
             });
-            target.disabled=false;target.textContent='Reply';
+            target.disabled=false;target.textContent='Responder';
             return;
           }
-          if(c.error){alert(c.error);target.disabled=false;target.textContent='Reply';return;}
+          if(c.error){alert(c.error);target.disabled=false;target.textContent='Responder';return;}
           rf.remove();
           var container=document.getElementById('dc-replies-'+parentId);
           if(container){
@@ -1124,7 +1124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             else container.insertAdjacentHTML('beforeend',renderReply(c,parentId));
           }
         })
-        .catch(function(){target.disabled=false;target.textContent='Reply';alert('Something went wrong.');});
+        .catch(function(){target.disabled=false;target.textContent='Responder';alert('Algo salió mal.');});
       return;
     }
   });

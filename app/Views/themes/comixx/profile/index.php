@@ -979,7 +979,7 @@ $uid = $u['id'] ?? '';
       <div class="profile-username"><?= esc($name ?: $username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">LOGOUT</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
   </div>
 </section>
 
@@ -988,23 +988,23 @@ $uid = $u['id'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab active">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Edit Profile</span>
+      <span class="tab-text">Editar Perfil</span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notifications</span>
+      <span class="tab-text">Notificaciones</span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">History</span>
+      <span class="tab-text">Historial</span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Bookmarks</span>
+      <span class="tab-text">Marcadores</span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Settings</span>
+      <span class="tab-text">Configuración</span>
     </a>
   </div>
 </div>
@@ -1026,21 +1026,21 @@ $uid = $u['id'] ?? '';
     </div>
     <div class="form-group">
       <label class="form-label">Username</label>
-      <input type="text" class="form-input" name="username" value="<?= esc($username) ?>" placeholder="Enter username">
+      <input type="text" class="form-input" name="username" value="<?= esc($username) ?>" placeholder="Ingresa usuario">
     </div>
     <div class="form-group">
       <label class="form-label">Email Address</label>
-      <input type="email" class="form-input" name="email" value="<?= esc($email) ?>" placeholder="Enter email address">
+      <input type="email" class="form-input" name="email" value="<?= esc($email) ?>" placeholder="Ingresa correo">
     </div>
     <div class="form-group">
       <label class="form-label">Display Name</label>
-      <input type="text" class="form-input" name="name" value="<?= esc($name) ?>" placeholder="Enter display name">
+      <input type="text" class="form-input" name="name" value="<?= esc($name) ?>" placeholder="Ingresa nombre">
     </div>
     <a href="<?= base_url('profile/change-password') ?>" class="change-password-link">
-      <span>&#128273;</span> Change Password
+      <span>&#128273;</span> Cambiar Contraseña
     </a>
     <br><br>
-    <button type="submit" class="save-btn">SAVE CHANGES</button>
+    <button type="submit" class="save-btn">GUARDAR CAMBIOS</button>
   </form>
 </div>
 

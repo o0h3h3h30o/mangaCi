@@ -582,18 +582,18 @@ function comixx_search_time_ago($datetime) {
     }
     $diff = $now->diff($ago);
 
-    if ($diff->y > 0) return $diff->y . ' year' . ($diff->y > 1 ? 's' : '') . ' ago';
-    if ($diff->m > 0) return $diff->m . ' month' . ($diff->m > 1 ? 's' : '') . ' ago';
+    if ($diff->y > 0) return 'hace ' . $diff->y . ' año' . ($diff->y > 1 ? 's' : '');
+    if ($diff->m > 0) return 'hace ' . $diff->m . ' mes' . ($diff->m > 1 ? 'es' : '');
     if ($diff->d > 0) {
         if ($diff->d >= 7) {
             $weeks = floor($diff->d / 7);
-            return $weeks . ' week' . ($weeks > 1 ? 's' : '') . ' ago';
+            return 'hace ' . $weeks . ' semana' . ($weeks > 1 ? 's' : '');
         }
-        return $diff->d . ' day' . ($diff->d > 1 ? 's' : '') . ' ago';
+        return 'hace ' . $diff->d . ' día' . ($diff->d > 1 ? 's' : '');
     }
-    if ($diff->h > 0) return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
-    if ($diff->i > 0) return $diff->i . ' min' . ($diff->i > 1 ? 's' : '') . ' ago';
-    return 'Just now';
+    if ($diff->h > 0) return 'hace ' . $diff->h . ' hora' . ($diff->h > 1 ? 's' : '');
+    if ($diff->i > 0) return 'hace ' . $diff->i . ' min';
+    return 'Ahora';
 }
 
 $currentKeyword = $_GET['filter']['name'] ?? '';
@@ -609,29 +609,29 @@ $resultCount = count($results ?? []);
   <div class="search-main-bar">
     <div class="search-main-input">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Search.." id="searchInput" value="<?= esc($currentKeyword) ?>">
+      <input type="text" placeholder="Buscar.." id="searchInput" value="<?= esc($currentKeyword) ?>">
     </div>
-    <button class="btn-advanced-filters" id="toggleFilters">ADVANCED FILTERS</button>
+    <button class="btn-advanced-filters" id="toggleFilters">FILTROS AVANZADOS</button>
   </div>
 
   <!-- Advanced Filters Panel -->
   <div class="search-filters" id="filtersPanel">
     <div class="filters-row">
       <div class="filter-group">
-        <label>Sort By</label>
+        <label>Ordenar Por</label>
         <select id="filterSort">
-          <option value="">Any</option>
-          <option value="-updated_at">Latest Update</option>
-          <option value="-views">Most Popular</option>
+          <option value="">Cualquiera</option>
+          <option value="-updated_at">Última Actualización</option>
+          <option value="-views">Más Popular</option>
           <option value="name">A-Z</option>
           <option value="-name">Z-A</option>
-          <option value="-created_at">Newest Added</option>
+          <option value="-created_at">Más Recientes</option>
         </select>
       </div>
       <div class="filter-group">
-        <label>Types</label>
+        <label>Tipos</label>
         <select id="filterType">
-          <option value="">Any</option>
+          <option value="">Cualquiera</option>
           <option value="manga">Manga</option>
           <option value="manhwa">Manhwa</option>
           <option value="manhua">Manhua</option>
@@ -641,9 +641,9 @@ $resultCount = count($results ?? []);
         </select>
       </div>
       <div class="filter-group">
-        <label>Genres</label>
+        <label>Géneros</label>
         <select id="filterGenre">
-          <option value="">Any</option>
+          <option value="">Cualquiera</option>
           <?php if (!empty($categories)): ?>
           <?php foreach ($categories as $cat): ?>
           <option value="<?= esc($cat['slug']) ?>"><?= esc($cat['name']) ?></option>
@@ -652,21 +652,21 @@ $resultCount = count($results ?? []);
         </select>
       </div>
       <div class="filter-group">
-        <label>Release Status</label>
+        <label>Estado</label>
         <select id="filterStatus">
-          <option value="">Any</option>
-          <option value="1">Ongoing</option>
-          <option value="2">Completed</option>
-          <option value="3">Hiatus</option>
-          <option value="4">Cancelled</option>
+          <option value="">Cualquiera</option>
+          <option value="1">En Curso</option>
+          <option value="2">Completado</option>
+          <option value="3">En Pausa</option>
+          <option value="4">Cancelado</option>
         </select>
       </div>
     </div>
 
     <div class="filters-actions">
-      <button class="btn-reset" id="resetFilters">RESET FILTERS</button>
-      <button class="btn-lucky" id="luckyBtn"><i class="fas fa-dice"></i> I'M FEELING LUCKY</button>
-      <button class="btn-apply" id="applyFilter">APPLY FILTER</button>
+      <button class="btn-reset" id="resetFilters">LIMPIAR FILTROS</button>
+      <button class="btn-lucky" id="luckyBtn"><i class="fas fa-dice"></i> TENGO SUERTE</button>
+      <button class="btn-apply" id="applyFilter">APLICAR FILTRO</button>
     </div>
   </div>
 
@@ -674,14 +674,14 @@ $resultCount = count($results ?? []);
   <div class="results-header">
     <div class="results-count">
       <?php if (!empty($currentKeyword)): ?>
-      <strong><?= $resultCount ?></strong> results for "<?= esc($currentKeyword) ?>"
+      <strong><?= $resultCount ?></strong> resultados para "<?= esc($currentKeyword) ?>"
       <?php else: ?>
-      <strong><?= $resultCount ?></strong> Items
+      <strong><?= $resultCount ?></strong> Elementos
       <?php endif; ?>
     </div>
     <div class="view-toggle">
-      <button class="view-toggle-btn" data-view="list" title="List view"><i class="fas fa-list"></i></button>
-      <button class="view-toggle-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
+      <button class="view-toggle-btn" data-view="list" title="Vista lista"><i class="fas fa-list"></i></button>
+      <button class="view-toggle-btn active" data-view="grid" title="Vista cuadrícula"><i class="fas fa-th"></i></button>
     </div>
   </div>
 
@@ -716,7 +716,7 @@ $resultCount = count($results ?? []);
     <?php endforeach; ?>
     <?php else: ?>
     <div class="no-results">
-      <p>No results found. Try adjusting your search or filters.</p>
+      <p>No se encontraron resultados. Intenta ajustar tu búsqueda o filtros.</p>
     </div>
     <?php endif; ?>
   </div>
@@ -738,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (toggleBtn && filtersPanel) {
     toggleBtn.addEventListener('click', function() {
       filtersPanel.classList.toggle('open');
-      toggleBtn.textContent = filtersPanel.classList.contains('open') ? 'HIDE FILTERS' : 'ADVANCED FILTERS';
+      toggleBtn.textContent = filtersPanel.classList.contains('open') ? 'OCULTAR FILTROS' : 'FILTROS AVANZADOS';
     });
   }
 
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (params.get('sort') || params.get('genre') || params.get('status') || params.get('type')) {
     if (filtersPanel) {
       filtersPanel.classList.add('open');
-      if (toggleBtn) toggleBtn.textContent = 'HIDE FILTERS';
+      if (toggleBtn) toggleBtn.textContent = 'OCULTAR FILTROS';
     }
   }
 

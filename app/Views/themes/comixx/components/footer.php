@@ -6,19 +6,19 @@
       </div>
       <div class="footer-links-row">
         <div class="footer-col">
-          <h4>Reading</h4>
-          <a href="/search?sort=-updated_at">LATEST UPDATES</a>
-          <a href="/search?sort=-views">POPULAR</a>
-          <a href="/search?sort=-created_at">NEWEST</a>
+          <h4>Lectura</h4>
+          <a href="/search?sort=-updated_at">ÚLTIMAS ACTUALIZACIONES</a>
+          <a href="/search?sort=-views">POPULARES</a>
+          <a href="/search?sort=-created_at">MÁS NUEVOS</a>
         </div>
         <div class="footer-col">
-          <h4>Links</h4>
-          <a href="/search">BROWSE ALL</a>
+          <h4>Enlaces</h4>
+          <a href="/search">VER TODO</a>
           <a href="/sitemap.xml">SITEMAP</a>
         </div>
       </div>
       <div class="footer-brand">
-        <h2>Next-Gen<br>Manga Experience.</h2>
+        <h2>La Nueva<br>Experiencia Manga.</h2>
         <div class="footer-bottom">
           <div class="footer-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

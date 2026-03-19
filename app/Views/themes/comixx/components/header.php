@@ -16,8 +16,8 @@
       </a>
       <div class="search-bar">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Search comic..." autocomplete="off" id="headerSearchInput">
-        <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> FILTER</a>
+        <input type="text" placeholder="Buscar cómic..." autocomplete="off" id="headerSearchInput">
+        <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> FILTRO</a>
         <div class="search-dropdown" id="headerSearchDropdown"></div>
       </div>
       <div class="header-actions">
@@ -26,11 +26,11 @@
           <button class="icon-btn" id="notiBtn" aria-label="Notifications"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
           <div class="noti-panel" id="notiPanel" style="display:none">
             <div class="noti-panel-header">
-              <span>Notifications</span>
-              <button onclick="notiMarkAll(event)">Mark all read</button>
+              <span>Notificaciones</span>
+              <button onclick="notiMarkAll(event)">Marcar todo leído</button>
             </div>
             <div class="noti-list" id="notiList">
-              <div class="noti-empty">Loading...</div>
+              <div class="noti-empty">Cargando...</div>
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
     </div>
     <!-- Mobile Search Bar (toggleable) -->
     <div class="mobile-search-bar" id="mobileSearchBar">
-      <input type="text" placeholder="Search comic..." autocomplete="off" id="mobileSearchInput">
+      <input type="text" placeholder="Buscar cómic..." autocomplete="off" id="mobileSearchInput">
       <div class="search-dropdown" id="mobileSearchDropdown"></div>
     </div>
   </header>
@@ -63,12 +63,12 @@
       <button class="mobile-menu-close" id="mobileMenuClose"><i class="fas fa-times"></i></button>
     </div>
     <nav class="mobile-menu-nav">
-      <a href="/"><i class="fas fa-play"></i> Home</a>
-      <a href="/search"><i class="fas fa-play"></i> Browse</a>
-      <a href="/search?sort=-views"><i class="fas fa-play"></i> Popular</a>
+      <a href="/"><i class="fas fa-play"></i> Inicio</a>
+      <a href="/search"><i class="fas fa-play"></i> Explorar</a>
+      <a href="/search?sort=-views"><i class="fas fa-play"></i> Populares</a>
       <?php if (!empty($categories)): ?>
       <div class="mobile-genre-wrapper">
-        <a href="#" class="mobile-genre-trigger"><i class="fas fa-play"></i> Genres <i class="fas fa-chevron-down genre-arrow"></i></a>
+        <a href="#" class="mobile-genre-trigger"><i class="fas fa-play"></i> Géneros <i class="fas fa-chevron-down genre-arrow"></i></a>
         <div class="mobile-genre-list">
           <?php foreach ($categories as $cat): ?>
           <a href="/search?genre=<?= esc($cat['slug'], 'url') ?>"><?= esc($cat['name']) ?></a>
@@ -80,7 +80,7 @@
     <div class="mobile-menu-actions">
       <?php if (session()->get('isLoggedIn')): ?>
       <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= esc(session()->get('user_username') ?: session()->get('user_name')) ?></a>
-      <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;">LOGOUT</a>
+      <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;">SALIR</a>
       <?php else: ?>
       <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;">LOGIN</a>
       <?php endif; ?>
@@ -90,12 +90,12 @@
   <!-- Dropdown Nav -->
   <nav class="nav-dropdown">
     <div class="nav-dropdown-inner container">
-      <a href="/search?sort=-created_at"><i class="fas fa-play"></i> Newest</a>
-      <a href="/search?sort=-updated_at"><i class="fas fa-play"></i> Latest Updates</a>
-      <a href="/search?sort=-views"><i class="fas fa-play"></i> Popular</a>
+      <a href="/search?sort=-created_at"><i class="fas fa-play"></i> Más Nuevos</a>
+      <a href="/search?sort=-updated_at"><i class="fas fa-play"></i> Últimas Actualizaciones</a>
+      <a href="/search?sort=-views"><i class="fas fa-play"></i> Populares</a>
       <?php if (!empty($categories)): ?>
       <div class="nav-genre-wrapper">
-        <a href="#" class="nav-genre-trigger"><i class="fas fa-play"></i> Genres <i class="fas fa-chevron-down genre-arrow"></i></a>
+        <a href="#" class="nav-genre-trigger"><i class="fas fa-play"></i> Géneros <i class="fas fa-chevron-down genre-arrow"></i></a>
         <div class="genre-dropdown">
           <?php foreach ($categories as $cat): ?>
           <a href="/search?genre=<?= esc($cat['slug'], 'url') ?>"><?= esc($cat['name']) ?></a>
@@ -103,7 +103,7 @@
         </div>
       </div>
       <?php endif; ?>
-      <a href="/search"><i class="fas fa-play"></i> Browse All</a>
+      <a href="/search"><i class="fas fa-play"></i> Ver Todo</a>
     </div>
   </nav>
 
@@ -220,8 +220,8 @@
   function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
   function _timeDiff(s){
     if(!s)return '';var d=new Date(s.replace(' ','T')),now=new Date(),sec=Math.floor((now-d)/1000);
-    if(sec<60)return 'Just now';if(sec<3600)return Math.floor(sec/60)+'m ago';
-    if(sec<86400)return Math.floor(sec/3600)+'h ago';return Math.floor(sec/86400)+'d ago';
+    if(sec<60)return 'Ahora';if(sec<3600)return 'hace '+Math.floor(sec/60)+'m';
+    if(sec<86400)return 'hace '+Math.floor(sec/3600)+'h';return 'hace '+Math.floor(sec/86400)+'d';
   }
   function updateBadge(n){
     var b=document.getElementById('notiBadge');if(!b)return;
@@ -232,7 +232,7 @@
     fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
       updateBadge(d.unread||0);
       var list=document.getElementById('notiList');
-      if(!d.notifications||!d.notifications.length){list.innerHTML='<div class="noti-empty">No notifications</div>';return;}
+      if(!d.notifications||!d.notifications.length){list.innerHTML='<div class="noti-empty">Sin notificaciones</div>';return;}
       list.innerHTML=d.notifications.map(function(n){
         var isResolved=n.type==='report_resolved';
         var avatar,msg;
@@ -256,13 +256,13 @@
     var id=el.dataset.id,slug=el.dataset.slug,chapter=el.dataset.chapter;
     fetch('/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});
     el.remove();var rem=document.querySelectorAll('.noti-item').length;updateBadge(rem);
-    if(!rem)document.getElementById('notiList').innerHTML='<div class="noti-empty">No notifications</div>';
+    if(!rem)document.getElementById('notiList').innerHTML='<div class="noti-empty">Sin notificaciones</div>';
     if(slug){window.location.href=chapter?'/manga/'+slug+'/'+chapter+'#cc-section':'/manga/'+slug+'#comment-section';}
   };
   window.notiMarkAll=function(e){
     e.stopPropagation();
     fetch('/api/notifications/read-all',{method:'POST',credentials:'same-origin'}).then(function(){
-      document.getElementById('notiList').innerHTML='<div class="noti-empty">No notifications</div>';updateBadge(0);
+      document.getElementById('notiList').innerHTML='<div class="noti-empty">Sin notificaciones</div>';updateBadge(0);
     });
   };
   document.addEventListener('DOMContentLoaded',function(){

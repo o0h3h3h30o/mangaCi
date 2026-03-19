@@ -16,18 +16,18 @@ function comixx_time_ago($datetime) {
     }
     $diff = $now->diff($ago);
 
-    if ($diff->y > 0) return $diff->y . ' year' . ($diff->y > 1 ? 's' : '') . ' ago';
-    if ($diff->m > 0) return $diff->m . ' month' . ($diff->m > 1 ? 's' : '') . ' ago';
+    if ($diff->y > 0) return 'hace ' . $diff->y . ' año' . ($diff->y > 1 ? 's' : '');
+    if ($diff->m > 0) return 'hace ' . $diff->m . ' mes' . ($diff->m > 1 ? 'es' : '');
     if ($diff->d > 0) {
         if ($diff->d >= 7) {
             $weeks = floor($diff->d / 7);
-            return $weeks . ' week' . ($weeks > 1 ? 's' : '') . ' ago';
+            return 'hace ' . $weeks . ' semana' . ($weeks > 1 ? 's' : '');
         }
-        return $diff->d . ' day' . ($diff->d > 1 ? 's' : '') . ' ago';
+        return 'hace ' . $diff->d . ' día' . ($diff->d > 1 ? 's' : '');
     }
-    if ($diff->h > 0) return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
-    if ($diff->i > 0) return $diff->i . ' min' . ($diff->i > 1 ? 's' : '') . ' ago';
-    return 'Just now';
+    if ($diff->h > 0) return 'hace ' . $diff->h . ' hora' . ($diff->h > 1 ? 's' : '');
+    if ($diff->i > 0) return 'hace ' . $diff->i . ' min';
+    return 'Ahora';
 }
 ?>
 
@@ -50,11 +50,11 @@ function comixx_time_ago($datetime) {
       <a href="#" class="social-btn telegram"><i class="fab fa-telegram-plane"></i></a>
     </div>
 
-    <!-- Most Follows New Comics -->
+    <!-- Los Más Seguidos -->
     <?php if (!empty($newestManga)): ?>
     <section class="section">
       <div class="section-header">
-        <h2>Most Follows New Comics</h2>
+        <h2>Los Más Seguidos</h2>
         <div class="section-nav">
           <button class="nav-arrow"><i class="fas fa-chevron-left"></i></button>
           <button class="nav-arrow"><i class="fas fa-chevron-right"></i></button>
@@ -85,13 +85,13 @@ function comixx_time_ago($datetime) {
     <?php endif; ?>
     <?php endif; ?>
 
-    <!-- Latest Updates -->
+    <!-- Últimas Actualizaciones -->
     <section class="section">
       <div class="section-header">
-        <h2>Latest Updates</h2>
+        <h2>Últimas Actualizaciones</h2>
         <div class="view-toggle">
-          <button class="view-toggle-btn" data-view="list" title="List view"><i class="fas fa-list"></i></button>
-          <button class="view-toggle-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
+          <button class="view-toggle-btn" data-view="list" title="Vista lista"><i class="fas fa-list"></i></button>
+          <button class="view-toggle-btn active" data-view="grid" title="Vista cuadrícula"><i class="fas fa-th"></i></button>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ function comixx_time_ago($datetime) {
         </a>
         <?php endforeach; ?>
         <?php else: ?>
-        <div class="no-results"><p>No manga found.</p></div>
+        <div class="no-results"><p>No se encontraron resultados.</p></div>
         <?php endif; ?>
       </div>
 
@@ -134,11 +134,11 @@ function comixx_time_ago($datetime) {
 
   <!-- Right Sidebar -->
   <aside class="right-sidebar">
-    <!-- Latest Comments -->
+    <!-- Últimos Comentarios -->
     <?php if (!empty($recentComments)): ?>
     <section class="section">
       <div class="section-header">
-        <h2>Latest Comments</h2>
+        <h2>Últimos Comentarios</h2>
       </div>
       <div class="comments-list">
         <?php foreach (array_slice($recentComments, 0, 5) as $comment):
@@ -168,7 +168,7 @@ function comixx_time_ago($datetime) {
     <!-- Popular -->
     <section class="section">
       <div class="section-header">
-        <h2>Popular</h2>
+        <h2>Populares</h2>
         <div class="tab-buttons">
           <button class="tab-btn active" data-popular="day">DAY</button>
           <button class="tab-btn" data-popular="month">MONTH</button>

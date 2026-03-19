@@ -976,7 +976,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
       <div class="profile-username"><?= esc($username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">LOGOUT</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
   </div>
 </section>
 
@@ -985,23 +985,23 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Edit Profile</span>
+      <span class="tab-text">Editar Perfil</span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notifications</span>
+      <span class="tab-text">Notificaciones</span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">History</span>
+      <span class="tab-text">Historial</span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Bookmarks</span>
+      <span class="tab-text">Marcadores</span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab active">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Settings</span>
+      <span class="tab-text">Configuración</span>
     </a>
   </div>
 </div>
@@ -1009,11 +1009,11 @@ $username = $u['username'] ?? $u['name'] ?? '';
 <!-- Profile Content -->
 <div class="container profile-content">
   <div class="settings-section">
-    <h3 class="settings-section-title">Appearance</h3>
+    <h3 class="settings-section-title">Apariencia</h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Dark Mode</div>
-        <div class="settings-row-desc">Use dark theme across the site</div>
+        <div class="settings-row-label">Modo Oscuro</div>
+        <div class="settings-row-desc">Usar tema oscuro en todo el sitio</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" checked>
@@ -1022,8 +1022,8 @@ $username = $u['username'] ?? $u['name'] ?? '';
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Compact Mode</div>
-        <div class="settings-row-desc">Show more items per page</div>
+        <div class="settings-row-label">Modo Compacto</div>
+        <div class="settings-row-desc">Mostrar más elementos por página</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox">
@@ -1033,36 +1033,36 @@ $username = $u['username'] ?? $u['name'] ?? '';
   </div>
 
   <div class="settings-section">
-    <h3 class="settings-section-title">Reading</h3>
+    <h3 class="settings-section-title">Lectura</h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Reading Direction</div>
-        <div class="settings-row-desc">Default reading direction for chapters</div>
+        <div class="settings-row-label">Dirección de Lectura</div>
+        <div class="settings-row-desc">Dirección predeterminada para capítulos</div>
       </div>
       <select class="settings-select">
-        <option>Left to Right</option>
-        <option>Right to Left</option>
+        <option>Izquierda a Derecha</option>
+        <option>Derecha a Izquierda</option>
       </select>
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Image Quality</div>
-        <div class="settings-row-desc">Higher quality uses more data</div>
+        <div class="settings-row-label">Calidad de Imagen</div>
+        <div class="settings-row-desc">Mayor calidad usa más datos</div>
       </div>
       <select class="settings-select">
-        <option>High</option>
-        <option>Medium</option>
-        <option>Low</option>
+        <option>Alta</option>
+        <option>Media</option>
+        <option>Baja</option>
       </select>
     </div>
   </div>
 
   <div class="settings-section">
-    <h3 class="settings-section-title">Notifications</h3>
+    <h3 class="settings-section-title">Notificaciones</h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Email Notifications</div>
-        <div class="settings-row-desc">Receive updates via email</div>
+        <div class="settings-row-label">Notificaciones por Correo</div>
+        <div class="settings-row-desc">Recibir actualizaciones por correo</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" checked>
@@ -1071,8 +1071,8 @@ $username = $u['username'] ?? $u['name'] ?? '';
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Push Notifications</div>
-        <div class="settings-row-desc">Browser push notifications</div>
+        <div class="settings-row-label">Notificaciones Push</div>
+        <div class="settings-row-desc">Notificaciones push del navegador</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox">
