@@ -1624,9 +1624,8 @@ class Admin extends BaseController
         $filename = ($id > 0 ? $id : 'new_' . time()) . '.' . $ext;
         file_put_contents($tmpDir . $filename, $data);
 
-        // Build URL - determine web-accessible path
-        $coverWebPath = str_replace(FCPATH, '', $coverDir);
-        $localUrl = base_url($coverWebPath . 'tmp/' . $filename);
+        // Build URL - use relative web path
+        $localUrl = base_url('cover/tmp/' . $filename);
 
         return $this->response->setJSON([
             'success'   => true,

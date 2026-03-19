@@ -26,8 +26,7 @@ if (!function_exists('manga_cover_url')) {
         foreach (['-thumb', ''] as $suffix) {
             foreach (['jpg', 'jpeg', 'png', 'webp', 'gif'] as $ext) {
                 if (is_file($coverDir . $id . $suffix . '.' . $ext)) {
-                    $webPath = str_replace(FCPATH, '', $coverDir);
-                    return base_url($webPath . $id . $suffix . '.' . $ext);
+                    return base_url('cover/' . $id . $suffix . '.' . $ext);
                 }
             }
         }
