@@ -6,6 +6,14 @@
 $statusMap = [1 => 'En Curso', 2 => 'Completado'];
 $statusLabel = $statusMap[$manga['status_id'] ?? 0] ?? 'Desconocido';
 
+$comicTypeLabel = 'Manga';
+if (!empty($manga['type_id'])) {
+    try {
+        $ctRow = \Config\Database::connect()->table('comictype')->where('id', (int)$manga['type_id'])->get()->getRowArray();
+        if ($ctRow) $comicTypeLabel = $ctRow['label'] ?? $ctRow['name'] ?? 'Manga';
+    } catch (\Throwable $e) {}
+}
+
 $firstChapterLink = '#';
 if (!empty($chapters)) {
     $lastCh = end($chapters);
@@ -27,7 +35,7 @@ $shareText = esc($manga['name']);
       </div>
       <div class="detail-hero-info">
         <div class="detail-hero-tags">
-          <span class="detail-tag-number">#<?= number_format($manga['views'] ?? 0) ?></span>
+          <span class="detail-tag-number"><?= esc(strtoupper($comicTypeLabel)) ?></span>
           <span class="detail-tag-year"><?= esc($statusLabel) ?></span>
         </div>
         <h1 class="detail-title"><?= esc($manga['name']) ?></h1>
