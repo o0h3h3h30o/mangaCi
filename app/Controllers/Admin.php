@@ -524,7 +524,7 @@ class Admin extends BaseController
         try {
             return $this->taxonomyList(
                 'comictype', 'Comic Types', 'comictypes', '/admin/comictypes', false,
-                'SELECT COUNT(*) FROM manga m WHERE m.comictype_id = t.id',
+                'SELECT COUNT(*) FROM manga m WHERE m.type_id = t.id',
                 'label'
             );
         } catch (\Exception $e) {
