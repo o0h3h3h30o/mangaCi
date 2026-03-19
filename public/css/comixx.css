@@ -1274,6 +1274,12 @@ button {
 .sidebar-type.manga {
   background: var(--accent-purple);
 }
+.sidebar-type.manhwa {
+  background: var(--accent-blue);
+}
+.sidebar-type.manhua {
+  background: #e67e22;
+}
 
 .sidebar-info h4 {
   font-size: 0.8rem;

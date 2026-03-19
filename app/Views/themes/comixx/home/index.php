@@ -197,7 +197,8 @@ function comixx_time_ago($datetime) {
             <img src="<?= manga_cover_url($manga) ?>" alt="<?= esc($manga['name']) ?>" loading="lazy">
           </div>
           <div class="sidebar-info">
-            <span class="sidebar-type manga">MANGA</span>
+            <?php $typeLabel = ($comictypeMap[(int)($manga['type_id'] ?? 0)] ?? 'Manga'); $typeCls = strtolower($typeLabel); ?>
+            <span class="sidebar-type <?= esc($typeCls) ?>"><?= esc(strtoupper($typeLabel)) ?></span>
             <h4><?= esc($manga['name']) ?></h4>
             <div class="sidebar-meta">
               <?php if (!empty($manga['chapter_1'])): ?>
@@ -254,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Popular tabs (Day/Month/All)
   var popularData = <?= json_encode($popularSets ?? []) ?>;
+  var comictypeMap = <?= json_encode($comictypeMap ?? []) ?>;
   document.querySelectorAll('[data-popular]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       document.querySelectorAll('[data-popular]').forEach(function(b) { b.classList.remove('active'); });
@@ -264,11 +266,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!container) return;
       container.innerHTML = list.map(function(m) {
         var coverUrl = m.cover_url || '';
-        var type = 'MANGA';
+        var typeLabel = comictypeMap[m.type_id] || 'Manga';
+        var typeCls = typeLabel.toLowerCase();
         return '<a href="/manga/' + m.slug + '" class="sidebar-item">'
           + '<div class="sidebar-thumb"><img src="' + coverUrl + '" alt="" loading="lazy"></div>'
           + '<div class="sidebar-info">'
-          + '<span class="sidebar-type manga">' + type + '</span>'
+          + '<span class="sidebar-type ' + typeCls + '">' + typeLabel.toUpperCase() + '</span>'
           + '<h4>' + m.name + '</h4>'
           + '<div class="sidebar-meta"><span>' + (m.chapter_1 || '') + '</span></div>'
           + '</div></a>';

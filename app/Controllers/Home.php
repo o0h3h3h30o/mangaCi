@@ -24,10 +24,23 @@ class Home extends BaseController
             'topDay' => $mangaModel->getHotToday(10),
             'topMonth' => $mangaModel->getTopMonth(10),
             'topAll' => $mangaModel->getTopAll(10),
+            'comictypeMap'   => $this->getComictypeMap(),
             'categories'     => $this->categories,
             'currentUser'    => $this->currentUser,
             'recentComments' => $commentModel->getRecentComments(5),
         ];
         return $this->themeView('home/index', $data);
+    }
+
+    private function getComictypeMap(): array
+    {
+        try {
+            $rows = \Config\Database::connect()->table('comictype')->get()->getResultArray();
+            $map = [];
+            foreach ($rows as $r) $map[(int)$r['id']] = $r['label'] ?? $r['name'] ?? '';
+            return $map;
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }
