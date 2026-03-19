@@ -925,6 +925,133 @@ if (!empty($pages) && isset($pages[0])):
       justify-content: center;
     }
 
+    /* Report button */
+    .rpt-btn {
+      background: none;
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: 6px;
+      color: #ef4444;
+      font-size: 12px;
+      padding: 5px 12px;
+      cursor: pointer;
+      opacity: .7;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .rpt-btn:hover { opacity: 1; border-color: rgba(239,68,68,.6); }
+
+    /* Report modal */
+    .rpt-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,.7);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .rpt-overlay.open { display: flex; }
+    .rpt-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      position: relative;
+    }
+    .rpt-box h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+    }
+    .rpt-box .rpt-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 0 0 14px;
+    }
+    .rpt-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .rpt-reasons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .rpt-reason-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: border-color .15s;
+    }
+    .rpt-reason-label:hover,
+    .rpt-reason-label.selected { border-color: var(--accent-blue); }
+    .rpt-reason-label input { accent-color: var(--accent-blue); }
+    .rpt-note {
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+    }
+    .rpt-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .rpt-cancel-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .rpt-submit-btn {
+      background: #ef4444;
+      border: none;
+      color: #fff;
+      border-radius: 8px;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .rpt-submit-btn:hover { background: #dc2626; }
+    .rpt-msg {
+      display: none;
+      text-align: center;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
     /* Mobile Bottom Section */
     .reader-mobile-bottom {
       display: none;
@@ -1265,6 +1392,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
         <button class="reader-like-btn" id="chLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="chLikeCount">0</span></button>
         <button class="reader-like-btn" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="chDislikeCount">0</span></button>
       </div>
+      <button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> Report</button>
     </div>
 
     <!-- Comments Section -->
@@ -1330,6 +1458,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count">0</span></button>
     <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count">0</span></button>
   </div>
+  <div style="text-align:center"><button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> Report Error</button></div>
 
   <div class="reader-comments" id="mobileComments">
     <div class="reader-comments-header">
@@ -2203,6 +2332,90 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     // Init both panels
     initCommentPanel('sc','sc-ch-list','sc-ch-pg','sc-all-list','sc-all-pg','sc-ch-count','sc-all-count','sc-input','sc-send');
     initCommentPanel('mc','mc-ch-list','mc-ch-pg','mc-all-list','mc-all-pg','mc-ch-count','mc-all-count','mc-input','mc-send');
+})();
+</script>
+
+<!-- Report Modal -->
+<div class="rpt-overlay" id="rptModal">
+  <div class="rpt-box">
+    <button class="rpt-close" id="rptClose">&times;</button>
+    <h3>Report Chapter Error</h3>
+    <p class="rpt-sub"><?= esc($manga['name']) ?> — <?= esc($chapTitle) ?></p>
+    <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;font-weight:500">Reason <span style="color:#ef4444">*</span></p>
+    <div class="rpt-reasons" id="rptReasons">
+      <?php foreach ([
+        'wrong_images'  => 'Wrong images / Not related',
+        'missing_pages' => 'Missing pages',
+        'low_quality'   => 'Low quality / Blurry',
+        'cant_load'     => 'Images not loading',
+        'wrong_order'   => 'Pages in wrong order',
+        'other'         => 'Other',
+      ] as $val => $label): ?>
+      <label class="rpt-reason-label">
+        <input type="radio" name="rpt-reason" value="<?= $val ?>">
+        <span><?= $label ?></span>
+      </label>
+      <?php endforeach; ?>
+    </div>
+    <textarea class="rpt-note" id="rptNote" rows="2" maxlength="300" placeholder="Additional details (optional)"></textarea>
+    <div class="rpt-actions">
+      <button class="rpt-cancel-btn" id="rptCancel">Cancel</button>
+      <button class="rpt-submit-btn" id="rptSubmit">Submit Report</button>
+    </div>
+    <p class="rpt-msg" id="rptMsg"></p>
+  </div>
+</div>
+<script>
+(function(){
+  var modal=document.getElementById('rptModal');
+  var submitBtn=document.getElementById('rptSubmit');
+  var msg=document.getElementById('rptMsg');
+
+  function openRpt(){modal.classList.add('open');document.body.style.overflow='hidden';}
+  function closeRpt(){
+    modal.classList.remove('open');document.body.style.overflow='';
+    msg.style.display='none';submitBtn.style.display='';submitBtn.disabled=false;submitBtn.textContent='Submit Report';
+    document.querySelectorAll('input[name="rpt-reason"]').forEach(function(r){r.checked=false;});
+    document.querySelectorAll('.rpt-reason-label').forEach(function(l){l.classList.remove('selected');});
+    document.getElementById('rptNote').value='';
+  }
+
+  document.querySelectorAll('.rpt-open-btn').forEach(function(b){b.addEventListener('click',openRpt);});
+  document.getElementById('rptClose').addEventListener('click',closeRpt);
+  document.getElementById('rptCancel').addEventListener('click',closeRpt);
+  modal.addEventListener('click',function(e){if(e.target===modal)closeRpt();});
+
+  document.querySelectorAll('input[name="rpt-reason"]').forEach(function(r){
+    r.addEventListener('change',function(){
+      document.querySelectorAll('.rpt-reason-label').forEach(function(l){l.classList.remove('selected');});
+      this.closest('.rpt-reason-label').classList.add('selected');
+    });
+  });
+
+  submitBtn.addEventListener('click',function(){
+    var reason=document.querySelector('input[name="rpt-reason"]:checked');
+    if(!reason){msg.style.display='block';msg.style.color='#ef4444';msg.textContent='Please select a reason.';return;}
+    submitBtn.disabled=true;submitBtn.textContent='Sending…';msg.style.display='none';
+    var fd=new FormData();
+    fd.append('reason',reason.value);
+    fd.append('note',document.getElementById('rptNote').value.trim());
+    fetch('/api/chapters/'+<?= (int)$chapter['id'] ?>+'/report',{method:'POST',credentials:'same-origin',body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      msg.style.display='block';
+      if(d.ok){
+        msg.style.color='#22c55e';msg.textContent='Thank you! Your report has been submitted.';
+        submitBtn.style.display='none';setTimeout(closeRpt,2500);
+      }else{
+        msg.style.color='#ef4444';msg.textContent=d.error||'Something went wrong.';
+        submitBtn.disabled=false;submitBtn.textContent='Submit Report';
+      }
+    })
+    .catch(function(){
+      msg.style.display='block';msg.style.color='#ef4444';msg.textContent='Something went wrong.';
+      submitBtn.disabled=false;submitBtn.textContent='Submit Report';
+    });
+  });
 })();
 </script>
 <?= $this->endSection() ?>
