@@ -167,9 +167,23 @@ $currentStatus = $isEdit ? (int)$manga['status_id'] : 1;
           <input type="file" name="image_file" id="mf-cover-file" accept="image/*"
                  class="a-file-input">
 
+          <!-- External URL input -->
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <input type="text" id="mf-cover-ext-url" placeholder="Paste external image URL…"
+                   class="a-input" style="flex:1;font-size:12px">
+            <button type="button" id="mf-cover-ext-btn" class="a-btn a-btn-sm" style="white-space:nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Fetch
+            </button>
+          </div>
+          <p class="a-hint" style="margin-top:2px">Nhập URL ảnh ngoài rồi bấm Fetch để tải về server</p>
+
           <!-- Hidden field to carry existing value when no new file chosen -->
           <?php $currentImage = $manga['image'] ?? ''; ?>
           <input type="hidden" name="image_url" id="mf-cover-url" value="<?= esc($currentImage) ?>">
+          <input type="hidden" name="tmp_file" id="mf-tmp-file" value="">
 
           <!-- CDN flag toggle -->
           <label class="a-checkbox">
@@ -581,5 +595,47 @@ Typeahead({
     preview.classList.add('a-hidden');
     removeBtn.classList.add('a-hidden');
   });
+
+  // Fetch external URL
+  var extUrlInput = document.getElementById('mf-cover-ext-url');
+  var extBtn = document.getElementById('mf-cover-ext-btn');
+  var tmpFileInput = document.getElementById('mf-tmp-file');
+  if(extBtn && extUrlInput){
+    extBtn.addEventListener('click', function(){
+      var url = extUrlInput.value.trim();
+      if(!url){ extUrlInput.focus(); return; }
+      extBtn.disabled = true;
+      extBtn.textContent = 'Fetching…';
+      var fd = new FormData();
+      fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+      fd.append('url', url);
+      fetch('/admin/manga/<?= $mangaId ?>/fetch-cover', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: fd
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        extBtn.disabled = false;
+        extBtn.textContent = 'Fetch';
+        if(data.success){
+          img.src = data.local_url + '?t=' + Date.now();
+          img.style.display = '';
+          preview.classList.remove('a-hidden');
+          removeBtn.classList.remove('a-hidden');
+          tmpFileInput.value = data.tmp_file;
+          urlInput.value = '';
+          extUrlInput.value = '';
+        } else {
+          alert('Lỗi: ' + (data.error || 'Unknown'));
+        }
+      })
+      .catch(function(){
+        extBtn.disabled = false;
+        extBtn.textContent = 'Fetch';
+        alert('Lỗi kết nối');
+      });
+    });
+  }
 })();
 </script>

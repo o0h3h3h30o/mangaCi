@@ -752,6 +752,20 @@ class Admin extends BaseController
             $db->table('manga')->where('id', $mangaId)->update(['image' => $imageUrl]);
         }
 
+        // Move fetched tmp image
+        $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
+        if ($tmpFile && !$pendingImageFile) {
+            $tmpPath = FCPATH . 'images/tmp/' . basename($tmpFile);
+            if (is_file($tmpPath)) {
+                $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
+                $newName = $mangaId . '-thumb.' . $ext;
+                $destDir = FCPATH . 'images/';
+                if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                rename($tmpPath, $destDir . $newName);
+                $db->table('manga')->where('id', $mangaId)->update(['image' => base_url('images/' . $newName)]);
+            }
+        }
+
         $this->syncMangaRelations($db, $mangaId);
 
         session()->setFlashdata('flash', ['type' => 'success', 'msg' => "Manga \"{$name}\" created."]);
@@ -852,6 +866,21 @@ class Admin extends BaseController
             'type_id'        => ($t = $this->request->getPost('type_id')) ? (int) $t : null,
             'update_at'      => date('Y-m-d H:i:s'),
         ];
+
+        // Move fetched tmp image
+        $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
+        if ($tmpFile) {
+            $tmpPath = FCPATH . 'images/tmp/' . basename($tmpFile);
+            if (is_file($tmpPath)) {
+                $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
+                $newName = $id . '-thumb.' . $ext;
+                $destDir = FCPATH . 'images/';
+                if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                rename($tmpPath, $destDir . $newName);
+                $row['image'] = base_url('images/' . $newName);
+                $row['cover'] = 0;
+            }
+        }
 
         try {
             $db->table('manga')->where('id', $id)->update($row);
@@ -1538,6 +1567,67 @@ class Admin extends BaseController
     }
 
     // ── Push cover image to S3 ─────────────────────────────────
+    public function fetchCover(int $id = 0): ResponseInterface
+    {
+        if ($r = $this->guard()) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Unauthorized'])->setStatusCode(401);
+        }
+
+        $url = trim($this->request->getPost('url') ?? '');
+        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Invalid URL']);
+        }
+
+        // Download image
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+        $data = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $mime     = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        curl_close($ch);
+
+        if (!$data || $httpCode !== 200) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Failed to download (HTTP ' . $httpCode . ')']);
+        }
+
+        // Validate mime
+        $mimeMap = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+        $ext = null;
+        foreach ($mimeMap as $m => $e) {
+            if (stripos($mime, $m) !== false) { $ext = $e; break; }
+        }
+        if (!$ext) {
+            // Try detect from data
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $detected = $finfo->buffer($data);
+            $ext = $mimeMap[$detected] ?? null;
+        }
+        if (!$ext) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Not a valid image (mime: ' . $mime . ')']);
+        }
+
+        // Save to tmp
+        $tmpDir = FCPATH . 'images/tmp/';
+        if (!is_dir($tmpDir)) mkdir($tmpDir, 0755, true);
+
+        $filename = ($id > 0 ? $id : 'new_' . time()) . '-thumb.' . $ext;
+        file_put_contents($tmpDir . $filename, $data);
+
+        $localUrl = base_url('images/tmp/' . $filename);
+
+        return $this->response->setJSON([
+            'success'   => true,
+            'local_url' => $localUrl,
+            'tmp_file'  => $filename,
+        ]);
+    }
+
     public function pushToS3(int $id): ResponseInterface
     {
         if ($r = $this->guard()) {
