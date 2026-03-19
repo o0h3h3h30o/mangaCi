@@ -38,9 +38,9 @@ function comixx_time_ago($datetime) {
     <?php if ($isFirstPage): ?>
     <!-- Announcement Banner -->
     <div class="announcement">
-      <p>• This site is new, so it may have bugs, please report to us if you found any. Thanks!</p>
-      <p>• Added bookmarks/follow features.</p>
-      <p>• Help us share the site to more people if you like it</p>
+      <p>• Este sitio es nuevo, por lo que puede tener errores. Por favor, repórtalos si encuentras alguno. ¡Gracias!</p>
+      <p>• Se han añadido funciones de marcadores/seguimiento.</p>
+      <p>• Ayúdanos a compartir el sitio con más personas si te gusta.</p>
     </div>
 
     <!-- Social Buttons -->
