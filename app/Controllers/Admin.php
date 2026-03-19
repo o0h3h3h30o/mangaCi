@@ -20,6 +20,41 @@ class Admin extends BaseController
         return $dir;
     }
 
+    /** Create a resized thumbnail from source image */
+    private function createThumb(string $src, string $dest, int $maxW = 300, int $maxH = 450): void
+    {
+        $info = @getimagesize($src);
+        if (!$info) { @copy($src, $dest); return; }
+
+        [$w, $h, $type] = $info;
+        $ratio = min($maxW / $w, $maxH / $h, 1);
+        $newW = (int) round($w * $ratio);
+        $newH = (int) round($h * $ratio);
+
+        $creators = [IMAGETYPE_JPEG => 'imagecreatefromjpeg', IMAGETYPE_PNG => 'imagecreatefrompng', IMAGETYPE_GIF => 'imagecreatefromgif', IMAGETYPE_WEBP => 'imagecreatefromwebp'];
+        $create = $creators[$type] ?? null;
+        if (!$create || !function_exists($create)) { @copy($src, $dest); return; }
+
+        $orig = @$create($src);
+        if (!$orig) { @copy($src, $dest); return; }
+
+        $thumb = imagecreatetruecolor($newW, $newH);
+        if ($type === IMAGETYPE_PNG || $type === IMAGETYPE_WEBP) {
+            imagealphablending($thumb, false);
+            imagesavealpha($thumb, true);
+        }
+        imagecopyresampled($thumb, $orig, 0, 0, 0, 0, $newW, $newH, $w, $h);
+
+        switch ($type) {
+            case IMAGETYPE_JPEG: imagejpeg($thumb, $dest, 85); break;
+            case IMAGETYPE_PNG:  imagepng($thumb, $dest, 8); break;
+            case IMAGETYPE_GIF:  imagegif($thumb, $dest); break;
+            case IMAGETYPE_WEBP: imagewebp($thumb, $dest, 85); break;
+        }
+        imagedestroy($orig);
+        imagedestroy($thumb);
+    }
+
     /** Returns null if user is admin, or redirect/403 response if not */
     private function guard(): ?ResponseInterface
     {
@@ -757,7 +792,7 @@ class Admin extends BaseController
         if ($pendingImageFile) {
             $ext = $pendingImageFile->getExtension();
             $pendingImageFile->move($coverDir, $mangaId . '.' . $ext, true);
-            @copy($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
+            $this->createThumb($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
             $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
         }
 
@@ -768,7 +803,7 @@ class Admin extends BaseController
             if (is_file($tmpPath)) {
                 $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
                 rename($tmpPath, $coverDir . $mangaId . '.' . $ext);
-                @copy($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
+                $this->createThumb($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
                 $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
             }
         }
@@ -855,7 +890,7 @@ class Admin extends BaseController
             if (in_array($imageFile->getMimeType(), $imgTypes)) {
                 $ext = $imageFile->getExtension();
                 $imageFile->move($coverDir, $id . '.' . $ext, true);
-                @copy($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
+                $this->createThumb($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
                 $imageUrl = '';
                 $coverCdn = 0;
             }
@@ -883,7 +918,7 @@ class Admin extends BaseController
             if (is_file($tmpPath)) {
                 $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
                 rename($tmpPath, $coverDir . $id . '.' . $ext);
-                @copy($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
+                $this->createThumb($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
                 $row['image'] = '';
                 $row['cover'] = 0;
             }
