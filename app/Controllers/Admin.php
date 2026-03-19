@@ -871,6 +871,65 @@ class Admin extends BaseController
         return redirect()->to("/admin/manga/{$id}/edit");
     }
 
+    public function deleteManga(int $id): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+        $db    = $this->db();
+        $manga = $db->table('manga')->where('id', $id)->get()->getRowArray();
+        if (!$manga) return $this->response->setStatusCode(404)->setBody('Manga not found');
+
+        $name = $manga['name'];
+
+        // 1. Delete cover images (local files)
+        foreach (['', '-thumb'] as $suffix) {
+            foreach (['jpg', 'jpeg', 'png', 'gif', 'webp'] as $ext) {
+                $path = FCPATH . "images/{$id}{$suffix}.{$ext}";
+                if (is_file($path)) @unlink($path);
+            }
+            foreach (['jpg', 'jpeg', 'png', 'gif', 'webp'] as $ext) {
+                $path = FCPATH . "cover/{$id}{$suffix}.{$ext}";
+                if (is_file($path)) @unlink($path);
+            }
+        }
+
+        // 2. Delete all pages of all chapters
+        $chapterIds = array_column(
+            $db->query('SELECT id FROM chapter WHERE manga_id = ?', [$id])->getResultArray(),
+            'id'
+        );
+        if ($chapterIds) {
+            $in = implode(',', $chapterIds);
+            $db->query("DELETE FROM page WHERE chapter_id IN ({$in})");
+        }
+
+        // 3. Delete chapters
+        $db->table('chapter')->where('manga_id', $id)->delete();
+
+        // 4. Delete relations
+        try { $db->table('category_manga')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('author_manga')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('manga_tag')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+
+        // 5. Delete bookmarks, comments, ratings, content_likes, notifications
+        try { $db->table('bookmarks')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('comments')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('item_ratings')->where('item_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('content_likes')->where('content_type', 'manga')->where('content_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('notifications')->where('manga_id', $id)->delete(); } catch (\Throwable $e) {}
+
+        // 6. Delete content_likes for chapters
+        if ($chapterIds) {
+            try { $db->table('content_likes')->where('content_type', 'chapter')->whereIn('content_id', $chapterIds)->delete(); } catch (\Throwable $e) {}
+            try { $db->table('chapter_reports')->whereIn('chapter_id', $chapterIds)->delete(); } catch (\Throwable $e) {}
+        }
+
+        // 7. Delete manga
+        $db->table('manga')->where('id', $id)->delete();
+
+        session()->setFlashdata('flash', ['type' => 'success', 'msg' => "Manga \"{$name}\" and all related data deleted."]);
+        return redirect()->to('/admin/manga');
+    }
+
     /** Find or create an author by name, return ID */
     private function findOrCreateAuthor(BaseConnection $db, array $a): int
     {

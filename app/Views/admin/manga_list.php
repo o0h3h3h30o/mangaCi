@@ -109,6 +109,10 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
             <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
               <a href="/admin/manga/<?= $m['id'] ?>/chapters" class="a-btn-sec a-btn-sm">Chapters</a>
               <a href="/admin/manga/<?= $m['id'] ?>/edit" class="a-btn a-btn-sm">Edit</a>
+              <form method="post" action="/admin/manga/<?= $m['id'] ?>/delete" style="margin:0" onsubmit="return confirm('Delete &quot;<?= esc($m['name']) ?>&quot; and all its chapters? This cannot be undone.')">
+                <?= csrf_field() ?>
+                <button type="submit" class="a-btn-danger a-btn-sm">Delete</button>
+              </form>
             </div>
           </td>
         </tr>

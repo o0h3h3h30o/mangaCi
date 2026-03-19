@@ -48,6 +48,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('manga/(:num)/edit',       'Admin::editManga/$1');
     $routes->post('manga/(:num)/edit',      'Admin::updateManga/$1');
     $routes->post('manga/(:num)/push-s3',   'Admin::pushToS3/$1');
+    $routes->post('manga/(:num)/delete',    'Admin::deleteManga/$1');
 
     // Chapters
     $routes->get ('manga/(:num)/chapters',          'Admin::chapterList/$1');
