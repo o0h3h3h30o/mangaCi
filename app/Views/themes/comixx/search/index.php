@@ -690,7 +690,10 @@ $resultCount = count($results ?? []);
     <?php if (!empty($results)): ?>
     <?php foreach ($results as $result): ?>
     <a href="<?= base_url('manga/' . esc($result['slug'])) ?>" class="result-card">
-      <div class="result-card-image"><img src="<?= manga_cover_url($result) ?>" alt="<?= esc($result['name']) ?>" loading="lazy"></div>
+      <div class="result-card-image">
+        <?php if (!empty($result['caution'])): ?><span class="badge-18">18+</span><?php endif; ?>
+        <img src="<?= manga_cover_url($result) ?>" alt="<?= esc($result['name']) ?>" loading="lazy">
+      </div>
       <div class="result-card-meta">
         <?php if (!empty($result['chapter_1'])): ?>
         <span class="ch-tag">Ch. <?= esc($result['chapter_1']) ?></span>

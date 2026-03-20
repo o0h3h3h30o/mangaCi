@@ -66,6 +66,7 @@ function comixx_time_ago($datetime) {
           <a href="<?= base_url('manga/' . esc($manga['slug'])) ?>" class="popular-card" style="min-width:180px;flex-shrink:0">
             <span class="rank"><?= $idx + 1 ?></span>
             <div class="card-image">
+              <?php if (!empty($manga['caution'])): ?><span class="badge-18">18+</span><?php endif; ?>
               <img src="<?= manga_cover_url($manga) ?>" alt="<?= esc($manga['name']) ?>" loading="lazy">
             </div>
             <div class="card-meta">
@@ -99,7 +100,10 @@ function comixx_time_ago($datetime) {
         <?php if (!empty($recentlyUpdated)): ?>
         <?php foreach ($recentlyUpdated as $manga): ?>
         <a href="<?= base_url('manga/' . esc($manga['slug'])) ?>" class="result-card">
-          <div class="result-card-image"><img src="<?= manga_cover_url($manga) ?>" alt="<?= esc($manga['name']) ?>" loading="lazy"></div>
+          <div class="result-card-image">
+            <?php if (!empty($manga['caution'])): ?><span class="badge-18">18+</span><?php endif; ?>
+            <img src="<?= manga_cover_url($manga) ?>" alt="<?= esc($manga['name']) ?>" loading="lazy">
+          </div>
           <div class="result-card-meta">
             <?php if (!empty($manga['chapter_1'])): ?>
             <span class="ch-tag">Ch. <?= esc($manga['chapter_1']) ?></span>
