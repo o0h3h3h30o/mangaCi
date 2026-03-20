@@ -39,7 +39,7 @@ abstract class BaseController extends Controller
         $this->activeTheme = site_setting('active_theme', 'default') ?: 'default';
 
         // Set locale from admin setting
-        $locale = site_setting('site_language', 'es');
+        $locale = site_setting('site_language', 'en');
         if (in_array($locale, config('App')->supportedLocales)) {
             $request->setLocale($locale);
             service('language')->setLocale($locale);
