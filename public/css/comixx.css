@@ -998,15 +998,16 @@ button {
 .badge-18 {
   position: absolute;
   top: 6px;
-  left: 6px;
-  background: #ef4444;
+  right: 6px;
+  background: #dc2626;
   color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 5px;
-  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 4px;
+  border-radius: 3px;
   z-index: 2;
-  line-height: 1.2;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .result-card-image {
