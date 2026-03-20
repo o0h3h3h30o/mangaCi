@@ -24,7 +24,7 @@ class ChapterReportController extends BaseController
 
         $allowed = ['wrong_images','missing_pages','low_quality','cant_load','wrong_order','other'];
         if (!in_array($reason, $allowed, true)) {
-            return $this->json(['error' => 'Invalid reason.'], 422);
+            return $this->json(['error' => lang('ComixxManga.invalid_reason')], 422);
         }
 
         $db = $this->db();
@@ -37,7 +37,7 @@ class ChapterReportController extends BaseController
             ->countAllResults();
 
         if ($recent > 0) {
-            return $this->json(['error' => 'You already reported this chapter recently. Please wait before reporting again.'], 429);
+            return $this->json(['error' => lang('ComixxManga.already_reported')], 429);
         }
 
         $db->table('chapter_reports')->insert([

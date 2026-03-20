@@ -75,4 +75,12 @@ return [
     'select_reason'       => 'Por favor selecciona una razón.',
     'report_thanks'       => '¡Gracias! Tu reporte ha sido enviado.',
     'report_error_msg'    => 'Algo salió mal.',
+
+    // API messages
+    'unauthorized'        => 'No autorizado',
+    'invalid_data'        => 'Datos inválidos',
+    'max_chars'           => 'Máximo 1000 caracteres',
+    'captcha_required'    => 'Se requiere verificación captcha',
+    'invalid_reason'      => 'Razón inválida.',
+    'already_reported'    => 'Ya reportaste este capítulo recientemente. Por favor espera antes de reportar de nuevo.',
 ];

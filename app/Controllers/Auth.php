@@ -21,18 +21,18 @@ class Auth extends BaseController
         $password = $this->request->getPost('password') ?? '';
 
         if (empty($login) || empty($password)) {
-            return redirect()->back()->withInput()->with('error', 'Please fill in all fields.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.fill_all_fields'));
         }
 
         $userModel = new UserModel();
         $user      = $userModel->findByLogin($login);
 
         if (!$user || !password_verify($password, $user['password'])) {
-            return redirect()->back()->withInput()->with('error', 'Invalid credentials.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.invalid_credentials'));
         }
 
         if (($user['active'] ?? 1) == 0) {
-            return redirect()->back()->withInput()->with('error', 'Your account is inactive.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.account_inactive'));
         }
 
         $now = date('Y-m-d H:i:s');
@@ -52,11 +52,11 @@ class Auth extends BaseController
             $value = base64_encode($user['id'] . '|' . $mac);
 
             return redirect()->to(session()->get('redirect_back') ?: '/')
-                ->with('success', 'Welcome back!')
+                ->with('success', lang('ComixxAuth.welcome_back'))
                 ->setCookie('_rm', $value, 7 * 24 * 3600);
         }
 
-        return redirect()->to(session()->get('redirect_back') ?: '/')->with('success', 'Welcome back!');
+        return redirect()->to(session()->get('redirect_back') ?: '/')->with('success', lang('ComixxAuth.welcome_back'));
     }
 
     public function register(): string|\CodeIgniter\HTTP\RedirectResponse
@@ -78,28 +78,28 @@ class Auth extends BaseController
 
         // Validation
         if (empty($name) || empty($username) || empty($email) || empty($password)) {
-            return redirect()->back()->withInput()->with('error', 'Please fill in all fields.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.fill_all_fields'));
         }
         if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
-            return redirect()->back()->withInput()->with('error', 'Username must be 3-30 characters (letters, numbers, underscore only).');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.username_format'));
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return redirect()->back()->withInput()->with('error', 'Invalid email address.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.invalid_email'));
         }
         if (strlen($password) < 6) {
-            return redirect()->back()->withInput()->with('error', 'Password must be at least 6 characters.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.password_min'));
         }
         if ($password !== $confirm) {
-            return redirect()->back()->withInput()->with('error', 'Passwords do not match.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.passwords_mismatch'));
         }
 
         $userModel = new UserModel();
 
         if ($userModel->where('username', $username)->first()) {
-            return redirect()->back()->withInput()->with('error', 'Username already taken.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.username_taken'));
         }
         if ($userModel->where('email', $email)->first()) {
-            return redirect()->back()->withInput()->with('error', 'Email already registered.');
+            return redirect()->back()->withInput()->with('error', lang('ComixxAuth.email_taken'));
         }
 
         $now = date('Y-m-d H:i:s');
@@ -129,7 +129,7 @@ class Auth extends BaseController
             'last_login'    => $now,
         ]);
 
-        return redirect()->to('/')->with('success', 'Account created successfully!');
+        return redirect()->to('/')->with('success', lang('ComixxAuth.account_created'));
     }
 
     public function logout(): \CodeIgniter\HTTP\RedirectResponse

@@ -24,4 +24,17 @@ return [
     'create_password'     => 'Create a password',
     'confirm_password'    => 'Confirm Password',
     'confirm_your_pass'   => 'Confirm your password',
+
+    // Validation messages
+    'fill_all_fields'     => 'Please fill in all fields.',
+    'invalid_credentials' => 'Invalid credentials.',
+    'account_inactive'    => 'Your account is inactive.',
+    'welcome_back'        => 'Welcome back!',
+    'username_format'     => 'Username must be 3-30 characters (letters, numbers, underscore only).',
+    'invalid_email'       => 'Invalid email address.',
+    'password_min'        => 'Password must be at least 6 characters.',
+    'passwords_mismatch'  => 'Passwords do not match.',
+    'username_taken'      => 'Username already taken.',
+    'email_taken'         => 'Email already registered.',
+    'account_created'     => 'Account created successfully!',
 ];

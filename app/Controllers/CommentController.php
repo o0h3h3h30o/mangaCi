@@ -138,7 +138,7 @@ class CommentController extends BaseController
     public function create(): \CodeIgniter\HTTP\ResponseInterface
     {
         if (!$user = $this->authUser()) {
-            return $this->json(['error' => 'Unauthorized'], 401);
+            return $this->json(['error' => lang('ComixxManga.unauthorized')], 401);
         }
 
         $mangaId   = (int) ($this->request->getPost('manga_id')      ?? 0);
@@ -147,10 +147,10 @@ class CommentController extends BaseController
         $comment   = trim($this->request->getPost('comment') ?? '');
 
         if ($mangaId <= 0 || $comment === '') {
-            return $this->json(['error' => 'Invalid data'], 400);
+            return $this->json(['error' => lang('ComixxManga.invalid_data')], 400);
         }
         if (mb_strlen($comment) > 1000) {
-            return $this->json(['error' => 'Max 1000 characters'], 400);
+            return $this->json(['error' => lang('ComixxManga.max_chars')], 400);
         }
 
         // Rate limiting: kiểm tra comment gần nhất trong 5 phút
@@ -169,7 +169,7 @@ class CommentController extends BaseController
                 $valid    = $given && $expected && $given === $expected && (time() - $ts) < 600;
 
                 if (!$valid) {
-                    return $this->json(['error' => 'Cần xác minh captcha', 'need_captcha' => true], 429);
+                    return $this->json(['error' => lang('ComixxManga.captcha_required'), 'need_captcha' => true], 429);
                 }
 
                 session()->remove('captcha_answer');

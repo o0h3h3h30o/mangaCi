@@ -75,4 +75,12 @@ return [
     'select_reason'       => 'Please select a reason.',
     'report_thanks'       => 'Thank you! Your report has been submitted.',
     'report_error_msg'    => 'Something went wrong.',
+
+    // API messages
+    'unauthorized'        => 'Unauthorized',
+    'invalid_data'        => 'Invalid data',
+    'max_chars'           => 'Max 1000 characters',
+    'captcha_required'    => 'Captcha verification required',
+    'invalid_reason'      => 'Invalid reason.',
+    'already_reported'    => 'You already reported this chapter recently. Please wait before reporting again.',
 ];

@@ -24,4 +24,17 @@ return [
     'create_password'     => 'Crea una contraseña',
     'confirm_password'    => 'Confirmar Contraseña',
     'confirm_your_pass'   => 'Confirma tu contraseña',
+
+    // Validation messages
+    'fill_all_fields'     => 'Por favor completa todos los campos.',
+    'invalid_credentials' => 'Credenciales inválidas.',
+    'account_inactive'    => 'Tu cuenta está inactiva.',
+    'welcome_back'        => '¡Bienvenido de nuevo!',
+    'username_format'     => 'El usuario debe tener 3-30 caracteres (letras, números, guion bajo).',
+    'invalid_email'       => 'Dirección de correo inválida.',
+    'password_min'        => 'La contraseña debe tener al menos 6 caracteres.',
+    'passwords_mismatch'  => 'Las contraseñas no coinciden.',
+    'username_taken'      => 'El usuario ya está en uso.',
+    'email_taken'         => 'El correo ya está registrado.',
+    'account_created'     => '¡Cuenta creada exitosamente!',
 ];
