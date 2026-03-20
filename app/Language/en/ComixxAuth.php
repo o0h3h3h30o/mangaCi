@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'login_tab'           => 'LOGIN',
+    'register_tab'        => 'REGISTER',
+    'username_or_email'   => 'Username or Email',
+    'enter_username_email'=> 'Enter username or email',
+    'password'            => 'Password',
+    'enter_password'      => 'Enter password',
+    'toggle_password'     => 'Toggle password',
+    'remember_me'         => 'Remember me',
+    'forgot_password'     => 'Forgot password?',
+    'or_continue_with'    => 'or continue with',
+    'no_account'          => "Don't have an account?",
+    'register_link'       => 'Register',
+    'has_account'         => 'Already have an account?',
+    'login_link'          => 'Login',
+    'display_name'        => 'Display Name',
+    'your_display_name'   => 'Your display name',
+    'username'            => 'Username',
+    'choose_username'     => 'Choose a username',
+    'email_address'       => 'Email Address',
+    'enter_email'         => 'Enter your email',
+    'create_password'     => 'Create a password',
+    'confirm_password'    => 'Confirm Password',
+    'confirm_your_pass'   => 'Confirm your password',
+];

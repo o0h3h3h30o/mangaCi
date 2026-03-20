@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'login_tab'           => 'INICIAR SESIÓN',
+    'register_tab'        => 'REGISTRARSE',
+    'username_or_email'   => 'Usuario o Correo',
+    'enter_username_email'=> 'Ingresa tu usuario o correo',
+    'password'            => 'Contraseña',
+    'enter_password'      => 'Ingresa tu contraseña',
+    'toggle_password'     => 'Mostrar contraseña',
+    'remember_me'         => 'Recuérdame',
+    'forgot_password'     => '¿Olvidaste tu contraseña?',
+    'or_continue_with'    => 'o continuar con',
+    'no_account'          => '¿No tienes una cuenta?',
+    'register_link'       => 'Regístrate',
+    'has_account'         => '¿Ya tienes una cuenta?',
+    'login_link'          => 'Inicia Sesión',
+    'display_name'        => 'Nombre',
+    'your_display_name'   => 'Tu nombre',
+    'username'            => 'Usuario',
+    'choose_username'     => 'Elige un usuario',
+    'email_address'       => 'Correo Electrónico',
+    'enter_email'         => 'Ingresa tu correo',
+    'create_password'     => 'Crea una contraseña',
+    'confirm_password'    => 'Confirmar Contraseña',
+    'confirm_your_pass'   => 'Confirma tu contraseña',
+];

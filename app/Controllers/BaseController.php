@@ -24,7 +24,7 @@ abstract class BaseController extends Controller
     protected array   $categories  = [];
     protected ?array  $currentUser = null;
     protected string  $activeTheme = 'default';
-    protected $helpers = ['site_settings'];
+    protected $helpers = ['site_settings', 'lang_helper'];
 
     /**
      * @return void
@@ -37,6 +37,13 @@ abstract class BaseController extends Controller
         $this->categories = $categoryModel->getAllCategories();
 
         $this->activeTheme = site_setting('active_theme', 'default') ?: 'default';
+
+        // Set locale from admin setting
+        $locale = site_setting('site_language', 'es');
+        if (in_array($locale, config('App')->supportedLocales)) {
+            $request->setLocale($locale);
+            service('language')->setLocale($locale);
+        }
 
         $session = session();
         if ($session->get('isLoggedIn')) {
