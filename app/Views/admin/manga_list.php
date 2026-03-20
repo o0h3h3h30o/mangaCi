@@ -80,7 +80,7 @@ $statusColors = [1=>'yellow', 2=>'green', 3=>'orange', 4=>'red'];
               <img src="<?= $cover ?>" alt="" loading="lazy" class="a-cover-thumb"
                    onerror="this.style.display='none'">
               <div style="min-width:0">
-                <a href="/admin/manga/<?= $m['id'] ?>/edit"
+                <a href="/admin/manga/<?= $m['id'] ?>/chapters"
                    class="a-font-medium a-txt2 a-truncate a-block" style="max-width:240px"><?= esc($m['name']) ?></a>
               </div>
             </div>
