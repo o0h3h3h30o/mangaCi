@@ -147,5 +147,6 @@ $routes->post('api/chapters/(:num)/report',       'ChapterReportController::repo
 // Sitemap & RSS Feed
 $routes->get('sitemap.xml',           'SitemapController::index');
 $routes->get('sitemap-manga.xml',    'SitemapController::manga');
-$routes->get('sitemap-chapters.xml', 'SitemapController::chapters');
+$routes->get('sitemap-chapters.xml',          'SitemapController::chapters/1');
+$routes->get('sitemap-chapters-(:num).xml',  'SitemapController::chapters/$1');
 $routes->get('feed',                 'SitemapController::feed');

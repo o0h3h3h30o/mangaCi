@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 class SitemapController extends BaseController
 {
+    private const CHAPTER_PER_PAGE = 10000;
+
     private function db(): \CodeIgniter\Database\BaseConnection
     {
         return \Config\Database::connect();
@@ -18,8 +20,9 @@ class SitemapController extends BaseController
             $xml = $generate();
             $cache->save($key, $xml, $ttl);
         }
+        $ct = str_contains($key, 'feed') ? 'application/rss+xml' : 'application/xml';
         return $this->response
-            ->setHeader('Content-Type', str_contains($key, 'feed') ? 'application/rss+xml; charset=UTF-8' : 'application/xml; charset=UTF-8')
+            ->setHeader('Content-Type', $ct . '; charset=UTF-8')
             ->setBody($xml);
     }
 
@@ -30,25 +33,32 @@ class SitemapController extends BaseController
     {
         return $this->cached('sitemap_index', 3600, function () {
             $base = rtrim(site_url(), '/');
-            $lastManga = $this->db()->table('manga')
+            $db = $this->db();
+
+            $lastManga = $db->table('manga')
                 ->select('update_at')
                 ->where('is_public', 1)
                 ->orderBy('update_at', 'DESC')
                 ->limit(1)
                 ->get()->getRowArray();
-
             $lastmod = $lastManga ? date('c', strtotime($lastManga['update_at'])) : date('c');
+
+            // Count chapters to determine pages
+            $totalChapters = (int) $db->table('chapter c')
+                ->join('manga m', 'c.manga_id = m.id')
+                ->where('c.is_show', 1)
+                ->where('m.is_public', 1)
+                ->countAllResults();
+            $chapterPages = max(1, (int) ceil($totalChapters / self::CHAPTER_PER_PAGE));
 
             $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-            $xml .= "  <sitemap>\n";
-            $xml .= "    <loc>{$base}/sitemap-manga.xml</loc>\n";
-            $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
-            $xml .= "  </sitemap>\n";
-            $xml .= "  <sitemap>\n";
-            $xml .= "    <loc>{$base}/sitemap-chapters.xml</loc>\n";
-            $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
-            $xml .= "  </sitemap>\n";
+            $xml .= "  <sitemap>\n    <loc>{$base}/sitemap-manga.xml</loc>\n    <lastmod>{$lastmod}</lastmod>\n  </sitemap>\n";
+
+            for ($i = 1; $i <= $chapterPages; $i++) {
+                $xml .= "  <sitemap>\n    <loc>{$base}/sitemap-chapters-{$i}.xml</loc>\n    <lastmod>{$lastmod}</lastmod>\n  </sitemap>\n";
+            }
+
             $xml .= '</sitemapindex>';
             return $xml;
         });
@@ -69,24 +79,14 @@ class SitemapController extends BaseController
 
             $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-            $xml .= "  <url>\n";
-            $xml .= "    <loc>{$base}/</loc>\n";
-            $xml .= "    <changefreq>daily</changefreq>\n";
-            $xml .= "    <priority>1.0</priority>\n";
-            $xml .= "  </url>\n";
+            $xml .= "  <url>\n    <loc>{$base}/</loc>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n";
 
             foreach ($rows as $m) {
                 $loc     = $base . '/manga/' . htmlspecialchars($m['slug'], ENT_XML1);
                 $lastmod = $m['update_at'] ? date('c', strtotime($m['update_at'])) : '';
-                $xml .= "  <url>\n";
-                $xml .= "    <loc>{$loc}</loc>\n";
-                if ($lastmod) {
-                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
-                }
-                $xml .= "    <changefreq>weekly</changefreq>\n";
-                $xml .= "    <priority>0.8</priority>\n";
-                $xml .= "  </url>\n";
+                $xml .= "  <url>\n    <loc>{$loc}</loc>\n";
+                if ($lastmod) $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                $xml .= "    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n";
             }
 
             $xml .= '</urlset>';
@@ -95,35 +95,35 @@ class SitemapController extends BaseController
     }
 
     /**
-     * GET /sitemap-chapters.xml — Tất cả chapter visible
+     * GET /sitemap-chapters.xml — redirect to page 1
+     * GET /sitemap-chapters-(:num).xml — paginated chapters
      */
-    public function chapters(): \CodeIgniter\HTTP\ResponseInterface
+    public function chapters(int $page = 1): \CodeIgniter\HTTP\ResponseInterface
     {
-        return $this->cached('sitemap_chapters', 3600, function () {
-            $base = rtrim(site_url(), '/');
+        $page = max(1, $page);
+        return $this->cached('sitemap_chapters_' . $page, 3600, function () use ($page) {
+            $base   = rtrim(site_url(), '/');
+            $offset = ($page - 1) * self::CHAPTER_PER_PAGE;
+
             $rows = $this->db()->table('chapter c')
-                ->select('m.slug AS manga_slug, c.slug AS chapter_slug, m.update_at')
+                ->select('m.slug AS manga_slug, c.slug AS chapter_slug, c.created_at')
                 ->join('manga m', 'c.manga_id = m.id')
                 ->where('c.is_show', 1)
                 ->where('m.is_public', 1)
-                ->orderBy('m.update_at', 'DESC')
+                ->orderBy('c.id', 'DESC')
+                ->limit(self::CHAPTER_PER_PAGE, $offset)
                 ->get()->getResultArray();
 
             $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
             foreach ($rows as $r) {
-                $loc     = $base . '/manga/' . htmlspecialchars($r['manga_slug'], ENT_XML1)
-                         . '/' . htmlspecialchars($r['chapter_slug'], ENT_XML1);
-                $lastmod = $r['update_at'] ? date('c', strtotime($r['update_at'])) : '';
-                $xml .= "  <url>\n";
-                $xml .= "    <loc>{$loc}</loc>\n";
-                if ($lastmod) {
-                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
-                }
-                $xml .= "    <changefreq>monthly</changefreq>\n";
-                $xml .= "    <priority>0.6</priority>\n";
-                $xml .= "  </url>\n";
+                $loc = $base . '/manga/' . htmlspecialchars($r['manga_slug'], ENT_XML1)
+                     . '/' . htmlspecialchars($r['chapter_slug'], ENT_XML1);
+                $lastmod = !empty($r['created_at']) ? date('c', strtotime($r['created_at'])) : '';
+                $xml .= "  <url>\n    <loc>{$loc}</loc>\n";
+                if ($lastmod) $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                $xml .= "    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n";
             }
 
             $xml .= '</urlset>';
@@ -168,24 +168,15 @@ class SitemapController extends BaseController
                 $pubDate = $m['update_at'] ? date('r', strtotime($m['update_at'])) : '';
                 $cover   = htmlspecialchars(manga_cover_url($m, $cdnBase), ENT_XML1);
 
-                $xml .= "  <item>\n";
-                $xml .= "    <title>{$title}</title>\n";
-                $xml .= "    <link>{$link}</link>\n";
+                $xml .= "  <item>\n    <title>{$title}</title>\n    <link>{$link}</link>\n";
                 $xml .= "    <guid isPermaLink=\"true\">{$link}</guid>\n";
-                if ($desc) {
-                    $xml .= "    <description>{$desc}</description>\n";
-                }
-                if ($pubDate) {
-                    $xml .= "    <pubDate>{$pubDate}</pubDate>\n";
-                }
-                if ($cover) {
-                    $xml .= "    <media:thumbnail url=\"{$cover}\" />\n";
-                }
+                if ($desc) $xml .= "    <description>{$desc}</description>\n";
+                if ($pubDate) $xml .= "    <pubDate>{$pubDate}</pubDate>\n";
+                if ($cover) $xml .= "    <media:thumbnail url=\"{$cover}\" />\n";
                 $xml .= "  </item>\n";
             }
 
-            $xml .= "</channel>\n";
-            $xml .= '</rss>';
+            $xml .= "</channel>\n</rss>";
             return $xml;
         });
     }
