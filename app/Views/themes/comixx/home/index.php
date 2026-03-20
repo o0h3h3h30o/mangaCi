@@ -111,13 +111,12 @@ function comixx_time_ago($datetime) {
           <div class="result-card-title"><?= esc($manga['name']) ?></div>
           <div class="result-card-detail">
             <div class="result-card-detail-title"><?= esc($manga['name']) ?></div>
-            <?php if (!empty($manga['chapter_1'])): ?>
-            <div class="result-card-detail-tags"><span>Ch. <?= esc($manga['chapter_1']) ?></span></div>
-            <?php endif; ?>
             <div class="result-card-detail-desc"><?= esc(character_limiter(strip_tags($manga['summary'] ?? ''), 150)) ?></div>
-            <?php if (!empty($manga['update_at'])): ?>
-            <div class="result-card-detail-time"><?= comixx_time_ago($manga['update_at']) ?></div>
-            <?php endif; ?>
+            <div class="result-card-detail-time">
+              <?php if (!empty($manga['chapter_1'])): ?>Ch. <?= esc($manga['chapter_1']) ?><?php endif; ?>
+              <?php if (!empty($manga['chapter_1']) && !empty($manga['update_at'])): ?> · <?php endif; ?>
+              <?php if (!empty($manga['update_at'])): ?><?= comixx_time_ago($manga['update_at']) ?><?php endif; ?>
+            </div>
           </div>
         </a>
         <?php endforeach; ?>
