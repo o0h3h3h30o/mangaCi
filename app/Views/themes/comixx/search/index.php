@@ -693,7 +693,7 @@ $resultCount = count($results ?? []);
       <div class="result-card-image"><img src="<?= manga_cover_url($result) ?>" alt="<?= esc($result['name']) ?>" loading="lazy"></div>
       <div class="result-card-meta">
         <?php if (!empty($result['chapter_1'])): ?>
-        <span class="ch-tag"><?= esc($result['chapter_1']) ?></span>
+        <span class="ch-tag">Ch. <?= esc($result['chapter_1']) ?></span>
         <?php endif; ?>
         <?php if (!empty($result['update_at'])): ?>
         <span><?= comixx_search_time_ago($result['update_at']) ?></span>
@@ -704,7 +704,7 @@ $resultCount = count($results ?? []);
         <div class="result-card-detail-title"><?= esc($result['name']) ?></div>
         <div class="result-card-detail-tags">
           <?php if (!empty($result['chapter_1'])): ?>
-          <span><?= esc($result['chapter_1']) ?></span>
+          <span>Ch. <?= esc($result['chapter_1']) ?></span>
           <?php endif; ?>
         </div>
         <div class="result-card-detail-desc"><?= esc(character_limiter(strip_tags($result['summary'] ?? ''), 150)) ?></div>
