@@ -48,19 +48,19 @@ class Search extends BaseController
 
         // Dynamic title / description
         if ($filterName !== '') {
-            $pageTitle = 'Search: "' . $filterName . '"';
-            $pageDesc  = 'Search results for "' . $filterName . '"';
+            $pageTitle = lang('ComixxSearch.search_title', ['q' => $filterName]);
+            $pageDesc  = lang('ComixxSearch.search_desc', ['q' => $filterName]);
         } elseif (!empty($acceptGenres)) {
             $genreRow  = db_connect()->table('category')->where('slug', $acceptGenres[0])->get()->getRowArray();
             $genreName = $genreRow['name'] ?? ucfirst(str_replace('-', ' ', $acceptGenres[0]));
             $pageTitle = $genreName . ' Manga';
-            $pageDesc  = 'Read ' . $genreName . ' manga online for free';
+            $pageDesc  = lang('ComixxSearch.genre_desc', ['genre' => $genreName]);
         } elseif ($filterArtist !== '') {
-            $pageTitle = 'Manga by ' . $filterArtist;
-            $pageDesc  = 'All manga by ' . $filterArtist;
+            $pageTitle = lang('ComixxSearch.artist_title', ['name' => $filterArtist]);
+            $pageDesc  = lang('ComixxSearch.artist_desc', ['name' => $filterArtist]);
         } else {
-            $pageTitle = 'Manga List';
-            $pageDesc  = 'Browse all manga online for free';
+            $pageTitle = lang('ComixxSearch.manga_list');
+            $pageDesc  = lang('ComixxSearch.manga_list_desc');
         }
 
         $data = [

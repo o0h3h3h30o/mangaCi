@@ -21,4 +21,13 @@ return [
     'results_for'        => 'results for',
     'items'              => 'Items',
     'no_results'         => 'No results found. Try adjusting your search or filters.',
+
+    // Page titles
+    'search_title'       => 'Search: "{q}"',
+    'search_desc'        => 'Search results for "{q}"',
+    'genre_desc'         => 'Read {genre} manga online for free',
+    'artist_title'       => 'Manga by {name}',
+    'artist_desc'        => 'All manga by {name}',
+    'manga_list'         => 'Manga List',
+    'manga_list_desc'    => 'Browse all manga online for free',
 ];

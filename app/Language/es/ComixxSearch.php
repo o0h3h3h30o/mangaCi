@@ -21,4 +21,13 @@ return [
     'results_for'        => 'resultados para',
     'items'              => 'Elementos',
     'no_results'         => 'No se encontraron resultados. Intenta ajustar tu búsqueda o filtros.',
+
+    // Page titles
+    'search_title'       => 'Buscar: "{q}"',
+    'search_desc'        => 'Resultados de búsqueda para "{q}"',
+    'genre_desc'         => 'Leer manga de {genre} en línea gratis',
+    'artist_title'       => 'Manga de {name}',
+    'artist_desc'        => 'Todo el manga de {name}',
+    'manga_list'         => 'Lista de Manga',
+    'manga_list_desc'    => 'Explorar todo el manga en línea gratis',
 ];
