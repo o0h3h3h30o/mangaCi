@@ -513,11 +513,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var currentRating = 0;
 
   function submitRating(rating, starsEls) {
-    var score10 = rating * 2; // convert 5-star click to 1-10 scale
     fetch('/api/rating', {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
-      body: 'item_id=' + mangaId + '&score=' + score10,
+      body: 'item_id=' + mangaId + '&score=' + rating,
       credentials: 'same-origin'
     })
     .then(function(r) { return r.json(); })
@@ -1109,13 +1108,12 @@ document.addEventListener('DOMContentLoaded', function () {
 (function(){
   var MID = <?= (int) $manga['id'] ?>;
 
-  function updateStars(containerId, avg10){
+  function updateStars(containerId, avg){
     var el=document.getElementById(containerId);if(!el)return;
-    var avg5 = avg10 / 2; // convert 1-10 scale to 1-5 stars
     var stars=el.querySelectorAll('i[data-rating]');
     stars.forEach(function(s){
       var v=parseInt(s.dataset.rating);
-      s.className = v<=Math.floor(avg5) ? 'fas fa-star' : (v-0.5<=avg5 ? 'fas fa-star-half-alt' : 'far fa-star');
+      s.className = v<=Math.floor(avg) ? 'fas fa-star' : (v-0.5<=avg ? 'fas fa-star-half-alt' : 'far fa-star');
     });
   }
 
@@ -1129,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateStars('ratingStars', avg);
     document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
     document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
-    currentRating = Math.round((parseInt(d.my_rating) || 0) / 2); // convert 1-10 to 1-5 for star highlight
+    currentRating = parseInt(d.my_rating) || 0;
 
     // Follow count
     document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});

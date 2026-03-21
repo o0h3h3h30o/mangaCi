@@ -11,7 +11,7 @@ class RatingController extends BaseController
         $itemId = (int) ($this->request->getPost('item_id') ?? 0);
         $score  = (int) ($this->request->getPost('score') ?? 0);
 
-        if ($itemId <= 0 || $score < 1 || $score > 10) {
+        if ($itemId <= 0 || $score < 1 || $score > 5) {
             return $this->response->setStatusCode(400)->setJSON(['error' => 'Invalid parameters']);
         }
 
