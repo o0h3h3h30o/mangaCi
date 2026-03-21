@@ -214,6 +214,7 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
       <select name="site_language" class="a-select">
         <option value="en" <?= $get('site_language', 'en') === 'en' ? 'selected' : '' ?>>English</option>
         <option value="es" <?= $get('site_language', 'en') === 'es' ? 'selected' : '' ?>>Español</option>
+        <option value="ja" <?= $get('site_language', 'en') === 'ja' ? 'selected' : '' ?>>日本語</option>
       </select>
       <p class="a-hint">Language for the frontend theme. Language files in <code style="color:#6b7280">app/Language/</code>.</p>
     </div>
