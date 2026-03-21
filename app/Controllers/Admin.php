@@ -149,7 +149,7 @@ class Admin extends BaseController
             }
         }
 
-        $fields = ['site_title', 'meta_description', 'meta_keywords', 'footer_copyright', 'footer_url', 'active_theme', 'site_language', 'ga_id'];
+        $fields = ['site_title', 'home_heading', 'meta_description', 'meta_keywords', 'footer_copyright', 'footer_url', 'active_theme', 'site_language', 'ga_id'];
         $values = ['site_logo' => $logoUrl, 'footer_logo' => $footerLogoUrl];
         foreach ($fields as $key) {
             $values[$key] = trim($this->request->getPost($key) ?? '');

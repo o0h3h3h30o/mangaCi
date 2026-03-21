@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <?php $_pt = trim($title ?? ''); $_st = site_setting('site_title', 'COMIX'); ?>
-  <title><?= $_pt ? esc($_pt) . ' - ' . esc($_st) : esc($_st) ?></title>
+  <?php $_pt = trim($title ?? ''); $_st = site_setting('site_title', 'COMIX'); $_hh = site_setting('home_heading', ''); ?>
+  <title><?= $_pt ? esc($_pt) . ' - ' . esc($_st) : ($_hh ? esc($_hh) : esc($_st)) ?></title>
 
   <?php $_cdn = rtrim(env('CDN_COVER_URL', ''), '/'); ?>
   <?php if ($_cdn): ?>

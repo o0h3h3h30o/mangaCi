@@ -3,8 +3,8 @@
 
 <head itemscope itemtype="http://schema.org/WebPage">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <?php $_pt = trim($title ?? ''); $_st = site_setting('site_title', 'MangaCI'); ?>
-  <title><?= $_pt ? esc($_pt) . ' - ' . esc($_st) : esc($_st) ?></title>
+  <?php $_pt = trim($title ?? ''); $_st = site_setting('site_title', 'MangaCI'); $_hh = site_setting('home_heading', ''); ?>
+  <title><?= $_pt ? esc($_pt) . ' - ' . esc($_st) : ($_hh ? esc($_hh) : esc($_st)) ?></title>
 
   <style>
     /* Critical: Self-hosted Font */

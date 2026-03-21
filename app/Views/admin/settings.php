@@ -43,7 +43,16 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
         <input type="text" name="site_title" value="<?= esc($get('site_title', 'MangaCI')) ?>"
                placeholder="MangaCI"
                class="a-input">
-        <p class="a-hint">Hiện ở tab trình duyệt, sidebar mobile và suffix của title.</p>
+        <p class="a-hint">Short name shown in browser tab, sidebar and as title suffix.</p>
+      </div>
+
+      <!-- Home Heading -->
+      <div>
+        <label class="a-label">Home Heading Title</label>
+        <input type="text" name="home_heading" value="<?= esc($get('home_heading', '')) ?>"
+               placeholder="ManhwasMe : Read Webtoon (Korean Manhwa) Online Free!"
+               class="a-input">
+        <p class="a-hint">SEO heading displayed on home page instead of site title. Leave empty to use Site Title.</p>
       </div>
 
       <!-- Site Logo -->

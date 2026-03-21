@@ -109,6 +109,7 @@ class Install extends Controller
             ('meta_keywords', ''),
             ('active_theme', 'default'),
             ('site_language', 'en'),
+            ('home_heading', ''),
             ('site_logo', ''),
             ('footer_logo', ''),
             ('footer_copyright', ''),
