@@ -15,7 +15,7 @@ class RatingController extends BaseController
             return $this->response->setStatusCode(400)->setJSON(['error' => 'Invalid parameters']);
         }
 
-        $ip          = $this->request->getIPAddress();
+        $ip          = real_ip();
         $ratingModel = new RatingModel();
         $result      = $ratingModel->rate($itemId, $score, $ip);
 
@@ -29,7 +29,7 @@ class RatingController extends BaseController
         $ratingModel = new RatingModel();
         $stats       = $ratingModel->getStats($itemId);
 
-        $existing = $ratingModel->findByIp($itemId, $this->request->getIPAddress());
+        $existing = $ratingModel->findByIp($itemId, real_ip());
         $stats['your_score'] = $existing ? (int) $existing['score'] : 0;
 
         return $this->response->setJSON($stats);

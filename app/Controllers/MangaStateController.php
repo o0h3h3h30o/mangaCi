@@ -58,7 +58,7 @@ class MangaStateController extends BaseController
         $isBookmarked = false;
         $myReaction = null;
 
-        $ip = $this->request->getIPAddress();
+        $ip = real_ip();
         $ratingModel = new RatingModel();
         $existing = $ratingModel->findByIp($id, $ip);
         if ($existing) $myRating = (int) $existing['score'];

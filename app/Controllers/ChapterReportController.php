@@ -19,7 +19,7 @@ class ChapterReportController extends BaseController
     {
         $reason = trim($this->request->getPost('reason') ?? '');
         $note   = trim($this->request->getPost('note') ?? '');
-        $ip     = $this->request->getIPAddress();
+        $ip     = real_ip();
         $userId = $this->currentUser ? (int) $this->currentUser['id'] : null;
 
         $allowed = ['wrong_images','missing_pages','low_quality','cant_load','wrong_order','other'];

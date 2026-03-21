@@ -1,6 +1,19 @@
 <?php
 
 /**
+ * Get real client IP (Cloudflare-aware)
+ */
+if (!function_exists('real_ip')) {
+    function real_ip(): string
+    {
+        return $_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? '0.0.0.0';
+    }
+}
+
+/**
  * Shortcut for lang() — usage: __('Comixx.login')
  */
 if (!function_exists('__')) {
