@@ -75,15 +75,15 @@ $shareText = esc($manga['name']);
             <i class="far fa-star" data-rating="<?= $i ?>"></i>
           <?php endfor; ?>
         </div>
-        <div class="detail-score" id="detailScore">0.0</div>
+        <div class="detail-score detailScore">0.0</div>
         <div class="detail-stats-list">
           <div class="detail-stat-row">
             <span class="detail-stat-label">Seguidores</span>
-            <span class="detail-stat-value" id="detailFollowCount">0 usuarios</span>
+            <span class="detail-stat-value detailFollowCount">0 usuarios</span>
           </div>
           <div class="detail-stat-row">
             <span class="detail-stat-label">Puntuación</span>
-            <span class="detail-stat-value" id="detailRatingText">0.0 por 0 usuarios</span>
+            <span class="detail-stat-value detailRatingText">0.0 por 0 usuarios</span>
           </div>
           <?php if (!empty($authors)): ?>
             <div class="detail-stat-row">
@@ -214,24 +214,18 @@ $shareText = esc($manga['name']);
     <div class="detail-rating-section">
       <div class="detail-stars" id="ratingStars">
         <?php for ($i = 1; $i <= 5; $i++): ?>
-          <?php if ($i <= floor($ratingAvg)): ?>
-            <i class="fas fa-star" data-rating="<?= $i ?>"></i>
-          <?php elseif ($i - 0.5 <= $ratingAvg): ?>
-            <i class="fas fa-star-half-alt" data-rating="<?= $i ?>"></i>
-          <?php else: ?>
             <i class="far fa-star" data-rating="<?= $i ?>"></i>
-          <?php endif; ?>
         <?php endfor; ?>
       </div>
-      <div class="detail-score"><?= number_format($ratingAvg, 1) ?></div>
+      <div class="detail-score detailScore">0.0</div>
       <div class="detail-stats-list">
         <div class="detail-stat-row">
           <span class="detail-stat-label">Seguidores</span>
-          <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> usuarios</span>
+          <span class="detail-stat-value detailFollowCount">0 usuarios</span>
         </div>
         <div class="detail-stat-row">
           <span class="detail-stat-label">Puntuación</span>
-          <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> por <?= number_format($ratingVotes) ?> usuarios</span>
+          <span class="detail-stat-value detailRatingText">0.0 por 0 usuarios</span>
         </div>
         <?php if (!empty($authors)): ?>
           <div class="detail-stat-row">
@@ -1133,12 +1127,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var votes = parseInt(d.rating_votes) || 0;
     updateStars('mobileRatingStars', avg);
     updateStars('ratingStars', avg);
-    document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
-    document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
+    document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
+    document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
     currentRating = Math.round((parseInt(d.my_rating) || 0) / 2); // convert 1-10 to 1-5 for star highlight
 
     // Follow count
-    document.querySelectorAll('#detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+    document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
 
     // Bookmark
     var bmBtn=document.getElementById('bookmarkBtn');
@@ -1186,9 +1180,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var votes = parseInt(d.rating_votes) || 0;
       updateStars('mobileRatingStars', avg);
       updateStars('ratingStars', avg);
-      document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
-      document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
-      document.querySelectorAll('#detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+      document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
+      document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
+      document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
       var lc=document.getElementById('mangaLikeCount');
       var dc=document.getElementById('mangaDislikeCount');
       if(lc) lc.textContent=d.likes;
