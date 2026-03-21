@@ -29,6 +29,7 @@ $routes->get('api/search', 'Search::liveSearch');
 $routes->get('history', 'History::index');
 $routes->get('bookmarks', 'Bookmarks::index');
 $routes->get('profile', 'Profile::index');
+$routes->post('profile', 'Profile::update');
 $routes->get('profile/change-password', 'Profile::changePassword');
 $routes->post('profile/change-password', 'Profile::changePasswordPost');
 

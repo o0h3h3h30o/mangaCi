@@ -40,6 +40,58 @@ class Profile extends BaseController
         return $this->themeView('profile/index', $data);
     }
 
+    public function update(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        if (!$this->currentUser) {
+            return redirect()->to('/login');
+        }
+
+        $username = trim($this->request->getPost('username') ?? '');
+        $email    = trim($this->request->getPost('email') ?? '');
+        $name     = trim($this->request->getPost('name') ?? '');
+
+        if (empty($username) || empty($email)) {
+            return redirect()->back()->with('error', lang('ComixxAuth.fill_all_fields'));
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            return redirect()->back()->with('error', lang('ComixxAuth.username_format'));
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect()->back()->with('error', lang('ComixxAuth.invalid_email'));
+        }
+
+        $userModel = new UserModel();
+        $userId    = (int) $this->currentUser['id'];
+
+        // Check username unique (exclude self)
+        $existing = $userModel->where('username', $username)->where('id !=', $userId)->first();
+        if ($existing) {
+            return redirect()->back()->with('error', lang('ComixxAuth.username_taken'));
+        }
+
+        // Check email unique (exclude self)
+        $existing = $userModel->where('email', $email)->where('id !=', $userId)->first();
+        if ($existing) {
+            return redirect()->back()->with('error', lang('ComixxAuth.email_taken'));
+        }
+
+        $userModel->update($userId, [
+            'username' => $username,
+            'email'    => $email,
+            'name'     => $name,
+        ]);
+
+        // Update session
+        session()->set([
+            'user_name'     => $name ?: $username,
+            'user_username' => $username,
+        ]);
+
+        return redirect()->to('/profile')->with('success', lang('ComixxProfile.save_changes'));
+    }
+
     public function changePassword(): string|\CodeIgniter\HTTP\RedirectResponse
     {
         if (!$this->currentUser) {
