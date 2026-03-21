@@ -257,6 +257,23 @@ class MangaModel extends Model
             $this->where('status_id', (int) $f['status']);
         }
 
+        // Type filter (by comictype label)
+        if (!empty($f['type'])) {
+            $ctRow = $this->db->table('comictype')
+                ->where('LOWER(label)', strtolower($f['type']))
+                ->get()->getRowArray();
+            if ($ctRow) {
+                $this->where('type_id', (int) $ctRow['id']);
+            } else {
+                $this->where('type_id', 0); // no match
+            }
+        }
+
+        // Caution / 18+ filter
+        if (isset($f['caution']) && $f['caution'] !== '') {
+            $this->where('caution', (int) $f['caution']);
+        }
+
         $sortMap = [
             '-updated_at' => ['update_at', 'DESC'],
             '-created_at' => ['id',        'DESC'],

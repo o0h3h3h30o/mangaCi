@@ -661,6 +661,14 @@ $resultCount = count($results ?? []);
           <option value="4">Cancelado</option>
         </select>
       </div>
+      <div class="filter-group">
+        <label>18+</label>
+        <select id="filterCaution">
+          <option value="">Cualquiera</option>
+          <option value="0">No 18+</option>
+          <option value="1">Solo 18+</option>
+        </select>
+      </div>
     </div>
 
     <div class="filters-actions">
@@ -753,14 +761,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var filterGenre = document.getElementById('filterGenre');
   var filterStatus = document.getElementById('filterStatus');
   var filterType = document.getElementById('filterType');
+  var filterCaution = document.getElementById('filterCaution');
 
   if (params.get('sort') && filterSort) filterSort.value = params.get('sort');
   if (params.get('genre') && filterGenre) filterGenre.value = params.get('genre');
   if (params.get('status') && filterStatus) filterStatus.value = params.get('status');
   if (params.get('type') && filterType) filterType.value = params.get('type');
+  if (params.has('caution') && filterCaution) filterCaution.value = params.get('caution');
 
   // Open filters panel if any filter is active
-  if (params.get('sort') || params.get('genre') || params.get('status') || params.get('type')) {
+  if (params.get('sort') || params.get('genre') || params.get('status') || params.get('type') || params.has('caution')) {
     if (filtersPanel) {
       filtersPanel.classList.add('open');
       if (toggleBtn) toggleBtn.textContent = 'OCULTAR FILTROS';
@@ -775,12 +785,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var genre = filterGenre ? filterGenre.value : '';
     var status = filterStatus ? filterStatus.value : '';
     var type = filterType ? filterType.value : '';
+    var caution = filterCaution ? filterCaution.value : '';
 
     if (keyword) url.searchParams.set('filter[name]', keyword);
     if (sort) url.searchParams.set('sort', sort);
     if (genre) url.searchParams.set('genre', genre);
     if (status) url.searchParams.set('status', status);
     if (type) url.searchParams.set('type', type);
+    if (caution !== '') url.searchParams.set('caution', caution);
 
     window.location.href = url.toString();
   }

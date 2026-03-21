@@ -35,7 +35,9 @@ class Search extends BaseController
             }
         }
 
-        $filterStatus = $this->request->getGet('status') ?? '';
+        $filterStatus  = $this->request->getGet('status') ?? '';
+        $filterType    = trim($this->request->getGet('type') ?? '');
+        $filterCaution = $this->request->getGet('caution');
 
         $results = $mangaModel->applySearchFilters([
             'filter_name'   => $filterName,
@@ -44,6 +46,8 @@ class Search extends BaseController
             'accept_genres' => $acceptGenres,
             'reject_genres' => $rejectGenres,
             'status'        => $filterStatus,
+            'type'          => $filterType,
+            'caution'       => $filterCaution,
         ])->paginate(24);
 
         // Dynamic title / description
