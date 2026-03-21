@@ -8,6 +8,7 @@ return [
     'weeks_ago'   => '{n} week(s) ago',
     'months_ago'  => '{n} month(s) ago',
     'years_ago'   => '{n} year(s) ago',
+    'last_read_time' => 'Last read {time}',
 
     // JS time format
     'js_min'    => 'm ago',

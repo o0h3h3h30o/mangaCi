@@ -21,6 +21,11 @@ return [
     'results_for'        => 'results for',
     'items'              => 'Items',
     'no_results'         => 'No results found. Try adjusting your search or filters.',
+    'genres'             => 'Genres',
+    'not_18'             => 'No 18+',
+    'only_18'            => '18+ Only',
+    'list_view'          => 'List view',
+    'grid_view'          => 'Grid view',
 
     // Page titles
     'search_title'       => 'Search: "{q}"',

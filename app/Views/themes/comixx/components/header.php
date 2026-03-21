@@ -16,36 +16,36 @@
       </a>
       <div class="search-bar">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Buscar cómic..." autocomplete="off" id="headerSearchInput">
-        <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> FILTRO</a>
+        <input type="text" placeholder="<?= lang('Comixx.search_placeholder') ?>" autocomplete="off" id="headerSearchInput">
+        <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> <?= lang('Comixx.filter') ?></a>
         <div class="search-dropdown" id="headerSearchDropdown"></div>
       </div>
       <div class="header-actions">
         <!-- Logged-in actions (hidden by default, shown by JS) -->
         <div id="headerLoggedIn" style="display:none;align-items:center;gap:4px">
           <div class="noti-wrap" id="notiWrap">
-            <button class="icon-btn" id="notiBtn" aria-label="Notifications"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
+            <button class="icon-btn" id="notiBtn" aria-label="<?= lang('Comixx.notifications') ?>"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
             <div class="noti-panel" id="notiPanel" style="display:none">
               <div class="noti-panel-header">
-                <span>Notificaciones</span>
-                <button onclick="notiMarkAll(event)">Marcar todo leído</button>
+                <span><?= lang('Comixx.notifications') ?></span>
+                <button onclick="notiMarkAll(event)"><?= lang('Comixx.mark_all_read') ?></button>
               </div>
               <div class="noti-list" id="notiList">
-                <div class="noti-empty">Cargando...</div>
+                <div class="noti-empty"><?= lang('Comixx.loading') ?></div>
               </div>
             </div>
           </div>
           <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
         </div>
         <!-- Logged-out (shown by default) -->
-        <a href="/login" class="login-btn" id="headerLoginBtn">LOGIN</a>
+        <a href="/login" class="login-btn" id="headerLoginBtn"><?= lang('Comixx.login') ?></a>
       </div>
       <button class="mobile-search-btn" id="mobileSearchBtn"><i class="fas fa-search"></i></button>
       <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
     </div>
     <!-- Mobile Search Bar (toggleable) -->
     <div class="mobile-search-bar" id="mobileSearchBar">
-      <input type="text" placeholder="Buscar cómic..." autocomplete="off" id="mobileSearchInput">
+      <input type="text" placeholder="<?= lang('Comixx.search_placeholder') ?>" autocomplete="off" id="mobileSearchInput">
       <div class="search-dropdown" id="mobileSearchDropdown"></div>
     </div>
   </header>
@@ -64,12 +64,12 @@
       <button class="mobile-menu-close" id="mobileMenuClose"><i class="fas fa-times"></i></button>
     </div>
     <nav class="mobile-menu-nav">
-      <a href="/"><i class="fas fa-play"></i> Inicio</a>
-      <a href="/search"><i class="fas fa-play"></i> Explorar</a>
-      <a href="/search?sort=-views"><i class="fas fa-play"></i> Populares</a>
+      <a href="/"><i class="fas fa-play"></i> <?= lang('Comixx.home') ?></a>
+      <a href="/search"><i class="fas fa-play"></i> <?= lang('Comixx.explore') ?></a>
+      <a href="/search?sort=-views"><i class="fas fa-play"></i> <?= lang('Comixx.popular') ?></a>
       <?php if (!empty($categories)): ?>
       <div class="mobile-genre-wrapper">
-        <a href="#" class="mobile-genre-trigger"><i class="fas fa-play"></i> Géneros <i class="fas fa-chevron-down genre-arrow"></i></a>
+        <a href="#" class="mobile-genre-trigger"><i class="fas fa-play"></i> <?= lang('Comixx.genres') ?> <i class="fas fa-chevron-down genre-arrow"></i></a>
         <div class="mobile-genre-list">
           <?php foreach ($categories as $cat): ?>
           <a href="/search?genre=<?= esc($cat['slug'], 'url') ?>"><?= esc($cat['name']) ?></a>
@@ -81,10 +81,10 @@
     <div class="mobile-menu-actions">
       <div id="mobileLoggedIn" style="display:none">
         <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;" id="mobileUsername"></a>
-        <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;">SALIR</a>
+        <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;"><?= lang('Comixx.logout') ?></a>
       </div>
       <div id="mobileLoggedOut">
-        <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;">LOGIN</a>
+        <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= lang('Comixx.login') ?></a>
       </div>
     </div>
   </div>
@@ -92,12 +92,12 @@
   <!-- Dropdown Nav -->
   <nav class="nav-dropdown">
     <div class="nav-dropdown-inner container">
-      <a href="/search?sort=-created_at"><i class="fas fa-play"></i> Más Nuevos</a>
-      <a href="/search?sort=-updated_at"><i class="fas fa-play"></i> Últimas Actualizaciones</a>
-      <a href="/search?sort=-views"><i class="fas fa-play"></i> Populares</a>
+      <a href="/search?sort=-created_at"><i class="fas fa-play"></i> <?= lang('Comixx.newest') ?></a>
+      <a href="/search?sort=-updated_at"><i class="fas fa-play"></i> <?= lang('Comixx.latest_updates') ?></a>
+      <a href="/search?sort=-views"><i class="fas fa-play"></i> <?= lang('Comixx.popular') ?></a>
       <?php if (!empty($categories)): ?>
       <div class="nav-genre-wrapper">
-        <a href="#" class="nav-genre-trigger"><i class="fas fa-play"></i> Géneros <i class="fas fa-chevron-down genre-arrow"></i></a>
+        <a href="#" class="nav-genre-trigger"><i class="fas fa-play"></i> <?= lang('Comixx.genres') ?> <i class="fas fa-chevron-down genre-arrow"></i></a>
         <div class="genre-dropdown">
           <?php foreach ($categories as $cat): ?>
           <a href="/search?genre=<?= esc($cat['slug'], 'url') ?>"><?= esc($cat['name']) ?></a>
@@ -105,11 +105,21 @@
         </div>
       </div>
       <?php endif; ?>
-      <a href="/search"><i class="fas fa-play"></i> Ver Todo</a>
+      <a href="/search"><i class="fas fa-play"></i> <?= lang('Comixx.browse_all') ?></a>
     </div>
   </nav>
 
 <script>
+// Lang strings for JS
+var __lang = {
+  no_notifications: <?= json_encode(lang('Comixx.no_notifications')) ?>,
+  loading: <?= json_encode(lang('Comixx.loading')) ?>,
+  now: <?= json_encode(lang('ComixxTime.now')) ?>,
+  js_min: <?= json_encode(lang('ComixxTime.js_min')) ?>,
+  js_hour: <?= json_encode(lang('ComixxTime.js_hour')) ?>,
+  js_day: <?= json_encode(lang('ComixxTime.js_day')) ?>,
+  js_format: <?= json_encode(lang('ComixxTime.js_format')) ?>
+};
 // Search autocomplete
 (function(){
   var input=document.getElementById('headerSearchInput');
@@ -204,6 +214,17 @@
   });
 })();
 
+// Time diff helper using lang strings
+function _timeDiff(s){
+  if(!s)return '';var d=new Date(s.replace(' ','T')),now=new Date(),sec=Math.floor((now-d)/1000);
+  var fmt=__lang.js_format||'suffix';
+  function f(n,unit){return fmt==='prefix'?unit.replace('{n}',n):n+unit;}
+  if(sec<60)return __lang.now;
+  if(sec<3600){var m=Math.floor(sec/60);return f(m,__lang.js_min);}
+  if(sec<86400){var h=Math.floor(sec/3600);return f(h,__lang.js_hour);}
+  var dd=Math.floor(sec/86400);return f(dd,__lang.js_day);
+}
+
 // Hydrate header from /api/me
 (function(){
   function updateBadge(n){
@@ -213,11 +234,6 @@
   window.updateBadge=updateBadge;
 
   function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
-  function _timeDiff(s){
-    if(!s)return '';var d=new Date(s.replace(' ','T')),now=new Date(),sec=Math.floor((now-d)/1000);
-    if(sec<60)return 'Ahora';if(sec<3600)return 'hace '+Math.floor(sec/60)+'m';
-    if(sec<86400)return 'hace '+Math.floor(sec/3600)+'h';return 'hace '+Math.floor(sec/86400)+'d';
-  }
 
   // Hydrate header on page load
   fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
@@ -264,7 +280,7 @@
     fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
       updateBadge(d.unread||0);
       var list=document.getElementById('notiList');
-      if(!d.notifications||!d.notifications.length){list.innerHTML='<div class="noti-empty">Sin notificaciones</div>';return;}
+      if(!d.notifications||!d.notifications.length){list.innerHTML='<div class="noti-empty">'+__lang.no_notifications+'</div>';return;}
       list.innerHTML=d.notifications.map(function(n){
         var isResolved=n.type==='report_resolved';
         var avatar,msg;
@@ -289,13 +305,13 @@
     var id=el.dataset.id,slug=el.dataset.slug,chapter=el.dataset.chapter;
     fetch('/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});
     el.remove();var rem=document.querySelectorAll('.noti-item').length;updateBadge(rem);
-    if(!rem)document.getElementById('notiList').innerHTML='<div class="noti-empty">Sin notificaciones</div>';
+    if(!rem)document.getElementById('notiList').innerHTML='<div class="noti-empty">'+__lang.no_notifications+'</div>';
     if(slug){window.location.href=chapter?'/manga/'+slug+'/'+chapter+'#cc-section':'/manga/'+slug+'#comment-section';}
   };
   window.notiMarkAll=function(e){
     e.stopPropagation();
     fetch('/api/notifications/read-all',{method:'POST',credentials:'same-origin'}).then(function(){
-      document.getElementById('notiList').innerHTML='<div class="noti-empty">Sin notificaciones</div>';updateBadge(0);
+      document.getElementById('notiList').innerHTML='<div class="noti-empty">'+__lang.no_notifications+'</div>';updateBadge(0);
     });
   };
 })();

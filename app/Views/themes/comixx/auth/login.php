@@ -280,8 +280,8 @@
 <div class="auth-wrapper">
   <div class="auth-card">
     <div class="auth-tabs">
-      <a href="<?= base_url('login') ?>" class="auth-tab active" data-panel="login">INICIAR SESIÓN</a>
-      <a href="<?= base_url('register') ?>" class="auth-tab" data-panel="register">REGISTRARSE</a>
+      <a href="<?= base_url('login') ?>" class="auth-tab active" data-panel="login"><?= lang('ComixxAuth.login_tab') ?></a>
+      <a href="<?= base_url('register') ?>" class="auth-tab" data-panel="register"><?= lang('ComixxAuth.register_tab') ?></a>
     </div>
 
     <div class="auth-body">
@@ -312,40 +312,40 @@
           <?= csrf_field() ?>
 
           <div class="auth-form-group">
-            <label class="auth-label">Usuario o Correo</label>
+            <label class="auth-label"><?= lang('ComixxAuth.username_or_email') ?></label>
             <div class="auth-input-wrapper">
               <i class="fas fa-user"></i>
-              <input type="text" name="login" class="auth-input" placeholder="Ingresa tu usuario o correo" value="<?= old('login') ?>" required>
+              <input type="text" name="login" class="auth-input" placeholder="<?= lang('ComixxAuth.enter_username_email') ?>" value="<?= old('login') ?>" required>
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label">Contraseña</label>
+            <label class="auth-label"><?= lang('ComixxAuth.password') ?></label>
             <div class="auth-input-wrapper">
               <i class="fas fa-lock"></i>
-              <input type="password" name="password" class="auth-input auth-password" placeholder="Ingresa tu contraseña" required>
-              <button type="button" class="auth-password-toggle" title="Mostrar contraseña"><i class="far fa-eye"></i></button>
+              <input type="password" name="password" class="auth-input auth-password" placeholder="<?= lang('ComixxAuth.enter_password') ?>" required>
+              <button type="button" class="auth-password-toggle" title="<?= lang('ComixxAuth.toggle_password') ?>"><i class="far fa-eye"></i></button>
             </div>
           </div>
 
           <div class="auth-options">
             <label class="auth-remember">
-              <input type="checkbox" name="remember"> Recuérdame
+              <input type="checkbox" name="remember"> <?= lang('ComixxAuth.remember_me') ?>
             </label>
-            <a href="<?= base_url('forgot-password') ?>" class="auth-forgot">¿Olvidaste tu contraseña?</a>
+            <a href="<?= base_url('forgot-password') ?>" class="auth-forgot"><?= lang('ComixxAuth.forgot_password') ?></a>
           </div>
 
-          <button type="submit" class="auth-submit">INICIAR SESIÓN</button>
+          <button type="submit" class="auth-submit"><?= lang('ComixxAuth.login_tab') ?></button>
         </form>
 
-        <div class="auth-divider">o continuar con</div>
+        <div class="auth-divider"><?= lang('ComixxAuth.or_continue_with') ?></div>
         <div class="auth-social-buttons">
           <button class="auth-social-btn"><i class="fab fa-google"></i> Google</button>
           <button class="auth-social-btn"><i class="fab fa-discord"></i> Discord</button>
         </div>
 
         <div class="auth-footer-text">
-          ¿No tienes una cuenta? <a href="<?= base_url('register') ?>">Regístrate</a>
+          <?= lang('ComixxAuth.no_account') ?> <a href="<?= base_url('register') ?>"><?= lang('ComixxAuth.register_link') ?></a>
         </div>
       </div>
     </div>

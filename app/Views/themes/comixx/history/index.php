@@ -976,7 +976,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
       <div class="profile-username"><?= esc($username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn"><?= lang('Comixx.logout') ?></a>
   </div>
 </section>
 
@@ -985,23 +985,23 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Editar Perfil</span>
+      <span class="tab-text"><?= lang('ComixxProfile.edit_profile') ?></span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notificaciones</span>
+      <span class="tab-text"><?= lang('ComixxProfile.notifications') ?></span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab active">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">Historial</span>
+      <span class="tab-text"><?= lang('ComixxProfile.history') ?></span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Marcadores</span>
+      <span class="tab-text"><?= lang('ComixxProfile.bookmarks') ?></span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Configuración</span>
+      <span class="tab-text"><?= lang('ComixxProfile.settings') ?></span>
     </a>
   </div>
 </div>
@@ -1011,18 +1011,18 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <?php if (empty($history)): ?>
     <div class="empty-state">
       <i class="fas fa-clock-rotate-left"></i>
-      <p>Sin historial de lectura aún. Comienza a leer manga y tu historial aparecerá aquí.</p>
+      <p><?= lang('ComixxProfile.no_history_desc') ?></p>
     </div>
   <?php else: ?>
     <div class="history-list">
       <?php foreach ($history as $h): ?>
         <?php
           $diff = time() - ($h['time'] ?? 0);
-          if ($diff < 60)         $ago = 'Ahora';
-          elseif ($diff < 3600)   $ago = 'Última lectura ' . floor($diff / 60) . ' min';
-          elseif ($diff < 86400)  $ago = 'Última lectura ' . floor($diff / 3600) . ' horas';
-          elseif ($diff < 604800) $ago = 'Última lectura ' . floor($diff / 86400) . ' días';
-          else                    $ago = 'Última lectura ' . date('M d, Y', $h['time'] ?? 0);
+          if ($diff < 60)         $ago = lang('ComixxTime.now');
+          elseif ($diff < 3600)   $ago = str_replace('{time}', str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago')), lang('ComixxTime.last_read_time'));
+          elseif ($diff < 86400)  $ago = str_replace('{time}', str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago')), lang('ComixxTime.last_read_time'));
+          elseif ($diff < 604800) $ago = str_replace('{time}', str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago')), lang('ComixxTime.last_read_time'));
+          else                    $ago = str_replace('{time}', date('M d, Y', $h['time'] ?? 0), lang('ComixxTime.last_read_time'));
 
           $chapUrl = base_url('manga/' . esc($h['manga_slug']) . '/' . esc($h['chap_slug']));
           $mangaUrl = base_url('manga/' . esc($h['manga_slug']));
@@ -1042,7 +1042,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
 
 <script>
 function clearHistory() {
-  if (!confirm('¿Borrar todo el historial de lectura?')) return;
+  if (!confirm('<?= lang('ComixxProfile.clear_confirm') ?>')) return;
   document.cookie = '_history=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   window.location.reload();
 }

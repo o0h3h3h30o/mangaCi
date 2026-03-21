@@ -33,6 +33,10 @@ return [
     'links'               => 'Links',
     'sitemap'             => 'SITEMAP',
     'footer_tagline'      => 'Next-Gen<br>Manga Experience.',
+    'latest_updates_link' => 'LATEST UPDATES',
+    'popular_link'        => 'POPULAR',
+    'newest_link'         => 'NEWEST',
+    'view_all'            => 'VIEW ALL',
 
     // Announcement
     'announce_1'          => 'This site is new, so it may have bugs, please report to us if you found any. Thanks!',

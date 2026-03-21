@@ -96,6 +96,9 @@ class Install extends Controller
             }
         }
 
+        // Insert default comic types
+        $mysqli->query("INSERT IGNORE INTO `comictype` (`id`, `label`) VALUES (1, 'Manga'), (2, 'Manhwa'), (3, 'Manhua')");
+
         // Insert default groups
         $mysqli->query("INSERT IGNORE INTO `groups` (`id`, `name`) VALUES (1, 'admin'), (2, 'members')");
 
@@ -105,10 +108,12 @@ class Install extends Controller
             ('meta_description', ''),
             ('meta_keywords', ''),
             ('active_theme', 'default'),
+            ('site_language', 'en'),
             ('site_logo', ''),
             ('footer_logo', ''),
             ('footer_copyright', ''),
-            ('footer_url', '/')");
+            ('footer_url', '/'),
+            ('ga_id', '')");
 
         // Insert admin user
         $now        = date('Y-m-d H:i:s');

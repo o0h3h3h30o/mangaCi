@@ -1299,10 +1299,10 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
   </div>
   <div class="reader-topbar-center">Ch. <?= esc($chapter['number']) ?><?php if (!empty($lastChapter)): ?>/<?= esc($lastChapter['number']) ?><?php endif; ?></div>
   <div class="reader-topbar-right">
-    <button class="reader-topbar-btn" id="sidebarToggleBtn" title="Alternar Panel">
+    <button class="reader-topbar-btn" id="sidebarToggleBtn" title="<?= esc(lang('ComixxManga.toggle_sidebar')) ?>">
       <i class="far fa-comment"></i>
     </button>
-    <button class="reader-topbar-btn" id="settingsBtn" title="Configuración">
+    <button class="reader-topbar-btn" id="settingsBtn" title="<?= esc(lang('ComixxManga.settings')) ?>">
       <i class="fas fa-sliders-h"></i>
     </button>
   </div>
@@ -1340,7 +1340,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
         </div>
         <?php endforeach; ?>
       <?php else: ?>
-        <p style="color: var(--text-muted); text-align: center; padding: 40px;">No hay páginas disponibles para este capítulo.</p>
+        <p style="color: var(--text-muted); text-align: center; padding: 40px;"><?= lang('ComixxManga.no_pages') ?></p>
       <?php endif; ?>
     </div>
   </div>
@@ -1352,11 +1352,11 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <!-- Chapter Navigation -->
     <div class="reader-chapter-nav">
       <?php if (!empty($prevChapter)): ?>
-      <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $prevChapter['slug']) ?>" class="reader-chapter-arrow" title="Capítulo Anterior">
+      <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $prevChapter['slug']) ?>" class="reader-chapter-arrow" title="<?= esc(lang('ComixxManga.prev_chapter')) ?>">
         <i class="fas fa-chevron-left"></i>
       </a>
       <?php else: ?>
-      <button class="reader-chapter-arrow disabled" title="Capítulo Anterior" disabled>
+      <button class="reader-chapter-arrow disabled" title="<?= esc(lang('ComixxManga.prev_chapter')) ?>" disabled>
         <i class="fas fa-chevron-left"></i>
       </button>
       <?php endif; ?>
@@ -1372,11 +1372,11 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
       </div>
 
       <?php if (!empty($nextChapter)): ?>
-      <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $nextChapter['slug']) ?>" class="reader-chapter-arrow" title="Capítulo Siguiente">
+      <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $nextChapter['slug']) ?>" class="reader-chapter-arrow" title="<?= esc(lang('ComixxManga.next_chapter')) ?>">
         <i class="fas fa-chevron-right"></i>
       </a>
       <?php else: ?>
-      <button class="reader-chapter-arrow disabled" title="Capítulo Siguiente" disabled>
+      <button class="reader-chapter-arrow disabled" title="<?= esc(lang('ComixxManga.next_chapter')) ?>" disabled>
         <i class="fas fa-chevron-right"></i>
       </button>
       <?php endif; ?>
@@ -1384,55 +1384,55 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 
     <!-- Follow + Like/Dislike -->
     <div class="reader-action-row">
-      <button class="reader-bookmark-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="readerFollowBtn" data-manga-id="<?= esc($manga['id']) ?>" title="Seguir">
+      <button class="reader-bookmark-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="readerFollowBtn" data-manga-id="<?= esc($manga['id']) ?>" title="<?= esc(lang('Comixx.follow')) ?>">
         <i class="<?= !empty($isBookmarked) ? 'fas' : 'far' ?> fa-bookmark"></i>
-        <span id="readerFollowLabel"><?= !empty($isBookmarked) ? 'Siguiendo' : 'Seguir' ?></span>
+        <span id="readerFollowLabel"><?= !empty($isBookmarked) ? lang('Comixx.following') : lang('Comixx.follow') ?></span>
       </button>
       <div class="reader-like-row">
         <button class="reader-like-btn" id="chLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="chLikeCount">0</span></button>
         <button class="reader-like-btn" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="chDislikeCount">0</span></button>
       </div>
-      <button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> Reportar</button>
+      <button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> <?= lang('Comixx.report') ?></button>
     </div>
 
     <!-- Comments Section -->
     <div class="reader-comments" id="sidebarComments">
       <div class="reader-comments-header">
         <div class="reader-comments-tabs">
-          <div class="reader-comments-tab active" data-tab="chapter">Comentarios del Capítulo <span class="rc-count" id="sc-ch-count"></span></div>
-          <div class="reader-comments-tab" data-tab="all">Todos los Comentarios <span class="rc-count" id="sc-all-count"></span></div>
+          <div class="reader-comments-tab active" data-tab="chapter"><?= lang('ComixxManga.chapter_comments') ?> <span class="rc-count" id="sc-ch-count"></span></div>
+          <div class="reader-comments-tab" data-tab="all"><?= lang('ComixxManga.all_comments') ?> <span class="rc-count" id="sc-all-count"></span></div>
         </div>
         <div class="tab-buttons">
-          <button class="tab-btn active" data-sort="newest">NUEVO</button>
-          <button class="tab-btn" data-sort="oldest">ANTERIOR</button>
-          <button class="tab-btn" data-sort="top">TOP</button>
+          <button class="tab-btn active" data-sort="newest"><?= lang('ComixxManga.new') ?></button>
+          <button class="tab-btn" data-sort="oldest"><?= lang('ComixxManga.older') ?></button>
+          <button class="tab-btn" data-sort="top"><?= lang('ComixxManga.top') ?></button>
         </div>
       </div>
 
       <div class="reader-comments-tab-content active" data-type="chapter">
-        <div class="reader-comments-list" id="sc-ch-list"><p class="rc-loading">Cargando...</p></div>
+        <div class="reader-comments-list" id="sc-ch-list"><p class="rc-loading">...</p></div>
         <div class="rc-pagination" id="sc-ch-pg"></div>
       </div>
 
       <div class="reader-comments-tab-content" data-type="all">
-        <div class="reader-comments-list" id="sc-all-list"><p class="rc-loading">Cargando...</p></div>
+        <div class="reader-comments-list" id="sc-all-list"><p class="rc-loading">...</p></div>
         <div class="rc-pagination" id="sc-all-pg"></div>
       </div>
 
       <?php if (!empty($currentUser)): ?>
       <div class="rc-captcha-wrap" id="sc-captcha" style="display:none">
-        <span class="rc-captcha-label">Resuelve para continuar:</span>
+        <span class="rc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></span>
         <span class="rc-captcha-q" id="sc-captcha-q"></span>
         <span>= ?</span>
         <input type="number" class="rc-captcha-ans" id="sc-captcha-ans" min="0" max="99" placeholder="0">
       </div>
       <div class="reader-comment-input-wrap">
-        <input type="text" class="reader-comment-input" id="sc-input" maxlength="1000" placeholder="Escribe un comentario...">
+        <input type="text" class="reader-comment-input" id="sc-input" maxlength="1000" placeholder="<?= esc(lang('ComixxManga.write_comment')) ?>">
         <button class="reader-comment-send" id="sc-send"><i class="fas fa-paper-plane"></i></button>
       </div>
       <?php else: ?>
       <div class="rc-login-notice">
-        <a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para comentar
+        <?= lang('ComixxManga.login_to_comment') ?>
       </div>
       <?php endif; ?>
     </div>
@@ -1443,14 +1443,14 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 <div class="reader-mobile-bottom">
   <div class="reader-mobile-chapter-nav">
     <?php if (!empty($prevChapter)): ?>
-    <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $prevChapter['slug']) ?>"><i class="fas fa-chevron-left"></i> Cap. Anterior</a>
+    <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $prevChapter['slug']) ?>"><i class="fas fa-chevron-left"></i> <?= lang('ComixxManga.prev_chapter') ?></a>
     <?php else: ?>
-    <a href="#" class="disabled"><i class="fas fa-chevron-left"></i> Cap. Anterior</a>
+    <a href="#" class="disabled"><i class="fas fa-chevron-left"></i> <?= lang('ComixxManga.prev_chapter') ?></a>
     <?php endif; ?>
     <?php if (!empty($nextChapter)): ?>
-    <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $nextChapter['slug']) ?>">Cap. Siguiente <i class="fas fa-chevron-right"></i></a>
+    <a href="<?= site_url('manga/' . $manga['slug'] . '/' . $nextChapter['slug']) ?>"><?= lang('ComixxManga.next_chapter') ?> <i class="fas fa-chevron-right"></i></a>
     <?php else: ?>
-    <a href="#" class="disabled">Cap. Siguiente <i class="fas fa-chevron-right"></i></a>
+    <a href="#" class="disabled"><?= lang('ComixxManga.next_chapter') ?> <i class="fas fa-chevron-right"></i></a>
     <?php endif; ?>
   </div>
 
@@ -1458,45 +1458,45 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count">0</span></button>
     <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count">0</span></button>
   </div>
-  <div style="text-align:center"><button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> Reportar Error</button></div>
+  <div style="text-align:center"><button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> <?= lang('Comixx.report_error') ?></button></div>
 
   <div class="reader-comments" id="mobileComments">
     <div class="reader-comments-header">
       <div class="reader-comments-tabs">
-        <div class="reader-comments-tab active" data-tab="chapter">Comentarios del Capítulo <span class="rc-count" id="mc-ch-count"></span></div>
-        <div class="reader-comments-tab" data-tab="all">Todos los Comentarios <span class="rc-count" id="mc-all-count"></span></div>
+        <div class="reader-comments-tab active" data-tab="chapter"><?= lang('ComixxManga.chapter_comments') ?> <span class="rc-count" id="mc-ch-count"></span></div>
+        <div class="reader-comments-tab" data-tab="all"><?= lang('ComixxManga.all_comments') ?> <span class="rc-count" id="mc-all-count"></span></div>
       </div>
       <div class="tab-buttons">
-        <button class="tab-btn active" data-sort="newest">NUEVO</button>
-        <button class="tab-btn" data-sort="oldest">ANTERIOR</button>
-        <button class="tab-btn" data-sort="top">TOP</button>
+        <button class="tab-btn active" data-sort="newest"><?= lang('ComixxManga.new') ?></button>
+        <button class="tab-btn" data-sort="oldest"><?= lang('ComixxManga.older') ?></button>
+        <button class="tab-btn" data-sort="top"><?= lang('ComixxManga.top') ?></button>
       </div>
     </div>
 
     <div class="reader-comments-tab-content active" data-type="chapter">
-      <div class="reader-comments-list" id="mc-ch-list"><p class="rc-loading">Cargando...</p></div>
+      <div class="reader-comments-list" id="mc-ch-list"><p class="rc-loading">...</p></div>
       <div class="rc-pagination" id="mc-ch-pg"></div>
     </div>
 
     <div class="reader-comments-tab-content" data-type="all">
-      <div class="reader-comments-list" id="mc-all-list"><p class="rc-loading">Cargando...</p></div>
+      <div class="reader-comments-list" id="mc-all-list"><p class="rc-loading">...</p></div>
       <div class="rc-pagination" id="mc-all-pg"></div>
     </div>
 
     <?php if (!empty($currentUser)): ?>
     <div class="rc-captcha-wrap" id="mc-captcha" style="display:none">
-      <span class="rc-captcha-label">Resuelve para continuar:</span>
+      <span class="rc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></span>
       <span class="rc-captcha-q" id="mc-captcha-q"></span>
       <span>= ?</span>
       <input type="number" class="rc-captcha-ans" id="mc-captcha-ans" min="0" max="99" placeholder="0">
     </div>
     <div class="reader-comment-input-wrap">
-      <input type="text" class="reader-comment-input" id="mc-input" maxlength="1000" placeholder="Escribe un comentario...">
+      <input type="text" class="reader-comment-input" id="mc-input" maxlength="1000" placeholder="<?= esc(lang('ComixxManga.write_comment')) ?>">
       <button class="reader-comment-send" id="mc-send"><i class="fas fa-paper-plane"></i></button>
     </div>
     <?php else: ?>
     <div class="rc-login-notice">
-      <a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para comentar
+      <?= lang('ComixxManga.login_to_comment') ?>
     </div>
     <?php endif; ?>
   </div>
@@ -1504,18 +1504,18 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 
 <!-- Page Navigation Bar (for single/double page modes) -->
 <div class="reader-page-nav hidden" id="pageNav">
-  <button class="reader-page-nav-btn" id="prevPageBtn" title="Página Anterior">
+  <button class="reader-page-nav-btn" id="prevPageBtn" title="<?= esc(lang('ComixxManga.prev_page')) ?>">
     <i class="fas fa-chevron-left"></i>
   </button>
   <input type="range" class="reader-page-slider" id="pageSlider" min="1" max="<?= $totalPages ?>" value="1">
   <span class="reader-page-info" id="pageInfo">1 / <?= $totalPages ?></span>
-  <button class="reader-page-nav-btn" id="nextPageBtn" title="Página Siguiente">
+  <button class="reader-page-nav-btn" id="nextPageBtn" title="<?= esc(lang('ComixxManga.next_page')) ?>">
     <i class="fas fa-chevron-right"></i>
   </button>
 </div>
 
 <!-- Back to Top Button -->
-<button class="reader-back-top" id="backTopBtn" title="Ir arriba">
+<button class="reader-back-top" id="backTopBtn" title="<?= esc(lang('ComixxManga.back_to_top')) ?>">
   <i class="fas fa-chevron-up"></i>
 </button>
 
@@ -1525,64 +1525,64 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <!-- Modal Header -->
     <div class="settings-modal-header">
       <div class="settings-mode-icons">
-        <button class="settings-mode-btn active" data-mode="palette" title="Modo de Color">
+        <button class="settings-mode-btn active" data-mode="palette" title="<?= esc(lang('ComixxManga.color_mode')) ?>">
           <i class="fas fa-palette"></i>
         </button>
-        <button class="settings-mode-btn" data-mode="brightness" title="Brillo">
+        <button class="settings-mode-btn" data-mode="brightness" title="<?= esc(lang('ComixxManga.brightness')) ?>">
           <i class="fas fa-sun"></i>
         </button>
-        <button class="settings-mode-btn" data-mode="dark" title="Modo Oscuro">
+        <button class="settings-mode-btn" data-mode="dark" title="<?= esc(lang('ComixxManga.dark_mode')) ?>">
           <i class="fas fa-moon"></i>
         </button>
       </div>
-      <button class="settings-close-btn" id="settingsCloseBtn" title="Cerrar">
+      <button class="settings-close-btn" id="settingsCloseBtn" title="<?= esc(lang('ComixxManga.close')) ?>">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
     <!-- Settings Tabs -->
     <div class="settings-tabs">
-      <button class="settings-tab active" data-tab="layout">DISEÑO</button>
-      <button class="settings-tab" data-tab="image">IMAGEN</button>
-      <button class="settings-tab" data-tab="shortcuts">ATAJOS</button>
+      <button class="settings-tab active" data-tab="layout"><?= lang('ComixxManga.settings_design') ?></button>
+      <button class="settings-tab" data-tab="image"><?= lang('ComixxManga.settings_image') ?></button>
+      <button class="settings-tab" data-tab="shortcuts"><?= lang('ComixxManga.settings_shortcuts') ?></button>
     </div>
 
     <!-- LAYOUT Tab -->
     <div class="settings-tab-content active" id="tab-layout">
       <div class="settings-group">
-        <div class="settings-group-label">Estilo de Visualización</div>
+        <div class="settings-group-label"><?= lang('ComixxManga.display_style') ?></div>
         <div class="settings-btn-row" data-group="page-display">
-          <button class="settings-option-btn" data-value="single">PÁGINA ÚNICA</button>
-          <button class="settings-option-btn" data-value="double">DOBLE PÁGINA</button>
-          <button class="settings-option-btn active" data-value="longstrip">TIRA LARGA</button>
+          <button class="settings-option-btn" data-value="single"><?= lang('ComixxManga.single_page') ?></button>
+          <button class="settings-option-btn" data-value="double"><?= lang('ComixxManga.double_page') ?></button>
+          <button class="settings-option-btn active" data-value="longstrip"><?= lang('ComixxManga.long_strip') ?></button>
         </div>
       </div>
 
       <div class="settings-group">
-        <div class="settings-group-label">Dirección de Lectura</div>
+        <div class="settings-group-label"><?= lang('ComixxManga.reading_direction') ?></div>
         <div class="settings-btn-row" data-group="reading-dir">
           <button class="settings-option-btn active" data-value="ltr">
-            <i class="fas fa-arrow-right"></i> Izquierda a Derecha
+            <i class="fas fa-arrow-right"></i> <?= lang('ComixxManga.ltr') ?>
           </button>
           <button class="settings-option-btn" data-value="rtl">
-            <i class="fas fa-arrow-left"></i> Derecha a Izquierda
+            <i class="fas fa-arrow-left"></i> <?= lang('ComixxManga.rtl') ?>
           </button>
         </div>
       </div>
 
       <div class="settings-group">
-        <div class="settings-group-label">Posición de Barra de Progreso</div>
+        <div class="settings-group-label"><?= lang('ComixxManga.progress_bar') ?></div>
         <div class="settings-btn-row settings-btn-row-small" data-group="progress-bar">
-          <button class="settings-option-btn" data-value="top">ARRIBA</button>
-          <button class="settings-option-btn" data-value="bottom">ABAJO</button>
-          <button class="settings-option-btn active" data-value="left">IZQUIERDA</button>
-          <button class="settings-option-btn" data-value="right">DERECHA</button>
-          <button class="settings-option-btn" data-value="none">NINGUNA</button>
+          <button class="settings-option-btn" data-value="top">TOP</button>
+          <button class="settings-option-btn" data-value="bottom">BOTTOM</button>
+          <button class="settings-option-btn active" data-value="left">LEFT</button>
+          <button class="settings-option-btn" data-value="right">RIGHT</button>
+          <button class="settings-option-btn" data-value="none">NONE</button>
         </div>
       </div>
 
       <div class="settings-group">
-        <div class="settings-group-label">Espacio entre Páginas <span id="pageGapValue" style="color: var(--text-muted); font-weight: 400;">0px</span></div>
+        <div class="settings-group-label"><?= lang('ComixxManga.page_gap') ?> <span id="pageGapValue" style="color: var(--text-muted); font-weight: 400;">0px</span></div>
         <input type="range" id="pageGapSlider" min="0" max="50" value="0" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;">
       </div>
     </div>
@@ -1591,7 +1591,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <div class="settings-tab-content" id="tab-image">
       <div class="settings-placeholder">
         <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
-        Configuración de imagen próximamente
+        <?= lang('ComixxManga.image_settings_soon') ?>
       </div>
     </div>
 
@@ -1599,13 +1599,50 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     <div class="settings-tab-content" id="tab-shortcuts">
       <div class="settings-placeholder">
         <i class="fas fa-keyboard" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
-        Atajos de teclado próximamente
+        <?= lang('ComixxManga.shortcuts_soon') ?>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+var __chapterLang = {
+  reply: <?= json_encode(lang('Comixx.reply')) ?>,
+  cancel: <?= json_encode(lang('Comixx.cancel')) ?>,
+  send: <?= json_encode(lang('Comixx.send')) ?>,
+  follow: <?= json_encode(lang('Comixx.follow')) ?>,
+  following: <?= json_encode(lang('Comixx.following')) ?>,
+  no_comments: <?= json_encode(lang('ComixxManga.no_comments')) ?>,
+  write_comment: <?= json_encode(lang('ComixxManga.write_comment')) ?>,
+  post_comment: <?= json_encode(lang('ComixxManga.post_comment')) ?>,
+  view_replies: <?= json_encode(lang('ComixxManga.view_replies')) ?>,
+  hide_replies: <?= json_encode(lang('ComixxManga.hide_replies')) ?>,
+  error: <?= json_encode(lang('ComixxManga.report_error_msg')) ?>,
+  submit_report: <?= json_encode(lang('ComixxManga.submit_report')) ?>,
+  sending: <?= json_encode(lang('ComixxManga.sending')) ?>,
+  select_reason: <?= json_encode(lang('ComixxManga.select_reason')) ?>,
+  report_thanks: <?= json_encode(lang('ComixxManga.report_thanks')) ?>,
+  login_to_comment: <?= json_encode(lang('ComixxManga.login_to_comment')) ?>,
+  report: <?= json_encode(lang('Comixx.report')) ?>,
+  report_error: <?= json_encode(lang('Comixx.report_error')) ?>,
+  report_chapter_error: <?= json_encode(lang('ComixxManga.report_chapter_error')) ?>,
+  close: <?= json_encode(lang('ComixxManga.close')) ?>,
+  reason: <?= json_encode(lang('ComixxManga.reason')) ?>,
+  wrong_images: <?= json_encode(lang('ComixxManga.wrong_images')) ?>,
+  missing_pages: <?= json_encode(lang('ComixxManga.missing_pages')) ?>,
+  low_quality: <?= json_encode(lang('ComixxManga.low_quality')) ?>,
+  cant_load: <?= json_encode(lang('ComixxManga.cant_load')) ?>,
+  wrong_order: <?= json_encode(lang('ComixxManga.wrong_order')) ?>,
+  other: <?= json_encode(lang('ComixxManga.other')) ?>,
+  additional_details: <?= json_encode(lang('ComixxManga.additional_details')) ?>,
+  back_to_top: <?= json_encode(lang('ComixxManga.back_to_top')) ?>,
+  js_min: <?= json_encode(lang('ComixxTime.js_min')) ?>,
+  js_hour: <?= json_encode(lang('ComixxTime.js_hour')) ?>,
+  js_day: <?= json_encode(lang('ComixxTime.js_day')) ?>,
+  js_format: <?= json_encode(lang('ComixxTime.js_format')) ?>,
+  now: <?= json_encode(lang('ComixxTime.now')) ?>,
+  show_more_replies: <?= json_encode(lang('ComixxManga.show_more_replies')) ?>
+};
 (function() {
     'use strict';
 
@@ -1924,11 +1961,11 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
           if (d.bookmarked) {
             followBtn.classList.add('active');
             if (icon) { icon.classList.remove('far'); icon.classList.add('fas'); }
-            if (label) label.textContent = 'Siguiendo';
+            if (label) label.textContent = __chapterLang.following;
           } else {
             followBtn.classList.remove('active');
             if (icon) { icon.classList.remove('fas'); icon.classList.add('far'); }
-            if (label) label.textContent = 'Seguir';
+            if (label) label.textContent = __chapterLang.follow;
           }
         });
       });
@@ -1988,11 +2025,11 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     function timeAgo(str){
       var d=new Date(str.replace(' ','T'));
       var diff=Math.floor((Date.now()-d.getTime())/1000);
-      if(diff<60) return 'hace '+diff+'s';
-      if(diff<3600) return 'hace '+Math.floor(diff/60)+' min';
-      if(diff<86400) return 'hace '+Math.floor(diff/3600)+' horas';
-      if(diff<604800) return 'hace '+Math.floor(diff/86400)+' días';
-      return 'hace '+Math.floor(diff/604800)+' sem';
+      if(diff<60) return __chapterLang.now;
+      if(diff<3600) return __chapterLang.js_format.replace('{n}',Math.floor(diff/60)).replace('{unit}',__chapterLang.js_min);
+      if(diff<86400) return __chapterLang.js_format.replace('{n}',Math.floor(diff/3600)).replace('{unit}',__chapterLang.js_hour);
+      if(diff<604800) return __chapterLang.js_format.replace('{n}',Math.floor(diff/86400)).replace('{unit}',__chapterLang.js_day);
+      return __chapterLang.js_format.replace('{n}',Math.floor(diff/604800)).replace('{unit}','w');
     }
     function rcAvatar(name, username, uid, sz){
       sz=sz||28;
@@ -2010,7 +2047,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 
     function rcRenderReply(c, topId){
       var name=c.user_name||c.user_username||'?';
-      var rb=(CURRENT_UID>0&&topId)?'<button class="rc-reply-btn" data-id="'+topId+'" data-reply-to="'+c.id+'" data-name="'+escHtml(name)+'">Responder</button>':'';
+      var rb=(CURRENT_UID>0&&topId)?'<button class="rc-reply-btn" data-id="'+topId+'" data-reply-to="'+c.id+'" data-name="'+escHtml(name)+'">'+__chapterLang.reply+'</button>':'';
       return '<div class="rc-item" data-id="'+c.id+'"><div class="rc-item-body">'+
         rcAvatar(c.user_name,c.user_username,c.user_id,22)+
         '<div class="rc-content"><div class="rc-bubble"><span class="rc-user">'+escHtml(name)+'</span><div class="rc-text">'+escHtml(c.comment)+'</div></div>'+
@@ -2022,25 +2059,25 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
         '<input type="hidden" class="rc-reply-to-id" value="'+(replyToId||0)+'">'+
         '<textarea class="rc-reply-input" rows="2" maxlength="1000">@'+escHtml(parentName)+' </textarea>'+
         '<div class="rc-captcha-wrap rc-reply-captcha" style="display:none">'+
-          '<span class="rc-captcha-label">Resuelve para continuar:</span>'+
+          '<span class="rc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></span>'+
           '<span class="rc-captcha-q rc-reply-captcha-q"></span>'+
           '<input type="text" class="rc-captcha-ans rc-reply-captcha-ans" placeholder="?" inputmode="numeric" style="font-size:16px">'+
         '</div>'+
         '<div class="rc-reply-form-actions">'+
-        '<button class="rc-reply-cancel" data-parent="'+parentId+'">Cancelar</button>'+
-        '<button class="rc-reply-submit" data-parent="'+parentId+'">Responder</button>'+
+        '<button class="rc-reply-cancel" data-parent="'+parentId+'">'+__chapterLang.cancel+'</button>'+
+        '<button class="rc-reply-submit" data-parent="'+parentId+'">'+__chapterLang.reply+'</button>'+
         '</div></div>';
     }
 
     function rcFetchReplies(commentId, btn, listEl){
       var container=listEl.querySelector('#rc-replies-'+commentId);
       if(!container) return;
-      if(btn){btn.disabled=true;btn.textContent='Cargando...';}
+      if(btn){btn.disabled=true;btn.textContent='...';}
       fetch('/api/comments/'+commentId+'/replies')
         .then(function(r){return r.json();})
         .then(function(d){
           if(!d.replies||!d.replies.length){
-            if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}
+            if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',cnt);}
             return;
           }
           var LIMIT=3,visible=d.replies.slice(0,LIMIT),hidden=d.replies.slice(LIMIT);
@@ -2048,20 +2085,20 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
           if(hidden.length>0){
             var mBtn=document.createElement('button');
             mBtn.className='rc-show-more';
-            mBtn.textContent='Mostrar '+hidden.length+' más...';
+            mBtn.textContent=__chapterLang.show_more_replies.replace('{n}',hidden.length);
             mBtn.onclick=function(){mBtn.remove();container.insertAdjacentHTML('beforeend',hidden.map(function(r){return rcRenderReply(r,commentId);}).join(''));};
             container.appendChild(mBtn);
           }
-          if(btn){btn.textContent='Ocultar respuestas';btn.disabled=false;btn.dataset.open='1';}
+          if(btn){btn.textContent=__chapterLang.hide_replies;btn.disabled=false;btn.dataset.open='1';}
         })
-        .catch(function(){if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}});
+        .catch(function(){if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',cnt);}});
     }
 
     function rcRenderCmt(c){
       var name=c.user_name||c.user_username||'?';
-      var rb=CURRENT_UID>0?'<button class="rc-reply-btn" data-id="'+c.id+'" data-name="'+escHtml(name)+'">Responder</button>':'';
+      var rb=CURRENT_UID>0?'<button class="rc-reply-btn" data-id="'+c.id+'" data-name="'+escHtml(name)+'">'+__chapterLang.reply+'</button>':'';
       var replyCount=parseInt(c.reply_count||0);
-      var rt=replyCount>0?'<button class="rc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">Ver '+replyCount+' respuesta'+(replyCount===1?'':'s')+'</button>':'';
+      var rt=replyCount>0?'<button class="rc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">'+__chapterLang.view_replies.replace('{n}',replyCount)+'</button>':'';
       return '<div class="rc-item" data-id="'+c.id+'"><div class="rc-item-body">'+
         rcAvatar(c.user_name,c.user_username,c.user_id)+
         '<div class="rc-content"><div class="rc-bubble"><span class="rc-user">'+escHtml(name)+'</span><div class="rc-text">'+escHtml(c.comment)+'</div></div>'+
@@ -2101,7 +2138,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
             if(countCh) countCh.textContent=data.total>0?'('+data.total+')':'';
             state.chTotal=data.total>0?Math.ceil(data.total/10):1;
             listCh.innerHTML=(!data.comments||!data.comments.length)
-              ?'<p class="rc-loading">Sin comentarios aún.</p>'
+              ?'<p class="rc-loading">'+__chapterLang.no_comments+'</p>'
               :data.comments.map(rcRenderCmt).join('');
             if(data.comments) data.comments.forEach(function(c){if(parseInt(c.reply_count||0)>0) rcFetchReplies(c.id,null,listCh);});
             rcRenderPg(pgCh,p,state.chTotal);
@@ -2117,7 +2154,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
             if(countAll) countAll.textContent=data.total>0?'('+data.total+')':'';
             state.allTotal=data.total>0?Math.ceil(data.total/10):1;
             listAll.innerHTML=(!data.comments||!data.comments.length)
-              ?'<p class="rc-loading">Sin comentarios aún.</p>'
+              ?'<p class="rc-loading">'+__chapterLang.no_comments+'</p>'
               :data.comments.map(rcRenderCmt).join('');
             if(data.comments) data.comments.forEach(function(c){if(parseInt(c.reply_count||0)>0) rcFetchReplies(c.id,null,listAll);});
             rcRenderPg(pgAll,p,state.allTotal);
@@ -2198,7 +2235,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
             if(!rc) return;
             if(target.dataset.open==='1'){
               rc.innerHTML=''; target.dataset.open='0';
-              var cnt=target.dataset.count; target.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');
+              var cnt=target.dataset.count; target.textContent=__chapterLang.view_replies.replace('{n}',cnt);
             } else { rcFetchReplies(parseInt(cid),target,listEl); }
             return;
           }
@@ -2258,15 +2295,15 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
                     if(rcCaptchaAns){rcCaptchaAns.value='';rcCaptchaAns.focus();}
                     if(rcCaptchaWrap) rcCaptchaWrap.scrollIntoView({behavior:'smooth',block:'center'});
                   });
-                  target.disabled=false;target.textContent='Responder';
+                  target.disabled=false;target.textContent=__chapterLang.reply;
                   return;
                 }
-                if(c.error){alert(c.error);target.disabled=false;target.textContent='Responder';return;}
+                if(c.error){alert(c.error);target.disabled=false;target.textContent=__chapterLang.reply;return;}
                 rf.remove();
                 var rc=listEl.querySelector('#rc-replies-'+parentId);
                 if(rc) rc.insertAdjacentHTML('beforeend',rcRenderReply(c,parentId));
               })
-              .catch(function(){target.disabled=false;target.textContent='Responder';});
+              .catch(function(){target.disabled=false;target.textContent=__chapterLang.reply;});
             return;
           }
         });
@@ -2322,7 +2359,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
               listCh.insertAdjacentHTML('afterbegin',rcRenderCmt(c));
               inp.value='';
             })
-            .catch(function(){sendBtn.disabled=false;alert('Algo salió mal.');});
+            .catch(function(){sendBtn.disabled=false;alert(__chapterLang.error);});
         }
         sendBtn.addEventListener('click',postComment);
         inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();postComment();}});
@@ -2339,17 +2376,17 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 <div class="rpt-overlay" id="rptModal">
   <div class="rpt-box">
     <button class="rpt-close" id="rptClose">&times;</button>
-    <h3>Reportar Error del Capítulo</h3>
+    <h3><?= lang('ComixxManga.report_chapter_error') ?></h3>
     <p class="rpt-sub"><?= esc($manga['name']) ?> — <?= esc($chapTitle) ?></p>
-    <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;font-weight:500">Razón <span style="color:#ef4444">*</span></p>
+    <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;font-weight:500"><?= lang('ComixxManga.reason') ?> <span style="color:#ef4444">*</span></p>
     <div class="rpt-reasons" id="rptReasons">
       <?php foreach ([
-        'wrong_images'  => 'Imágenes incorrectas / No relacionadas',
-        'missing_pages' => 'Páginas faltantes',
-        'low_quality'   => 'Baja calidad / Borroso',
-        'cant_load'     => 'Las imágenes no cargan',
-        'wrong_order'   => 'Páginas en orden incorrecto',
-        'other'         => 'Otro',
+        'wrong_images'  => lang('ComixxManga.wrong_images'),
+        'missing_pages' => lang('ComixxManga.missing_pages'),
+        'low_quality'   => lang('ComixxManga.low_quality'),
+        'cant_load'     => lang('ComixxManga.cant_load'),
+        'wrong_order'   => lang('ComixxManga.wrong_order'),
+        'other'         => lang('ComixxManga.other'),
       ] as $val => $label): ?>
       <label class="rpt-reason-label">
         <input type="radio" name="rpt-reason" value="<?= $val ?>">
@@ -2357,10 +2394,10 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
       </label>
       <?php endforeach; ?>
     </div>
-    <textarea class="rpt-note" id="rptNote" rows="2" maxlength="300" placeholder="Detalles adicionales (opcional)"></textarea>
+    <textarea class="rpt-note" id="rptNote" rows="2" maxlength="300" placeholder="<?= esc(lang('ComixxManga.additional_details')) ?>"></textarea>
     <div class="rpt-actions">
-      <button class="rpt-cancel-btn" id="rptCancel">Cancelar</button>
-      <button class="rpt-submit-btn" id="rptSubmit">Enviar Reporte</button>
+      <button class="rpt-cancel-btn" id="rptCancel"><?= lang('Comixx.cancel') ?></button>
+      <button class="rpt-submit-btn" id="rptSubmit"><?= lang('ComixxManga.submit_report') ?></button>
     </div>
     <p class="rpt-msg" id="rptMsg"></p>
   </div>
@@ -2374,7 +2411,7 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
   function openRpt(){modal.classList.add('open');document.body.style.overflow='hidden';}
   function closeRpt(){
     modal.classList.remove('open');document.body.style.overflow='';
-    msg.style.display='none';submitBtn.style.display='';submitBtn.disabled=false;submitBtn.textContent='Enviar Reporte';
+    msg.style.display='none';submitBtn.style.display='';submitBtn.disabled=false;submitBtn.textContent=__chapterLang.submit_report;
     document.querySelectorAll('input[name="rpt-reason"]').forEach(function(r){r.checked=false;});
     document.querySelectorAll('.rpt-reason-label').forEach(function(l){l.classList.remove('selected');});
     document.getElementById('rptNote').value='';
@@ -2394,8 +2431,8 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 
   submitBtn.addEventListener('click',function(){
     var reason=document.querySelector('input[name="rpt-reason"]:checked');
-    if(!reason){msg.style.display='block';msg.style.color='#ef4444';msg.textContent='Por favor selecciona una razón.';return;}
-    submitBtn.disabled=true;submitBtn.textContent='Enviando…';msg.style.display='none';
+    if(!reason){msg.style.display='block';msg.style.color='#ef4444';msg.textContent=__chapterLang.select_reason;return;}
+    submitBtn.disabled=true;submitBtn.textContent=__chapterLang.sending;msg.style.display='none';
     var fd=new FormData();
     fd.append('reason',reason.value);
     fd.append('note',document.getElementById('rptNote').value.trim());
@@ -2404,16 +2441,16 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
     .then(function(d){
       msg.style.display='block';
       if(d.ok){
-        msg.style.color='#22c55e';msg.textContent='¡Gracias! Tu reporte ha sido enviado.';
+        msg.style.color='#22c55e';msg.textContent=__chapterLang.report_thanks;
         submitBtn.style.display='none';setTimeout(closeRpt,2500);
       }else{
-        msg.style.color='#ef4444';msg.textContent=d.error||'Algo salió mal.';
-        submitBtn.disabled=false;submitBtn.textContent='Enviar Reporte';
+        msg.style.color='#ef4444';msg.textContent=d.error||__chapterLang.error;
+        submitBtn.disabled=false;submitBtn.textContent=__chapterLang.submit_report;
       }
     })
     .catch(function(){
-      msg.style.display='block';msg.style.color='#ef4444';msg.textContent='Algo salió mal.';
-      submitBtn.disabled=false;submitBtn.textContent='Enviar Reporte';
+      msg.style.display='block';msg.style.color='#ef4444';msg.textContent=__chapterLang.error;
+      submitBtn.disabled=false;submitBtn.textContent=__chapterLang.submit_report;
     });
   });
 })();

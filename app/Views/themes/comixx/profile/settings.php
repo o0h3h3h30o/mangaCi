@@ -976,7 +976,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
       <div class="profile-username"><?= esc($username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn"><?= lang('Comixx.logout') ?></a>
   </div>
 </section>
 
@@ -985,23 +985,23 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Editar Perfil</span>
+      <span class="tab-text"><?= lang('ComixxProfile.edit_profile') ?></span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notificaciones</span>
+      <span class="tab-text"><?= lang('ComixxProfile.notifications') ?></span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">Historial</span>
+      <span class="tab-text"><?= lang('ComixxProfile.history') ?></span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Marcadores</span>
+      <span class="tab-text"><?= lang('ComixxProfile.bookmarks') ?></span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab active">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Configuración</span>
+      <span class="tab-text"><?= lang('ComixxProfile.settings') ?></span>
     </a>
   </div>
 </div>
@@ -1009,11 +1009,11 @@ $username = $u['username'] ?? $u['name'] ?? '';
 <!-- Profile Content -->
 <div class="container profile-content">
   <div class="settings-section">
-    <h3 class="settings-section-title">Apariencia</h3>
+    <h3 class="settings-section-title"><?= lang('ComixxProfile.appearance') ?></h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Modo Oscuro</div>
-        <div class="settings-row-desc">Usar tema oscuro en todo el sitio</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.dark_mode') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.dark_mode_desc') ?></div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" checked>
@@ -1022,8 +1022,8 @@ $username = $u['username'] ?? $u['name'] ?? '';
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Modo Compacto</div>
-        <div class="settings-row-desc">Mostrar más elementos por página</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.compact_mode') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.compact_mode_desc') ?></div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox">
@@ -1033,36 +1033,36 @@ $username = $u['username'] ?? $u['name'] ?? '';
   </div>
 
   <div class="settings-section">
-    <h3 class="settings-section-title">Lectura</h3>
+    <h3 class="settings-section-title"><?= lang('ComixxProfile.reading') ?></h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Dirección de Lectura</div>
-        <div class="settings-row-desc">Dirección predeterminada para capítulos</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.reading_direction') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.reading_dir_desc') ?></div>
       </div>
       <select class="settings-select">
-        <option>Izquierda a Derecha</option>
-        <option>Derecha a Izquierda</option>
+        <option><?= lang('ComixxProfile.ltr') ?></option>
+        <option><?= lang('ComixxProfile.rtl') ?></option>
       </select>
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Calidad de Imagen</div>
-        <div class="settings-row-desc">Mayor calidad usa más datos</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.image_quality') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.quality_desc') ?></div>
       </div>
       <select class="settings-select">
-        <option>Alta</option>
-        <option>Media</option>
-        <option>Baja</option>
+        <option><?= lang('ComixxProfile.high') ?></option>
+        <option><?= lang('ComixxProfile.medium') ?></option>
+        <option><?= lang('ComixxProfile.low') ?></option>
       </select>
     </div>
   </div>
 
   <div class="settings-section">
-    <h3 class="settings-section-title">Notificaciones</h3>
+    <h3 class="settings-section-title"><?= lang('ComixxProfile.notifications') ?></h3>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Notificaciones por Correo</div>
-        <div class="settings-row-desc">Recibir actualizaciones por correo</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.email_notif') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.email_notif_desc') ?></div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" checked>
@@ -1071,8 +1071,8 @@ $username = $u['username'] ?? $u['name'] ?? '';
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">Notificaciones Push</div>
-        <div class="settings-row-desc">Notificaciones push del navegador</div>
+        <div class="settings-row-label"><?= lang('ComixxProfile.push_notif') ?></div>
+        <div class="settings-row-desc"><?= lang('ComixxProfile.push_notif_desc') ?></div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox">

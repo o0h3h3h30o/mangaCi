@@ -25,6 +25,19 @@ return [
     'comments'            => 'Comentarios',
     'show_more'           => '[+más]',
     'show_less'           => '[-menos]',
+    'authors'             => 'Autores',
+    'artists'             => 'Artistas',
+    'all_filter'          => 'Todos',
+    'comment_rules_note'  => 'Nota: Por favor, tómate un momento para leer las reglas de comentarios antes de publicar.',
+    'join_conversation'   => 'para unirte a la conversación',
+    'no_comments_first'   => 'Sin comentarios aún. ¡Sé el primero!',
+    'captcha_label'       => 'Acabas de comentar. Resuelve el captcha para continuar:',
+    'no_chapters_found'   => 'No se encontraron capítulos',
+    'showing_chapters'    => 'Mostrando {start} a {end} de {total} capítulos',
+    'show_more_replies'   => 'Mostrar {n} más...',
+    'view_n_replies'      => 'Ver {n} respuesta(s)',
+    'sending_reply'       => 'Enviando...',
+    'error_try_again'     => 'Algo salió mal, por favor intenta de nuevo.',
 
     // Chapter Reader
     'toggle_sidebar'      => 'Alternar Panel',
@@ -48,6 +61,13 @@ return [
     'no_pages'            => 'No hay páginas disponibles',
 
     // Reader Settings
+    'settings_design'     => 'DISEÑO',
+    'settings_image'      => 'IMAGEN',
+    'settings_shortcuts'  => 'ATAJOS',
+    'display_style'       => 'Estilo de Visualización',
+    'reading_direction'   => 'Dirección de Lectura',
+    'progress_bar'        => 'Posición de Barra de Progreso',
+    'page_gap'            => 'Espacio entre Páginas',
     'single_page'         => 'PÁGINA ÚNICA',
     'double_page'         => 'DOBLE PÁGINA',
     'long_strip'          => 'TIRA LARGA',

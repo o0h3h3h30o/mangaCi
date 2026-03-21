@@ -67,4 +67,8 @@ return [
 
     // Notifications
     'no_notifications'    => 'No notifications yet.',
+    'unread_count'        => '{n} unread',
+    'mark_all_read'       => 'Mark All as Read',
+    'clear_confirm'       => 'Clear all reading history?',
+    'no_history_desc'     => 'No reading history yet. Start reading manga and your history will appear here.',
 ];

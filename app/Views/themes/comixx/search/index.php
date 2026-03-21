@@ -582,18 +582,18 @@ function comixx_search_time_ago($datetime) {
     }
     $diff = $now->diff($ago);
 
-    if ($diff->y > 0) return 'hace ' . $diff->y . ' año' . ($diff->y > 1 ? 's' : '');
-    if ($diff->m > 0) return 'hace ' . $diff->m . ' mes' . ($diff->m > 1 ? 'es' : '');
+    if ($diff->y > 0) return str_replace('{n}', $diff->y, lang('ComixxTime.years_ago'));
+    if ($diff->m > 0) return str_replace('{n}', $diff->m, lang('ComixxTime.months_ago'));
     if ($diff->d > 0) {
         if ($diff->d >= 7) {
             $weeks = floor($diff->d / 7);
-            return 'hace ' . $weeks . ' semana' . ($weeks > 1 ? 's' : '');
+            return str_replace('{n}', $weeks, lang('ComixxTime.weeks_ago'));
         }
-        return 'hace ' . $diff->d . ' día' . ($diff->d > 1 ? 's' : '');
+        return str_replace('{n}', $diff->d, lang('ComixxTime.days_ago'));
     }
-    if ($diff->h > 0) return 'hace ' . $diff->h . ' hora' . ($diff->h > 1 ? 's' : '');
-    if ($diff->i > 0) return 'hace ' . $diff->i . ' min';
-    return 'Ahora';
+    if ($diff->h > 0) return str_replace('{n}', $diff->h, lang('ComixxTime.hours_ago'));
+    if ($diff->i > 0) return str_replace('{n}', $diff->i, lang('ComixxTime.minutes_ago'));
+    return lang('ComixxTime.now');
 }
 
 $currentKeyword = $_GET['filter']['name'] ?? '';
@@ -609,29 +609,29 @@ $resultCount = count($results ?? []);
   <div class="search-main-bar">
     <div class="search-main-input">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Buscar.." id="searchInput" value="<?= esc($currentKeyword) ?>">
+      <input type="text" placeholder="<?= lang('ComixxSearch.search') ?>" id="searchInput" value="<?= esc($currentKeyword) ?>">
     </div>
-    <button class="btn-advanced-filters" id="toggleFilters">FILTROS AVANZADOS</button>
+    <button class="btn-advanced-filters" id="toggleFilters"><?= lang('ComixxSearch.advanced_filters') ?></button>
   </div>
 
   <!-- Advanced Filters Panel -->
   <div class="search-filters" id="filtersPanel">
     <div class="filters-row">
       <div class="filter-group">
-        <label>Ordenar Por</label>
+        <label><?= lang('ComixxSearch.sort_by') ?></label>
         <select id="filterSort">
-          <option value="">Cualquiera</option>
-          <option value="-updated_at">Última Actualización</option>
-          <option value="-views">Más Popular</option>
+          <option value=""><?= lang('ComixxSearch.any') ?></option>
+          <option value="-updated_at"><?= lang('ComixxSearch.latest_update') ?></option>
+          <option value="-views"><?= lang('ComixxSearch.most_popular') ?></option>
           <option value="name">A-Z</option>
           <option value="-name">Z-A</option>
-          <option value="-created_at">Más Recientes</option>
+          <option value="-created_at"><?= lang('ComixxSearch.newest_added') ?></option>
         </select>
       </div>
       <div class="filter-group">
-        <label>Tipos</label>
+        <label><?= lang('ComixxSearch.types') ?></label>
         <select id="filterType">
-          <option value="">Cualquiera</option>
+          <option value=""><?= lang('ComixxSearch.any') ?></option>
           <option value="manga">Manga</option>
           <option value="manhwa">Manhwa</option>
           <option value="manhua">Manhua</option>
@@ -641,9 +641,9 @@ $resultCount = count($results ?? []);
         </select>
       </div>
       <div class="filter-group">
-        <label>Géneros</label>
+        <label><?= lang('ComixxSearch.genres') ?></label>
         <select id="filterGenre">
-          <option value="">Cualquiera</option>
+          <option value=""><?= lang('ComixxSearch.any') ?></option>
           <?php if (!empty($categories)): ?>
           <?php foreach ($categories as $cat): ?>
           <option value="<?= esc($cat['slug']) ?>"><?= esc($cat['name']) ?></option>
@@ -652,29 +652,29 @@ $resultCount = count($results ?? []);
         </select>
       </div>
       <div class="filter-group">
-        <label>Estado</label>
+        <label><?= lang('ComixxSearch.release_status') ?></label>
         <select id="filterStatus">
-          <option value="">Cualquiera</option>
-          <option value="1">En Curso</option>
-          <option value="2">Completado</option>
-          <option value="3">En Pausa</option>
-          <option value="4">Cancelado</option>
+          <option value=""><?= lang('ComixxSearch.any') ?></option>
+          <option value="1"><?= lang('ComixxSearch.ongoing') ?></option>
+          <option value="2"><?= lang('ComixxSearch.completed') ?></option>
+          <option value="3"><?= lang('ComixxSearch.hiatus') ?></option>
+          <option value="4"><?= lang('ComixxSearch.cancelled') ?></option>
         </select>
       </div>
       <div class="filter-group">
         <label>18+</label>
         <select id="filterCaution">
-          <option value="">Cualquiera</option>
-          <option value="0">No 18+</option>
-          <option value="1">Solo 18+</option>
+          <option value=""><?= lang('ComixxSearch.any') ?></option>
+          <option value="0"><?= lang('ComixxSearch.not_18') ?></option>
+          <option value="1"><?= lang('ComixxSearch.only_18') ?></option>
         </select>
       </div>
     </div>
 
     <div class="filters-actions">
-      <button class="btn-reset" id="resetFilters">LIMPIAR FILTROS</button>
-      <button class="btn-lucky" id="luckyBtn"><i class="fas fa-dice"></i> TENGO SUERTE</button>
-      <button class="btn-apply" id="applyFilter">APLICAR FILTRO</button>
+      <button class="btn-reset" id="resetFilters"><?= lang('ComixxSearch.reset_filters') ?></button>
+      <button class="btn-lucky" id="luckyBtn"><i class="fas fa-dice"></i> <?= lang('ComixxSearch.feeling_lucky') ?></button>
+      <button class="btn-apply" id="applyFilter"><?= lang('ComixxSearch.apply_filter') ?></button>
     </div>
   </div>
 
@@ -682,14 +682,14 @@ $resultCount = count($results ?? []);
   <div class="results-header">
     <div class="results-count">
       <?php if (!empty($currentKeyword)): ?>
-      <strong><?= $resultCount ?></strong> resultados para "<?= esc($currentKeyword) ?>"
+      <strong><?= $resultCount ?></strong> <?= lang('ComixxSearch.results_for') ?> "<?= esc($currentKeyword) ?>"
       <?php else: ?>
-      <strong><?= $resultCount ?></strong> Elementos
+      <strong><?= $resultCount ?></strong> <?= lang('ComixxSearch.items') ?>
       <?php endif; ?>
     </div>
     <div class="view-toggle">
-      <button class="view-toggle-btn" data-view="list" title="Vista lista"><i class="fas fa-list"></i></button>
-      <button class="view-toggle-btn active" data-view="grid" title="Vista cuadrícula"><i class="fas fa-th"></i></button>
+      <button class="view-toggle-btn" data-view="list" title="<?= lang('ComixxSearch.list_view') ?>"><i class="fas fa-list"></i></button>
+      <button class="view-toggle-btn active" data-view="grid" title="<?= lang('ComixxSearch.grid_view') ?>"><i class="fas fa-th"></i></button>
     </div>
   </div>
 
@@ -727,7 +727,7 @@ $resultCount = count($results ?? []);
     <?php endforeach; ?>
     <?php else: ?>
     <div class="no-results">
-      <p>No se encontraron resultados. Intenta ajustar tu búsqueda o filtros.</p>
+      <p><?= lang('ComixxSearch.no_results') ?></p>
     </div>
     <?php endif; ?>
   </div>
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (toggleBtn && filtersPanel) {
     toggleBtn.addEventListener('click', function() {
       filtersPanel.classList.toggle('open');
-      toggleBtn.textContent = filtersPanel.classList.contains('open') ? 'OCULTAR FILTROS' : 'FILTROS AVANZADOS';
+      toggleBtn.textContent = filtersPanel.classList.contains('open') ? '<?= lang('ComixxSearch.hide_filters') ?>' : '<?= lang('ComixxSearch.advanced_filters') ?>';
     });
   }
 
@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (params.get('sort') || params.get('genre') || params.get('status') || params.get('type') || params.has('caution')) {
     if (filtersPanel) {
       filtersPanel.classList.add('open');
-      if (toggleBtn) toggleBtn.textContent = 'OCULTAR FILTROS';
+      if (toggleBtn) toggleBtn.textContent = '<?= lang('ComixxSearch.hide_filters') ?>';
     }
   }
 

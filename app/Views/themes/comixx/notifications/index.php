@@ -976,7 +976,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
       <div class="profile-username"><?= esc($username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn"><?= lang('Comixx.logout') ?></a>
   </div>
 </section>
 
@@ -985,23 +985,23 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Editar Perfil</span>
+      <span class="tab-text"><?= lang('ComixxProfile.edit_profile') ?></span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab active">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notificaciones</span>
+      <span class="tab-text"><?= lang('ComixxProfile.notifications') ?></span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">Historial</span>
+      <span class="tab-text"><?= lang('ComixxProfile.history') ?></span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Marcadores</span>
+      <span class="tab-text"><?= lang('ComixxProfile.bookmarks') ?></span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Configuración</span>
+      <span class="tab-text"><?= lang('ComixxProfile.settings') ?></span>
     </a>
   </div>
 </div>
@@ -1010,10 +1010,10 @@ $username = $u['username'] ?? $u['name'] ?? '';
 <div class="container profile-content">
   <?php if (!empty($unread) && $unread > 0): ?>
     <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:13px;color:var(--text-muted)"><?= esc($unread) ?> unread</span>
+      <span style="font-size:13px;color:var(--text-muted)"><?= str_replace('{n}', esc($unread), lang('ComixxProfile.unread_count')) ?></span>
       <form action="<?= base_url('notifications/mark-all-read') ?>" method="post" style="display:inline">
         <?= csrf_field() ?>
-        <button type="submit" style="background:none;border:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent-blue);cursor:pointer">Mark All as Read</button>
+        <button type="submit" style="background:none;border:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent-blue);cursor:pointer"><?= lang('ComixxProfile.mark_all_read') ?></button>
       </form>
     </div>
   <?php endif; ?>
@@ -1021,7 +1021,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <?php if (empty($notifications)): ?>
     <div class="empty-state">
       <i class="fas fa-bell"></i>
-      <p>Sin notificaciones</p>
+      <p><?= lang('ComixxProfile.no_notifications') ?></p>
     </div>
   <?php else: ?>
     <div class="notification-list">
@@ -1045,10 +1045,10 @@ $username = $u['username'] ?? $u['name'] ?? '';
           if (!empty($noti['created_at'])) {
               $createdTime = strtotime($noti['created_at']);
               $diff = time() - $createdTime;
-              if ($diff < 60) $timeAgo = 'Ahora';
-              elseif ($diff < 3600) $timeAgo = floor($diff / 60) . ' min';
-              elseif ($diff < 86400) $timeAgo = floor($diff / 3600) . ' horas';
-              elseif ($diff < 604800) $timeAgo = floor($diff / 86400) . ' días';
+              if ($diff < 60) $timeAgo = lang('ComixxTime.now');
+              elseif ($diff < 3600) $timeAgo = str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago'));
+              elseif ($diff < 86400) $timeAgo = str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago'));
+              elseif ($diff < 604800) $timeAgo = str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago'));
               else $timeAgo = date('M d, Y', $createdTime);
           }
         ?>

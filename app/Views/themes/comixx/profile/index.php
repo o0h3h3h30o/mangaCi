@@ -979,7 +979,7 @@ $uid = $u['id'] ?? '';
       <div class="profile-username"><?= esc($name ?: $username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn"><?= lang('Comixx.logout') ?></a>
   </div>
 </section>
 
@@ -988,23 +988,23 @@ $uid = $u['id'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab active">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Editar Perfil</span>
+      <span class="tab-text"><?= lang('ComixxProfile.edit_profile') ?></span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notificaciones</span>
+      <span class="tab-text"><?= lang('ComixxProfile.notifications') ?></span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">Historial</span>
+      <span class="tab-text"><?= lang('ComixxProfile.history') ?></span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Marcadores</span>
+      <span class="tab-text"><?= lang('ComixxProfile.bookmarks') ?></span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Configuración</span>
+      <span class="tab-text"><?= lang('ComixxProfile.settings') ?></span>
     </a>
   </div>
 </div>
@@ -1026,21 +1026,21 @@ $uid = $u['id'] ?? '';
     </div>
     <div class="form-group">
       <label class="form-label">Username</label>
-      <input type="text" class="form-input" name="username" value="<?= esc($username) ?>" placeholder="Ingresa usuario">
+      <input type="text" class="form-input" name="username" value="<?= esc($username) ?>" placeholder="<?= lang('ComixxProfile.enter_username') ?>">
     </div>
     <div class="form-group">
       <label class="form-label">Email Address</label>
-      <input type="email" class="form-input" name="email" value="<?= esc($email) ?>" placeholder="Ingresa correo">
+      <input type="email" class="form-input" name="email" value="<?= esc($email) ?>" placeholder="<?= lang('ComixxProfile.enter_email') ?>">
     </div>
     <div class="form-group">
       <label class="form-label">Display Name</label>
-      <input type="text" class="form-input" name="name" value="<?= esc($name) ?>" placeholder="Ingresa nombre">
+      <input type="text" class="form-input" name="name" value="<?= esc($name) ?>" placeholder="<?= lang('ComixxProfile.enter_name') ?>">
     </div>
     <a href="<?= base_url('profile/change-password') ?>" class="change-password-link">
-      <span>&#128273;</span> Cambiar Contraseña
+      <span>&#128273;</span> <?= lang('ComixxProfile.change_password') ?>
     </a>
     <br><br>
-    <button type="submit" class="save-btn">GUARDAR CAMBIOS</button>
+    <button type="submit" class="save-btn"><?= lang('ComixxProfile.save_changes') ?></button>
   </form>
 </div>
 

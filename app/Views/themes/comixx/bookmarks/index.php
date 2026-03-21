@@ -976,7 +976,7 @@ $username = $u['username'] ?? $u['name'] ?? '';
       <div class="profile-username"><?= esc($username) ?></div>
       <div class="profile-handle"><?= esc($username) ?></div>
     </div>
-    <a href="<?= base_url('logout') ?>" class="profile-logout-btn">SALIR</a>
+    <a href="<?= base_url('logout') ?>" class="profile-logout-btn"><?= lang('Comixx.logout') ?></a>
   </div>
 </section>
 
@@ -985,23 +985,23 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <div class="profile-tabs-inner container">
     <a href="<?= base_url('profile') ?>" class="profile-tab">
       <i class="fas fa-user-pen"></i>
-      <span class="tab-text">Editar Perfil</span>
+      <span class="tab-text"><?= lang('ComixxProfile.edit_profile') ?></span>
     </a>
     <a href="<?= base_url('notifications') ?>" class="profile-tab">
       <i class="fas fa-bell"></i>
-      <span class="tab-text">Notificaciones</span>
+      <span class="tab-text"><?= lang('ComixxProfile.notifications') ?></span>
     </a>
     <a href="<?= base_url('history') ?>" class="profile-tab">
       <i class="fas fa-clock-rotate-left"></i>
-      <span class="tab-text">Historial</span>
+      <span class="tab-text"><?= lang('ComixxProfile.history') ?></span>
     </a>
     <a href="<?= base_url('bookmarks') ?>" class="profile-tab active">
       <i class="fas fa-bookmark"></i>
-      <span class="tab-text">Marcadores</span>
+      <span class="tab-text"><?= lang('ComixxProfile.bookmarks') ?></span>
     </a>
     <a href="<?= base_url('profile/settings') ?>" class="profile-tab">
       <i class="fas fa-gear"></i>
-      <span class="tab-text">Configuración</span>
+      <span class="tab-text"><?= lang('ComixxProfile.settings') ?></span>
     </a>
   </div>
 </div>
@@ -1013,37 +1013,37 @@ $username = $u['username'] ?? $u['name'] ?? '';
   <?php endif; ?>
 
   <div class="bookmarks-subtabs">
-    <button class="bookmark-subtab active">LISTA</button>
-    <button class="bookmark-subtab">IMPORTAR</button>
-    <button class="bookmark-subtab">EXPORTAR</button>
-    <button class="bookmark-subtab">CARPETA</button>
+    <button class="bookmark-subtab active"><?= lang('ComixxProfile.list') ?></button>
+    <button class="bookmark-subtab"><?= lang('ComixxProfile.import') ?></button>
+    <button class="bookmark-subtab"><?= lang('ComixxProfile.export') ?></button>
+    <button class="bookmark-subtab"><?= lang('ComixxProfile.folder') ?></button>
   </div>
 
   <div class="bookmarks-toolbar">
     <div class="bookmarks-search">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Buscar marcadores...">
+      <input type="text" placeholder="<?= lang('ComixxProfile.search_bookmarks') ?>">
     </div>
-    <button class="advanced-filters-btn"><i class="fas fa-sliders-h"></i> ADVANCED FILTERS</button>
+    <button class="advanced-filters-btn"><i class="fas fa-sliders-h"></i> <?= lang('ComixxSearch.advanced_filters') ?></button>
   </div>
 
   <?php if (empty($bookmarks)): ?>
     <div class="empty-state">
       <i class="fas fa-bookmark"></i>
-      <p>Sin marcadores aún. Agrega marcadores para seguir tus favoritos.</p>
+      <p><?= lang('ComixxProfile.no_bookmarks') ?></p>
     </div>
   <?php else: ?>
     <!-- Desktop Table -->
     <div class="bookmarks-table">
       <div class="bookmarks-table-header">
-        <span>Título</span>
-        <span>Continuar</span>
-        <span>Calificación</span>
-        <span>Carpeta</span>
-        <span>Estado</span>
-        <span>Actualizado</span>
-        <span>Última lectura</span>
-        <span>Agregado</span>
+        <span><?= lang('ComixxProfile.title') ?></span>
+        <span><?= lang('ComixxProfile.continue') ?></span>
+        <span><?= lang('ComixxProfile.rating') ?></span>
+        <span><?= lang('ComixxProfile.folder') ?></span>
+        <span><?= lang('ComixxProfile.status') ?></span>
+        <span><?= lang('ComixxProfile.updated') ?></span>
+        <span><?= lang('ComixxProfile.last_read') ?></span>
+        <span><?= lang('ComixxProfile.added') ?></span>
       </div>
       <?php foreach ($bookmarks as $manga): ?>
         <?php
@@ -1053,19 +1053,19 @@ $username = $u['username'] ?? $u['name'] ?? '';
           $updatedAgo = '-';
           if (!empty($manga['update_at'])) {
               $diff = time() - strtotime($manga['update_at']);
-              if ($diff < 60) $updatedAgo = 'Ahora';
-              elseif ($diff < 3600) $updatedAgo = floor($diff / 60) . ' min';
-              elseif ($diff < 86400) $updatedAgo = floor($diff / 3600) . ' horas';
-              elseif ($diff < 604800) $updatedAgo = floor($diff / 86400) . ' días';
+              if ($diff < 60) $updatedAgo = lang('ComixxTime.now');
+              elseif ($diff < 3600) $updatedAgo = str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago'));
+              elseif ($diff < 86400) $updatedAgo = str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago'));
+              elseif ($diff < 604800) $updatedAgo = str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago'));
               else $updatedAgo = date('M d', strtotime($manga['update_at']));
           }
           $addedAgo = '-';
           if (!empty($manga['bookmarked_at'])) {
               $diff = time() - strtotime($manga['bookmarked_at']);
-              if ($diff < 60) $addedAgo = 'Ahora';
-              elseif ($diff < 3600) $addedAgo = floor($diff / 60) . ' min';
-              elseif ($diff < 86400) $addedAgo = floor($diff / 3600) . ' horas';
-              elseif ($diff < 604800) $addedAgo = floor($diff / 86400) . ' días';
+              if ($diff < 60) $addedAgo = lang('ComixxTime.now');
+              elseif ($diff < 3600) $addedAgo = str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago'));
+              elseif ($diff < 86400) $addedAgo = str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago'));
+              elseif ($diff < 604800) $addedAgo = str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago'));
               else $addedAgo = date('M d', strtotime($manga['bookmarked_at']));
           }
         ?>
@@ -1076,8 +1076,8 @@ $username = $u['username'] ?? $u['name'] ?? '';
           </div>
           <span><?= $continueChap ?></span>
           <select class="bookmark-select"><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-          <select class="bookmark-select"><option>Leyendo</option><option>Por Leer</option><option>Completado</option><option>Abandonado</option></select>
-          <span style="color: var(--accent-blue);">Publicándose</span>
+          <select class="bookmark-select"><option><?= lang('ComixxProfile.reading_status') ?></option><option><?= lang('ComixxProfile.plan_to_read') ?></option><option><?= lang('ComixxProfile.completed') ?></option><option><?= lang('ComixxProfile.dropped') ?></option></select>
+          <span style="color: var(--accent-blue);"><?= lang('ComixxProfile.releasing') ?></span>
           <span><?= $updatedAgo ?></span>
           <span>-</span>
           <span><?= $addedAgo ?></span>
@@ -1095,19 +1095,19 @@ $username = $u['username'] ?? $u['name'] ?? '';
           $updatedAgo = '-';
           if (!empty($manga['update_at'])) {
               $diff = time() - strtotime($manga['update_at']);
-              if ($diff < 60) $updatedAgo = 'Ahora';
-              elseif ($diff < 3600) $updatedAgo = floor($diff / 60) . ' min';
-              elseif ($diff < 86400) $updatedAgo = floor($diff / 3600) . ' horas';
-              elseif ($diff < 604800) $updatedAgo = floor($diff / 86400) . ' días';
+              if ($diff < 60) $updatedAgo = lang('ComixxTime.now');
+              elseif ($diff < 3600) $updatedAgo = str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago'));
+              elseif ($diff < 86400) $updatedAgo = str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago'));
+              elseif ($diff < 604800) $updatedAgo = str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago'));
               else $updatedAgo = date('M d', strtotime($manga['update_at']));
           }
           $addedAgo = '-';
           if (!empty($manga['bookmarked_at'])) {
               $diff = time() - strtotime($manga['bookmarked_at']);
-              if ($diff < 60) $addedAgo = 'Ahora';
-              elseif ($diff < 3600) $addedAgo = floor($diff / 60) . ' min';
-              elseif ($diff < 86400) $addedAgo = floor($diff / 3600) . ' horas';
-              elseif ($diff < 604800) $addedAgo = floor($diff / 86400) . ' días';
+              if ($diff < 60) $addedAgo = lang('ComixxTime.now');
+              elseif ($diff < 3600) $addedAgo = str_replace('{n}', floor($diff / 60), lang('ComixxTime.minutes_ago'));
+              elseif ($diff < 86400) $addedAgo = str_replace('{n}', floor($diff / 3600), lang('ComixxTime.hours_ago'));
+              elseif ($diff < 604800) $addedAgo = str_replace('{n}', floor($diff / 86400), lang('ComixxTime.days_ago'));
               else $addedAgo = date('M d', strtotime($manga['bookmarked_at']));
           }
         ?>
@@ -1116,20 +1116,20 @@ $username = $u['username'] ?? $u['name'] ?? '';
           <div class="bookmark-card-info">
             <div class="bookmark-card-title"><?= esc($manga['name']) ?></div>
             <div class="bookmark-card-meta">
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Lectura:</span> <span class="bookmark-card-meta-value"><?= $continueChap ?></span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Calificación:</span> <span class="bookmark-card-meta-value">-</span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Carpeta:</span> <span class="bookmark-card-meta-value">Leyendo</span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Estado:</span> <span class="bookmark-card-meta-value" style="color: var(--accent-blue);">Publicándose</span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Actualizado:</span> <span class="bookmark-card-meta-value"><?= $updatedAgo ?></span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Última lectura:</span> <span class="bookmark-card-meta-value">-</span></div>
-              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label">Agregado:</span> <span class="bookmark-card-meta-value"><?= $addedAgo ?></span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.continue') ?>:</span> <span class="bookmark-card-meta-value"><?= $continueChap ?></span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.rating') ?>:</span> <span class="bookmark-card-meta-value">-</span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.folder') ?>:</span> <span class="bookmark-card-meta-value"><?= lang('ComixxProfile.reading_status') ?></span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.status') ?>:</span> <span class="bookmark-card-meta-value" style="color: var(--accent-blue);"><?= lang('ComixxProfile.releasing') ?></span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.updated') ?>:</span> <span class="bookmark-card-meta-value"><?= $updatedAgo ?></span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.last_read') ?>:</span> <span class="bookmark-card-meta-value">-</span></div>
+              <div class="bookmark-card-meta-item"><span class="bookmark-card-meta-label"><?= lang('ComixxProfile.added') ?>:</span> <span class="bookmark-card-meta-value"><?= $addedAgo ?></span></div>
             </div>
           </div>
         </a>
       <?php endforeach; ?>
     </div>
 
-    <div class="bookmarks-count">Mostrando <?= count($bookmarks) ?> de <?= esc($total) ?> Elementos</div>
+    <div class="bookmarks-count"><?= lang('ComixxProfile.showing') ?> <?= count($bookmarks) ?> <?= lang('ComixxProfile.of') ?> <?= esc($total) ?> <?= lang('ComixxProfile.items') ?></div>
 
     <?php if (isset($pager)): ?>
       <div class="pagination-wrapper">

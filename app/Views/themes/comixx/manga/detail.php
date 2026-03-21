@@ -3,8 +3,8 @@
 <?= $this->section('content') ?>
 
 <?php
-$statusMap = [1 => 'En Curso', 2 => 'Completado'];
-$statusLabel = $statusMap[$manga['status_id'] ?? 0] ?? 'Desconocido';
+$statusMap = [1 => lang('ComixxManga.ongoing'), 2 => lang('ComixxManga.completed')];
+$statusLabel = $statusMap[$manga['status_id'] ?? 0] ?? lang('ComixxManga.unknown_status');
 
 $comicTypeLabel = 'Manga';
 if (!empty($manga['type_id'])) {
@@ -43,7 +43,7 @@ $shareText = esc($manga['name']);
           <p class="detail-alt-titles"><?= esc($manga['otherNames']) ?></p>
         <?php endif; ?>
         <div class="detail-actions">
-          <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> EMPEZAR A LEER</a>
+          <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> <?= lang('ComixxManga.start_reading') ?></a>
           <button class="detail-icon-btn" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="far fa-bookmark"></i></button>
           <button class="detail-icon-btn"><i class="fas fa-flag"></i></button>
         </div>
@@ -53,7 +53,7 @@ $shareText = esc($manga['name']);
         </div>
         <div class="detail-synopsis clamped" id="synopsisBox">
           <p><?= $manga['summary'] ?? '' ?></p>
-          <a href="javascript:void(0)" class="detail-more-link" id="synopsisToggle">[+más]</a>
+          <a href="javascript:void(0)" class="detail-more-link" id="synopsisToggle"><?= lang('ComixxManga.show_more') ?></a>
         </div>
         <div class="detail-share">
           <span class="detail-share-count"><?= number_format($manga['views'] ?? 0) ?></span>
@@ -78,16 +78,16 @@ $shareText = esc($manga['name']);
         <div class="detail-score detailScore">0.0</div>
         <div class="detail-stats-list">
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Seguidores</span>
-            <span class="detail-stat-value detailFollowCount">0 usuarios</span>
+            <span class="detail-stat-label"><?= lang('ComixxManga.followers') ?></span>
+            <span class="detail-stat-value detailFollowCount">0 <?= lang('ComixxManga.users') ?></span>
           </div>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Puntuación</span>
-            <span class="detail-stat-value detailRatingText">0.0 por 0 usuarios</span>
+            <span class="detail-stat-label"><?= lang('ComixxManga.score') ?></span>
+            <span class="detail-stat-value detailRatingText">0.0 <?= lang('ComixxManga.by') ?> 0 <?= lang('ComixxManga.users') ?></span>
           </div>
           <?php if (!empty($authors)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Autores</span>
+              <span class="detail-stat-label"><?= lang('ComixxManga.authors') ?></span>
               <span class="detail-stat-value">
                 <?php
                 $authorNames = array_map(function ($a) {
@@ -100,7 +100,7 @@ $shareText = esc($manga['name']);
           <?php endif; ?>
           <?php if (!empty($artists)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Artistas</span>
+              <span class="detail-stat-label"><?= lang('ComixxManga.artists') ?></span>
               <span class="detail-stat-value">
                 <?php
                 $artistNames = array_map(function ($a) {
@@ -113,7 +113,7 @@ $shareText = esc($manga['name']);
           <?php endif; ?>
           <?php if (!empty($mangaCats)): ?>
             <div class="detail-stat-row">
-              <span class="detail-stat-label">Géneros</span>
+              <span class="detail-stat-label"><?= lang('Comixx.genres') ?></span>
               <span class="detail-stat-value detail-genres">
                 <?php foreach ($mangaCats as $idx => $cat): ?>
                   <?php if ($idx > 0): ?>, <?php endif; ?>
@@ -130,20 +130,20 @@ $shareText = esc($manga['name']);
     <section class="detail-chapter-section">
       <div class="detail-chapter-header">
         <div class="detail-chapter-search">
-          <input type="text" id="chapterSearchInput" placeholder="Ir al cap..">
+          <input type="text" id="chapterSearchInput" placeholder="<?= lang('ComixxManga.go_to_chap') ?>">
         </div>
         <div class="detail-chapter-controls">
           <button class="detail-view-btn active"><i class="fas fa-list"></i></button>
           <button class="detail-view-btn"><i class="fas fa-th"></i></button>
-          <button class="detail-filter-dropdown">Todos <i class="fas fa-chevron-down"></i></button>
+          <button class="detail-filter-dropdown"><?= lang('ComixxManga.all_filter') ?> <i class="fas fa-chevron-down"></i></button>
         </div>
       </div>
 
       <div class="detail-chapter-table">
         <div class="detail-chapter-table-header">
-          <span class="detail-col-chapter"><i class="fas fa-sort-down"></i> Capítulo</span>
-          <span class="detail-col-views"><i class="fas fa-eye"></i> Vistas</span>
-          <span class="detail-col-updated"><i class="fas fa-clock"></i> Fecha</span>
+          <span class="detail-col-chapter"><i class="fas fa-sort-down"></i> <?= lang('ComixxManga.chapter') ?></span>
+          <span class="detail-col-views"><i class="fas fa-eye"></i> <?= lang('Comixx.views') ?></span>
+          <span class="detail-col-updated"><i class="fas fa-clock"></i> <?= lang('ComixxManga.date') ?></span>
         </div>
 
         <?php if (!empty($chapters)): ?>
@@ -156,7 +156,7 @@ $shareText = esc($manga['name']);
           <?php endforeach; ?>
         <?php else: ?>
           <div class="detail-chapter-row">
-            <span class="detail-col-chapter">Aún no hay capítulos disponibles.</span>
+            <span class="detail-col-chapter"><?= lang('ComixxManga.no_chapters') ?></span>
           </div>
         <?php endif; ?>
       </div>
@@ -171,22 +171,22 @@ $shareText = esc($manga['name']);
     <section class="detail-comments" id="dc-section">
       <div class="detail-comments-warning">
         <i class="fas fa-exclamation-triangle"></i>
-        <span>Nota: Por favor, tómate un momento para leer las reglas de comentarios antes de publicar.</span>
+        <span><?= lang('ComixxManga.comment_rules_note') ?></span>
       </div>
       <div class="detail-comments-header">
-        <span class="detail-comments-count">Comentarios <span id="dc-count"></span></span>
+        <span class="detail-comments-count"><?= lang('ComixxManga.comments') ?> <span id="dc-count"></span></span>
         <div class="tab-buttons">
-          <button class="tab-btn active" data-dc-order="newest">NUEVO</button>
-          <button class="tab-btn" data-dc-order="oldest">ANTERIOR</button>
-          <button class="tab-btn" data-dc-order="top">TOP</button>
+          <button class="tab-btn active" data-dc-order="newest"><?= lang('ComixxManga.new') ?></button>
+          <button class="tab-btn" data-dc-order="oldest"><?= lang('ComixxManga.older') ?></button>
+          <button class="tab-btn" data-dc-order="top"><?= lang('ComixxManga.top') ?></button>
         </div>
       </div>
 
-      <p class="detail-comment-login" id="dcLoginPrompt"><a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para unirte a la conversación</p>
+      <p class="detail-comment-login" id="dcLoginPrompt"><a href="/login"><?= lang('ComixxManga.login_to_comment') ?></a> o <a href="/register"><?= lang('ComixxAuth.register_link') ?></a> <?= lang('ComixxManga.join_conversation') ?></p>
       <form id="dc-form" class="detail-comment-form" style="display:none">
-        <textarea id="dc-input" rows="3" maxlength="1000" placeholder="Escribe un comentario..."></textarea>
+        <textarea id="dc-input" rows="3" maxlength="1000" placeholder="<?= lang('ComixxManga.write_comment') ?>"></textarea>
         <div id="dc-captcha-box" class="dc-captcha" style="display:none">
-          <p class="dc-captcha-label">Acabas de comentar. Resuelve el captcha para continuar:</p>
+          <p class="dc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></p>
           <div class="dc-captcha-row">
             <span id="dc-captcha-q"></span>
             <span>= ?</span>
@@ -195,12 +195,12 @@ $shareText = esc($manga['name']);
         </div>
         <div class="detail-comment-form-footer">
           <span id="dc-char" class="dc-char-count">0 / 1000</span>
-          <button type="submit" class="dc-submit-btn">Publicar comentario</button>
+          <button type="submit" class="dc-submit-btn"><?= lang('ComixxManga.post_comment') ?></button>
         </div>
       </form>
 
       <div id="dc-list" class="detail-comment-list">
-        <p class="dc-loading">Cargando...</p>
+        <p class="dc-loading"><?= lang('Comixx.loading') ?></p>
       </div>
       <div id="dc-pg" class="dc-pagination"></div>
     </section>
@@ -220,16 +220,16 @@ $shareText = esc($manga['name']);
       <div class="detail-score detailScore">0.0</div>
       <div class="detail-stats-list">
         <div class="detail-stat-row">
-          <span class="detail-stat-label">Seguidores</span>
-          <span class="detail-stat-value detailFollowCount">0 usuarios</span>
+          <span class="detail-stat-label"><?= lang('ComixxManga.followers') ?></span>
+          <span class="detail-stat-value detailFollowCount">0 <?= lang('ComixxManga.users') ?></span>
         </div>
         <div class="detail-stat-row">
-          <span class="detail-stat-label">Puntuación</span>
-          <span class="detail-stat-value detailRatingText">0.0 por 0 usuarios</span>
+          <span class="detail-stat-label"><?= lang('ComixxManga.score') ?></span>
+          <span class="detail-stat-value detailRatingText">0.0 <?= lang('ComixxManga.by') ?> 0 <?= lang('ComixxManga.users') ?></span>
         </div>
         <?php if (!empty($authors)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Autores</span>
+            <span class="detail-stat-label"><?= lang('ComixxManga.authors') ?></span>
             <span class="detail-stat-value">
               <?php
               $authorLinks = array_map(function ($a) {
@@ -242,7 +242,7 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <?php if (!empty($artists)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Artistas</span>
+            <span class="detail-stat-label"><?= lang('ComixxManga.artists') ?></span>
             <span class="detail-stat-value">
               <?php
               $artistLinks = array_map(function ($a) {
@@ -255,7 +255,7 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <?php if (!empty($mangaCats)): ?>
           <div class="detail-stat-row">
-            <span class="detail-stat-label">Géneros</span>
+            <span class="detail-stat-label"><?= lang('Comixx.genres') ?></span>
             <span class="detail-stat-value detail-genres">
               <?php foreach ($mangaCats as $idx => $cat): ?>
                 <?php if ($idx > 0): ?>, <?php endif; ?>
@@ -271,7 +271,7 @@ $shareText = esc($manga['name']);
     <?php if (!empty($recommended)): ?>
       <div class="detail-recommendations">
         <div class="section-header">
-          <h2>Recomendados</h2>
+          <h2><?= lang('ComixxManga.recommendations') ?></h2>
           <div class="section-nav">
             <button class="nav-arrow"><i class="fas fa-chevron-left"></i></button>
             <button class="nav-arrow"><i class="fas fa-chevron-right"></i></button>
@@ -302,6 +302,8 @@ $shareText = esc($manga['name']);
 <!-- Synopsis Toggle JS -->
 <script>
 (function(){
+  var showMore = <?= json_encode(lang('ComixxManga.show_more')) ?>;
+  var showLess = <?= json_encode(lang('ComixxManga.show_less')) ?>;
   var box = document.getElementById('synopsisBox');
   var btn = document.getElementById('synopsisToggle');
   if (!box || !btn) return;
@@ -310,10 +312,10 @@ $shareText = esc($manga['name']);
   btn.addEventListener('click', function() {
     if (box.classList.contains('clamped')) {
       box.classList.remove('clamped');
-      btn.textContent = '[-menos]';
+      btn.textContent = showLess;
     } else {
       box.classList.add('clamped');
-      btn.textContent = '[+más]';
+      btn.textContent = showMore;
     }
   });
 })();
@@ -397,6 +399,11 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- Chapter Pagination + Search JS -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var __chLang = {
+      no_chapters_found: <?= json_encode(lang('ComixxManga.no_chapters_found')) ?>,
+      showing_chapters: <?= json_encode(lang('ComixxManga.showing_chapters')) ?>
+    };
+
     var PER_PAGE = 10;
     var allRows = Array.from(document.querySelectorAll('.detail-chapter-row'));
     var filteredRows = allRows.slice();
@@ -425,9 +432,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update showing text
         if (total === 0) {
-            showingEl.textContent = 'No se encontraron capítulos';
+            showingEl.textContent = __chLang.no_chapters_found;
         } else {
-            showingEl.textContent = 'Mostrando ' + (start + 1) + ' a ' + end + ' de ' + total + ' capítulos';
+            showingEl.textContent = __chLang.showing_chapters
+              .replace('{start}', start + 1)
+              .replace('{end}', end)
+              .replace('{total}', total);
         }
 
         // Build pagination buttons
@@ -528,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function () {
       currentRating = rating;
       if(typeof reloadMangaState==='function') reloadMangaState();
     })
-    .catch(function(err) { alert('Error al calificar'); });
+    .catch(function(err) { alert(__mangaLang.rating_error); });
   }
 
   function highlightStars(starsEls, n) {
@@ -734,6 +744,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Comment System JS -->
 <script>
+var __mangaLang = {
+  reply: <?= json_encode(lang('Comixx.reply')) ?>,
+  cancel: <?= json_encode(lang('Comixx.cancel')) ?>,
+  send: <?= json_encode(lang('Comixx.send')) ?>,
+  no_comments: <?= json_encode(lang('ComixxManga.no_comments')) ?>,
+  login_to_comment: <?= json_encode(lang('ComixxManga.login_to_comment')) ?>,
+  write_comment: <?= json_encode(lang('ComixxManga.write_comment')) ?>,
+  view_replies: <?= json_encode(lang('ComixxManga.view_replies')) ?>,
+  hide_replies: <?= json_encode(lang('ComixxManga.hide_replies')) ?>,
+  rating_error: <?= json_encode(lang('ComixxManga.report_error_msg')) ?>,
+  error: <?= json_encode(lang('ComixxManga.report_error_msg')) ?>,
+  post_comment: <?= json_encode(lang('ComixxManga.post_comment')) ?>,
+  follow: <?= json_encode(lang('Comixx.follow')) ?>,
+  following: <?= json_encode(lang('Comixx.following')) ?>,
+  followers: <?= json_encode(lang('ComixxManga.followers')) ?>,
+  score: <?= json_encode(lang('ComixxManga.score')) ?>,
+  users: <?= json_encode(lang('ComixxManga.users')) ?>,
+  by: <?= json_encode(lang('ComixxManga.by')) ?>,
+  no_comments_first: <?= json_encode(lang('ComixxManga.no_comments_first')) ?>,
+  show_more_replies: <?= json_encode(lang('ComixxManga.show_more_replies')) ?>,
+  view_n_replies: <?= json_encode(lang('ComixxManga.view_n_replies')) ?>,
+  sending: <?= json_encode(lang('ComixxManga.sending')) ?>,
+  captcha_label: <?= json_encode(lang('ComixxManga.captcha_label')) ?>,
+  loading: <?= json_encode(lang('Comixx.loading')) ?>,
+  error_try_again: <?= json_encode(lang('ComixxManga.error_try_again')) ?>
+};
+
+var __timeLang = {
+  js_min: <?= json_encode(lang('ComixxTime.js_min')) ?>,
+  js_hour: <?= json_encode(lang('ComixxTime.js_hour')) ?>,
+  js_day: <?= json_encode(lang('ComixxTime.js_day')) ?>,
+  js_week: <?= json_encode(lang('ComixxTime.js_week')) ?>,
+  js_month: <?= json_encode(lang('ComixxTime.js_month')) ?>,
+  js_year: <?= json_encode(lang('ComixxTime.js_year')) ?>,
+  js_format: <?= json_encode(lang('ComixxTime.js_format')) ?>,
+  now: <?= json_encode(lang('ComixxTime.now')) ?>
+};
+
 (function() {
   var MANGA_ID    = <?= (int) $manga['id'] ?>;
   var MANGA_SLUG  = <?= json_encode($manga['slug']) ?>;
@@ -746,11 +794,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function timeAgo(str){
     var d=new Date(str.replace(' ','T'));
     var diff=Math.floor((Date.now()-d.getTime())/1000);
-    if(diff<60) return 'hace '+diff+'s';
-    if(diff<3600) return 'hace '+Math.floor(diff/60)+'m';
-    if(diff<86400) return 'hace '+Math.floor(diff/3600)+'h';
-    if(diff<604800) return 'hace '+Math.floor(diff/86400)+'d';
-    return 'hace '+Math.floor(diff/604800)+'sem';
+    var fmt=__timeLang.js_format;
+    function fmt_time(n, unit){
+      var s=unit.replace('{n}','');
+      if(fmt==='prefix') return s+n;
+      return n+s;
+    }
+    if(diff<60) return __timeLang.now;
+    if(diff<3600) return fmt_time(Math.floor(diff/60), __timeLang.js_min);
+    if(diff<86400) return fmt_time(Math.floor(diff/3600), __timeLang.js_hour);
+    if(diff<604800) return fmt_time(Math.floor(diff/86400), __timeLang.js_day);
+    if(diff<2592000) return fmt_time(Math.floor(diff/604800), __timeLang.js_week);
+    if(diff<31536000) return fmt_time(Math.floor(diff/2592000), __timeLang.js_month);
+    return fmt_time(Math.floor(diff/31536000), __timeLang.js_year);
   }
 
   function avatar(name, username, uid, size){
@@ -770,10 +826,18 @@ document.addEventListener('DOMContentLoaded', function () {
     return '<span class="dc-react" style="cursor:default">'+likeIcon+'<span>'+c.likes_count+'</span></span>';
   }
 
+  function viewRepliesText(count){
+    return __mangaLang.view_n_replies.replace('{n}', count);
+  }
+
+  function showMoreRepliesText(count){
+    return __mangaLang.show_more_replies.replace('{n}', count);
+  }
+
   function renderReply(c, topParentId){
     var name=c.user_name||c.user_username||'?';
     var replyBtn=(CURRENT_UID>0&&topParentId)
-      ? '<button class="dc-reply-btn" data-id="'+topParentId+'" data-reply-to="'+c.id+'" data-name="'+esc(name)+'">Responder</button>'
+      ? '<button class="dc-reply-btn" data-id="'+topParentId+'" data-reply-to="'+c.id+'" data-name="'+esc(name)+'">'+__mangaLang.reply+'</button>'
       : '';
     return '<div class="dc-item" data-id="'+c.id+'">'+
       '<div class="dc-item-body">'+
@@ -795,24 +859,24 @@ document.addEventListener('DOMContentLoaded', function () {
       '<input type="hidden" class="dc-reply-to-id" value="'+(replyToId||0)+'">'+
       '<textarea class="dc-reply-input" rows="2" maxlength="1000">@'+esc(parentName)+' </textarea>'+
       '<div class="dc-rf-captcha-box dc-captcha" style="display:none">'+
-      '<p class="dc-captcha-label">Acabas de comentar. Resuelve el captcha para continuar:</p>'+
+      '<p class="dc-captcha-label">'+esc(__mangaLang.captcha_label)+'</p>'+
       '<div class="dc-captcha-row"><span class="dc-rf-captcha-q"></span><span>= ?</span>'+
       '<input class="dc-rf-captcha-ans" type="number" min="0" max="99" placeholder="0"></div></div>'+
       '<div class="dc-reply-form-actions">'+
-      '<button class="dc-reply-cancel-btn dc-reply-cancel" data-parent="'+parentId+'">Cancelar</button>'+
-      '<button class="dc-reply-submit-btn dc-reply-submit" data-parent="'+parentId+'">Responder</button>'+
+      '<button class="dc-reply-cancel-btn dc-reply-cancel" data-parent="'+parentId+'">'+__mangaLang.cancel+'</button>'+
+      '<button class="dc-reply-submit-btn dc-reply-submit" data-parent="'+parentId+'">'+__mangaLang.reply+'</button>'+
       '</div></div>';
   }
 
   function fetchReplies(commentId, btn){
     var container=document.getElementById('dc-replies-'+commentId);
     if(!container) return;
-    if(btn){btn.disabled=true;btn.textContent='Cargando...';}
+    if(btn){btn.disabled=true;btn.textContent=__mangaLang.loading;}
     fetch('/api/comments/'+commentId+'/replies')
       .then(function(r){return r.json();})
       .then(function(d){
         if(!d.replies||!d.replies.length){
-          if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}
+          if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=viewRepliesText(cnt);}
           return;
         }
         var LIMIT=5,visible=d.replies.slice(0,LIMIT),hidden=d.replies.slice(LIMIT);
@@ -820,14 +884,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if(hidden.length>0){
           var mBtn=document.createElement('button');
           mBtn.className='dc-show-more';
-          mBtn.textContent='Mostrar '+hidden.length+' respuesta'+(hidden.length===1?'':'s')+' más...';
+          mBtn.textContent=showMoreRepliesText(hidden.length);
           mBtn.onclick=function(){mBtn.remove();container.insertAdjacentHTML('beforeend',hidden.map(function(r){return renderReply(r,commentId);}).join(''));};
           container.appendChild(mBtn);
         }
-        if(btn){btn.textContent='Ocultar respuestas';btn.disabled=false;btn.dataset.open='1';}
+        if(btn){btn.textContent=__mangaLang.hide_replies;btn.disabled=false;btn.dataset.open='1';}
       })
       .catch(function(){
-        if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');}
+        if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=viewRepliesText(cnt);}
       });
   }
 
@@ -835,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var name=c.user_name||c.user_username||'?';
     var replyBtn='';
     if(CURRENT_UID>0){
-      replyBtn='<button class="dc-reply-btn" data-id="'+c.id+'" data-name="'+esc(name)+'">Responder</button>';
+      replyBtn='<button class="dc-reply-btn" data-id="'+c.id+'" data-name="'+esc(name)+'">'+__mangaLang.reply+'</button>';
     }
     var chapterTag='';
     if(c.chapter_slug){
@@ -844,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var replyCount=parseInt(c.reply_count||0);
     var repliesToggle='';
     if(replyCount>0){
-      repliesToggle='<button class="dc-reply-btn dc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">Ver '+replyCount+' respuesta'+(replyCount===1?'':'s')+'</button>';
+      repliesToggle='<button class="dc-reply-btn dc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">'+viewRepliesText(replyCount)+'</button>';
     }
     return '<div class="dc-item" data-id="'+c.id+'">'+
       '<div class="dc-item-body">'+
@@ -888,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if(countEl) countEl.textContent=data.total>0?'('+data.total+')':'';
         totalPages=data.total>0?Math.ceil(data.total/10):1;
         list.innerHTML=(!data.comments||!data.comments.length)
-          ?'<p class="dc-loading">Sin comentarios aún. ¡Sé el primero!</p>'
+          ?'<p class="dc-loading">'+__mangaLang.no_comments_first+'</p>'
           :data.comments.map(renderCmt).join('');
         if(data.comments) data.comments.forEach(function(c){
           if(parseInt(c.reply_count||0)>0) fetchReplies(c.id,null);
@@ -981,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var countEl=document.getElementById('dc-count');
           if(countEl){var cur=parseInt((countEl.textContent||'').replace(/\D/g,''))||0;countEl.textContent='('+(cur+1)+')';}
         })
-        .catch(function(){alert('Algo salió mal, por favor intenta de nuevo.');});
+        .catch(function(){alert(__mangaLang.error_try_again);});
     });
   }
 
@@ -1020,7 +1084,7 @@ document.addEventListener('DOMContentLoaded', function () {
         container.innerHTML='';
         target.dataset.open='0';
         var cnt=target.dataset.count;
-        target.textContent='Ver '+cnt+' respuesta'+(parseInt(cnt)===1?'':'s');
+        target.textContent=viewRepliesText(cnt);
       } else {
         fetchReplies(parseInt(cid),target);
       }
@@ -1063,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var captchaAns=rf.querySelector('.dc-rf-captcha-ans');
         if(!captchaAns||!captchaAns.value.trim()){captchaAns&&captchaAns.focus();return;}
       }
-      target.disabled=true;target.textContent='Enviando...';
+      target.disabled=true;target.textContent=__mangaLang.sending;
       var replyToInput=rf.querySelector('.dc-reply-to-id');
       var fd=new FormData();
       fd.append('manga_id',MANGA_ID);
@@ -1086,10 +1150,10 @@ document.addEventListener('DOMContentLoaded', function () {
               if(q) q.textContent=d.question;
               if(ans){ans.value='';ans.focus();}
             });
-            target.disabled=false;target.textContent='Responder';
+            target.disabled=false;target.textContent=__mangaLang.reply;
             return;
           }
-          if(c.error){alert(c.error);target.disabled=false;target.textContent='Responder';return;}
+          if(c.error){alert(c.error);target.disabled=false;target.textContent=__mangaLang.reply;return;}
           rf.remove();
           var container=document.getElementById('dc-replies-'+parentId);
           if(container){
@@ -1098,7 +1162,7 @@ document.addEventListener('DOMContentLoaded', function () {
             else container.insertAdjacentHTML('beforeend',renderReply(c,parentId));
           }
         })
-        .catch(function(){target.disabled=false;target.textContent='Responder';alert('Algo salió mal.');});
+        .catch(function(){target.disabled=false;target.textContent=__mangaLang.reply;alert(__mangaLang.error);});
       return;
     }
   });
@@ -1126,11 +1190,11 @@ document.addEventListener('DOMContentLoaded', function () {
     updateStars('mobileRatingStars', avg);
     updateStars('ratingStars', avg);
     document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
-    document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
+    document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' '+__mangaLang.by+' '+votes+' '+__mangaLang.users;});
     currentRating = parseInt(d.my_rating) || 0;
 
     // Follow count
-    document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+    document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' '+__mangaLang.users;});
 
     // Bookmark
     var bmBtn=document.getElementById('bookmarkBtn');
@@ -1179,8 +1243,8 @@ document.addEventListener('DOMContentLoaded', function () {
       updateStars('mobileRatingStars', avg);
       updateStars('ratingStars', avg);
       document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
-      document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' por '+votes+' usuarios';});
-      document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+      document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' '+__mangaLang.by+' '+votes+' '+__mangaLang.users;});
+      document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' '+__mangaLang.users;});
       var lc=document.getElementById('mangaLikeCount');
       var dc=document.getElementById('mangaDislikeCount');
       if(lc) lc.textContent=d.likes;

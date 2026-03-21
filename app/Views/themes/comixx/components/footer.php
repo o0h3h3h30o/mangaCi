@@ -6,19 +6,19 @@
       </div>
       <div class="footer-links-row">
         <div class="footer-col">
-          <h4>Lectura</h4>
-          <a href="/search?sort=-updated_at">ÚLTIMAS ACTUALIZACIONES</a>
-          <a href="/search?sort=-views">POPULARES</a>
-          <a href="/search?sort=-created_at">MÁS NUEVOS</a>
+          <h4><?= lang('Comixx.reading') ?></h4>
+          <a href="/search?sort=-updated_at"><?= lang('Comixx.latest_updates_link') ?></a>
+          <a href="/search?sort=-views"><?= lang('Comixx.popular_link') ?></a>
+          <a href="/search?sort=-created_at"><?= lang('Comixx.newest_link') ?></a>
         </div>
         <div class="footer-col">
-          <h4>Enlaces</h4>
-          <a href="/search">VER TODO</a>
-          <a href="/sitemap.xml">SITEMAP</a>
+          <h4><?= lang('Comixx.links') ?></h4>
+          <a href="/search"><?= lang('Comixx.view_all') ?></a>
+          <a href="/sitemap.xml"><?= lang('Comixx.sitemap') ?></a>
         </div>
       </div>
       <div class="footer-brand">
-        <h2>La Nueva<br>Experiencia Manga.</h2>
+        <h2><?= lang('Comixx.footer_tagline') ?></h2>
         <div class="footer-bottom">
           <div class="footer-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

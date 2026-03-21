@@ -25,6 +25,19 @@ return [
     'comments'            => 'Comments',
     'show_more'           => '[+more]',
     'show_less'           => '[-less]',
+    'authors'             => 'Authors',
+    'artists'             => 'Artists',
+    'all_filter'          => 'All',
+    'comment_rules_note'  => 'Note: Please take a moment to read the comment rules before posting.',
+    'join_conversation'   => 'to join the conversation',
+    'no_comments_first'   => 'No comments yet. Be the first!',
+    'captcha_label'       => 'You just commented. Solve the captcha to continue:',
+    'no_chapters_found'   => 'No chapters found',
+    'showing_chapters'    => 'Showing {start} to {end} of {total} chapters',
+    'show_more_replies'   => 'Show {n} more...',
+    'view_n_replies'      => 'View {n} reply(ies)',
+    'sending_reply'       => 'Sending...',
+    'error_try_again'     => 'Something went wrong, please try again.',
 
     // Chapter Reader
     'toggle_sidebar'      => 'Toggle Sidebar',
@@ -48,6 +61,13 @@ return [
     'no_pages'            => 'No pages available',
 
     // Reader Settings
+    'settings_design'     => 'DESIGN',
+    'settings_image'      => 'IMAGE',
+    'settings_shortcuts'  => 'SHORTCUTS',
+    'display_style'       => 'Display Style',
+    'reading_direction'   => 'Reading Direction',
+    'progress_bar'        => 'Progress Bar Position',
+    'page_gap'            => 'Page Gap',
     'single_page'         => 'SINGLE PAGE',
     'double_page'         => 'DOUBLE PAGE',
     'long_strip'          => 'LONG STRIP',

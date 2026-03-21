@@ -25,6 +25,19 @@ return [
     'comments'            => 'コメント',
     'show_more'           => '[+もっと見る]',
     'show_less'           => '[-閉じる]',
+    'authors'             => '著者',
+    'artists'             => '作画',
+    'all_filter'          => 'すべて',
+    'comment_rules_note'  => '注意：投稿前にコメントルールをお読みください。',
+    'join_conversation'   => '会話に参加する',
+    'no_comments_first'   => 'まだコメントがありません。最初のコメントを投稿しましょう！',
+    'captcha_label'       => 'コメントしたばかりです。続けるにはキャプチャを解いてください：',
+    'no_chapters_found'   => '章が見つかりません',
+    'showing_chapters'    => '{start}～{end}件目（全{total}章）',
+    'show_more_replies'   => 'さらに{n}件表示...',
+    'view_n_replies'      => '{n}件の返信を見る',
+    'sending_reply'       => '送信中...',
+    'error_try_again'     => 'エラーが発生しました。もう一度お試しください。',
 
     // Chapter Reader
     'toggle_sidebar'      => 'サイドバー切替',
@@ -48,6 +61,13 @@ return [
     'no_pages'            => 'ページなし',
 
     // Reader Settings
+    'settings_design'     => 'デザイン',
+    'settings_image'      => '画像',
+    'settings_shortcuts'  => 'ショートカット',
+    'display_style'       => '表示スタイル',
+    'reading_direction'   => '読む方向',
+    'progress_bar'        => 'プログレスバーの位置',
+    'page_gap'            => 'ページ間のスペース',
     'single_page'         => '単ページ',
     'double_page'         => '見開き',
     'long_strip'          => '縦スクロール',
