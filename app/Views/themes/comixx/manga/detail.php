@@ -44,7 +44,7 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <div class="detail-actions">
           <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> EMPEZAR A LEER</a>
-          <button class="detail-icon-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="<?= !empty($isBookmarked) ? 'fas' : 'far' ?> fa-bookmark"></i></button>
+          <button class="detail-icon-btn" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="far fa-bookmark"></i></button>
           <button class="detail-icon-btn"><i class="fas fa-flag"></i></button>
         </div>
         <div class="detail-like-row" id="mangaLikeRow">
@@ -72,24 +72,18 @@ $shareText = esc($manga['name']);
       <div class="detail-rating-section">
         <div class="detail-stars" id="mobileRatingStars">
           <?php for ($i = 1; $i <= 5; $i++): ?>
-            <?php if ($i <= floor($ratingAvg)): ?>
-              <i class="fas fa-star" data-rating="<?= $i ?>"></i>
-            <?php elseif ($i - 0.5 <= $ratingAvg): ?>
-              <i class="fas fa-star-half-alt" data-rating="<?= $i ?>"></i>
-            <?php else: ?>
-              <i class="far fa-star" data-rating="<?= $i ?>"></i>
-            <?php endif; ?>
+            <i class="far fa-star" data-rating="<?= $i ?>"></i>
           <?php endfor; ?>
         </div>
-        <div class="detail-score"><?= number_format($ratingAvg, 1) ?></div>
+        <div class="detail-score" id="detailScore">0.0</div>
         <div class="detail-stats-list">
           <div class="detail-stat-row">
             <span class="detail-stat-label">Seguidores</span>
-            <span class="detail-stat-value"><?= number_format($followCount ?? 0) ?> usuarios</span>
+            <span class="detail-stat-value" id="detailFollowCount">0 usuarios</span>
           </div>
           <div class="detail-stat-row">
             <span class="detail-stat-label">Puntuación</span>
-            <span class="detail-stat-value"><?= number_format($ratingAvg, 1) ?> por <?= number_format($ratingVotes) ?> usuarios</span>
+            <span class="detail-stat-value" id="detailRatingText">0.0 por 0 usuarios</span>
           </div>
           <?php if (!empty($authors)): ?>
             <div class="detail-stat-row">
@@ -188,10 +182,8 @@ $shareText = esc($manga['name']);
         </div>
       </div>
 
-      <?php if (empty($currentUser)): ?>
-      <p class="detail-comment-login"><a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para unirte a la conversación</p>
-      <?php else: ?>
-      <form id="dc-form" class="detail-comment-form">
+      <p class="detail-comment-login" id="dcLoginPrompt"><a href="/login">Inicia sesión</a> o <a href="/register">Regístrate</a> para unirte a la conversación</p>
+      <form id="dc-form" class="detail-comment-form" style="display:none">
         <textarea id="dc-input" rows="3" maxlength="1000" placeholder="Escribe un comentario..."></textarea>
         <div id="dc-captcha-box" class="dc-captcha" style="display:none">
           <p class="dc-captcha-label">Acabas de comentar. Resuelve el captcha para continuar:</p>
@@ -206,7 +198,6 @@ $shareText = esc($manga['name']);
           <button type="submit" class="dc-submit-btn">Publicar comentario</button>
         </div>
       </form>
-      <?php endif; ?>
 
       <div id="dc-list" class="detail-comment-list">
         <p class="dc-loading">Cargando...</p>
@@ -356,23 +347,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!data) return;
                 if (data.error) { alert(data.error); return; }
                 var icon = bookmarkBtn.querySelector('i');
-                var followEls = document.querySelectorAll('.detail-stat-value');
                 if (data.bookmarked) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
+                    icon.className='fas fa-bookmark';
                     bookmarkBtn.classList.add('active');
                 } else {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
+                    icon.className='far fa-bookmark';
                     bookmarkBtn.classList.remove('active');
                 }
-                followEls.forEach(function(el) {
-                    if (el.textContent.indexOf('usuarios') !== -1 && el.closest('.detail-stat-row') && el.closest('.detail-stat-row').querySelector('.detail-stat-label') && el.closest('.detail-stat-row').querySelector('.detail-stat-label').textContent.trim() === 'Seguidores') {
-                        var n = parseInt(el.textContent.replace(/\D/g, '')) || 0;
-                        n = data.bookmarked ? n + 1 : Math.max(0, n - 1);
-                        el.textContent = n.toLocaleString() + ' usuarios';
-                    }
-                });
+                if(typeof reloadMangaState==='function') reloadMangaState();
             })
             .catch(function(err) { console.error('Bookmark error:', err); });
         });
@@ -398,12 +380,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if(data.my_reaction==='dislike') dislikeBtn.classList.add('active');
     else dislikeBtn.classList.remove('active');
   }
-
-  // Load initial counts
-  fetch('/api/content-like?content_type=manga&content_id='+mangaId)
-    .then(function(r){return r.json();})
-    .then(updateUI)
-    .catch(function(){});
 
   function toggle(type){
     fetch('/api/content-like',{
@@ -540,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 (function(){
   var mangaId = <?= (int)($manga['id'] ?? 0) ?>;
-  var currentRating = <?= (int)($myRating ?? 0) ?>;
+  var currentRating = 0;
 
   function submitRating(rating, starsEls) {
     fetch('/api/rating', {
@@ -556,11 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
         s.className = (idx < rating) ? 'fas fa-star' : 'far fa-star';
       });
       currentRating = rating;
-      if (data.avg !== undefined) {
-        document.querySelectorAll('.detail-score').forEach(function(el) {
-          el.textContent = parseFloat(data.avg).toFixed(1);
-        });
-      }
+      if(typeof reloadMangaState==='function') reloadMangaState();
     })
     .catch(function(err) { alert('Error al calificar'); });
   }
@@ -771,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
 (function() {
   var MANGA_ID    = <?= (int) $manga['id'] ?>;
   var MANGA_SLUG  = <?= json_encode($manga['slug']) ?>;
-  var CURRENT_UID = <?= !empty($currentUser) ? (int)$currentUser['id'] : 0 ?>;
+  var CURRENT_UID = 0;
   var page = 1, totalPages = 1, loading = false, order = 'newest';
   var BG = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444'];
 
@@ -1136,6 +1108,75 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
   });
+})();
+
+// ── Hydrate dynamic data from API ──
+(function(){
+  var MID = <?= (int) $manga['id'] ?>;
+
+  function updateStars(containerId, avg){
+    var el=document.getElementById(containerId);if(!el)return;
+    var stars=el.querySelectorAll('i[data-rating]');
+    stars.forEach(function(s){
+      var v=parseInt(s.dataset.rating);
+      s.className = v<=Math.floor(avg) ? 'fas fa-star' : (v-0.5<=avg ? 'fas fa-star-half-alt' : 'far fa-star');
+    });
+  }
+
+  fetch('/api/manga/'+MID+'/state',{credentials:'same-origin'})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    // Rating
+    updateStars('mobileRatingStars', d.rating_avg);
+    updateStars('sidebarRatingStars', d.rating_avg);
+    document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=d.rating_avg.toFixed(1);});
+    document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=d.rating_avg.toFixed(1)+' por '+d.rating_votes+' usuarios';});
+    currentRating = d.my_rating || 0;
+
+    // Follow count
+    document.querySelectorAll('#detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+
+    // Bookmark
+    var bmBtn=document.getElementById('bookmarkBtn');
+    if(bmBtn && d.is_bookmarked){
+      bmBtn.classList.add('active');
+      bmBtn.querySelector('i').className='fas fa-bookmark';
+    }
+
+    // Likes
+    var lc=document.getElementById('mangaLikeCount');
+    var dc=document.getElementById('mangaDislikeCount');
+    if(lc) lc.textContent=d.likes;
+    if(dc) dc.textContent=d.dislikes;
+    if(d.my_reaction==='like') document.getElementById('mangaLikeBtn').classList.add('active');
+    if(d.my_reaction==='dislike') document.getElementById('mangaDislikeBtn').classList.add('active');
+
+    // Comment form: show if logged in (window.__user set by header)
+    if(window.__user && window.__user.logged_in){
+      CURRENT_UID = window.__user.id;
+      var form=document.getElementById('dc-form');
+      var prompt=document.getElementById('dcLoginPrompt');
+      if(form) form.style.display='';
+      if(prompt) prompt.style.display='none';
+    }
+  }).catch(function(){});
+
+  // Re-fetch state after actions
+  window.reloadMangaState = function(){
+    fetch('/api/manga/'+MID+'/state',{credentials:'same-origin'})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      updateStars('mobileRatingStars', d.rating_avg);
+      updateStars('sidebarRatingStars', d.rating_avg);
+      document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=d.rating_avg.toFixed(1);});
+      document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=d.rating_avg.toFixed(1)+' por '+d.rating_votes+' usuarios';});
+      document.querySelectorAll('#detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
+      var lc=document.getElementById('mangaLikeCount');
+      var dc=document.getElementById('mangaDislikeCount');
+      if(lc) lc.textContent=d.likes;
+      if(dc) dc.textContent=d.dislikes;
+    }).catch(function(){});
+  };
 })();
 </script>
 

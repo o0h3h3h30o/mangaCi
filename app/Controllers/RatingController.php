@@ -19,6 +19,8 @@ class RatingController extends BaseController
         $ratingModel = new RatingModel();
         $result      = $ratingModel->rate($itemId, $score, $ip);
 
+        MangaStateController::clearCache($itemId);
+
         return $this->response->setJSON($result);
     }
 

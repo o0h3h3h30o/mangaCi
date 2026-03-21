@@ -21,6 +21,8 @@ class BookmarkController extends BaseController
         $bookmarkModel = new BookmarkModel();
         $bookmarked    = $bookmarkModel->toggle($userId, $mangaId);
 
+        MangaStateController::clearCache($mangaId);
+
         return $this->response->setJSON(['bookmarked' => $bookmarked]);
     }
 }

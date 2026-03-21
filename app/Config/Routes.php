@@ -48,6 +48,9 @@ $routes->get ('api/content-like',   'ContentLikeController::get');
 $routes->post('api/rating',            'RatingController::rate');
 $routes->get ('api/rating/(:num)',     'RatingController::stats/$1');
 
+// Manga state (dynamic data for Cloudflare cache)
+$routes->get('api/manga/(:num)/state', 'MangaStateController::index/$1');
+
 // Admin
 $routes->group('admin', function ($routes) {
     $routes->get('/',                       'Admin::dashboard');

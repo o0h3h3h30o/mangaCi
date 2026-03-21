@@ -81,6 +81,11 @@ class ContentLikeController extends BaseController
             ->where('type', 'dislike')
             ->countAllResults();
 
+        // Clear cache
+        if ($contentType === 'manga') {
+            MangaStateController::clearCache($contentId);
+        }
+
         return $this->json([
             'my_reaction' => $myReaction,
             'likes'       => $likes,
