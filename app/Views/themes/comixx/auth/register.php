@@ -323,7 +323,7 @@
             <label class="auth-label">Usuario</label>
             <div class="auth-input-wrapper">
               <i class="fas fa-user"></i>
-              <input type="text" name="login" class="auth-input" placeholder="Elige un usuario" value="<?= old('login') ?>" required>
+              <input type="text" name="username" class="auth-input" placeholder="Elige un usuario" value="<?= old('username') ?>" required>
             </div>
           </div>
 
