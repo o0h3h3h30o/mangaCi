@@ -1128,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', function () {
   .then(function(d){
     // Rating
     updateStars('mobileRatingStars', d.rating_avg);
-    updateStars('sidebarRatingStars', d.rating_avg);
+    updateStars('ratingStars', d.rating_avg);
     document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=d.rating_avg.toFixed(1);});
     document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=d.rating_avg.toFixed(1)+' por '+d.rating_votes+' usuarios';});
     currentRating = d.my_rating || 0;
@@ -1151,14 +1151,26 @@ document.addEventListener('DOMContentLoaded', function () {
     if(d.my_reaction==='like') document.getElementById('mangaLikeBtn').classList.add('active');
     if(d.my_reaction==='dislike') document.getElementById('mangaDislikeBtn').classList.add('active');
 
-    // Comment form: show if logged in (window.__user set by header)
-    if(window.__user && window.__user.logged_in){
-      CURRENT_UID = window.__user.id;
+    // Comment form: show if user has bookmark/reaction data (means logged in)
+    // Also check is_bookmarked or my_reaction as signals, plus explicit logged_in from state
+    if(d.is_bookmarked || d.my_reaction){
       var form=document.getElementById('dc-form');
       var prompt=document.getElementById('dcLoginPrompt');
       if(form) form.style.display='';
       if(prompt) prompt.style.display='none';
     }
+    // Also try window.__user (from /api/me)
+    function checkUserForComments(){
+      if(window.__user && window.__user.logged_in){
+        CURRENT_UID = window.__user.id;
+        var form=document.getElementById('dc-form');
+        var prompt=document.getElementById('dcLoginPrompt');
+        if(form) form.style.display='';
+        if(prompt) prompt.style.display='none';
+      }
+    }
+    if(window.__user) checkUserForComments();
+    else setTimeout(checkUserForComments, 500);
   }).catch(function(){});
 
   // Re-fetch state after actions
@@ -1167,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(function(r){return r.json()})
     .then(function(d){
       updateStars('mobileRatingStars', d.rating_avg);
-      updateStars('sidebarRatingStars', d.rating_avg);
+      updateStars('ratingStars', d.rating_avg);
       document.querySelectorAll('#detailScore').forEach(function(el){el.textContent=d.rating_avg.toFixed(1);});
       document.querySelectorAll('#detailRatingText').forEach(function(el){el.textContent=d.rating_avg.toFixed(1)+' por '+d.rating_votes+' usuarios';});
       document.querySelectorAll('#detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' usuarios';});
