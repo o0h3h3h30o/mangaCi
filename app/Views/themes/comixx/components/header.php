@@ -21,23 +21,24 @@
         <div class="search-dropdown" id="headerSearchDropdown"></div>
       </div>
       <div class="header-actions">
-        <?php if (session()->get('isLoggedIn')): ?>
-        <div class="noti-wrap" id="notiWrap">
-          <button class="icon-btn" id="notiBtn" aria-label="Notifications"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
-          <div class="noti-panel" id="notiPanel" style="display:none">
-            <div class="noti-panel-header">
-              <span>Notificaciones</span>
-              <button onclick="notiMarkAll(event)">Marcar todo leído</button>
-            </div>
-            <div class="noti-list" id="notiList">
-              <div class="noti-empty">Cargando...</div>
+        <!-- Logged-in actions (hidden by default, shown by JS) -->
+        <div id="headerLoggedIn" style="display:none;align-items:center;gap:4px">
+          <div class="noti-wrap" id="notiWrap">
+            <button class="icon-btn" id="notiBtn" aria-label="Notifications"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
+            <div class="noti-panel" id="notiPanel" style="display:none">
+              <div class="noti-panel-header">
+                <span>Notificaciones</span>
+                <button onclick="notiMarkAll(event)">Marcar todo leído</button>
+              </div>
+              <div class="noti-list" id="notiList">
+                <div class="noti-empty">Cargando...</div>
+              </div>
             </div>
           </div>
+          <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
         </div>
-        <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
-        <?php else: ?>
-        <a href="/login" class="login-btn">LOGIN</a>
-        <?php endif; ?>
+        <!-- Logged-out (shown by default) -->
+        <a href="/login" class="login-btn" id="headerLoginBtn">LOGIN</a>
       </div>
       <button class="mobile-search-btn" id="mobileSearchBtn"><i class="fas fa-search"></i></button>
       <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
@@ -78,12 +79,13 @@
       <?php endif; ?>
     </nav>
     <div class="mobile-menu-actions">
-      <?php if (session()->get('isLoggedIn')): ?>
-      <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= esc(session()->get('user_username') ?: session()->get('user_name')) ?></a>
-      <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;">SALIR</a>
-      <?php else: ?>
-      <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;">LOGIN</a>
-      <?php endif; ?>
+      <div id="mobileLoggedIn" style="display:none">
+        <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;" id="mobileUsername"></a>
+        <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;">SALIR</a>
+      </div>
+      <div id="mobileLoggedOut">
+        <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;">LOGIN</a>
+      </div>
     </div>
   </div>
 
@@ -202,32 +204,62 @@
   });
 })();
 
-// Notifications
+// Hydrate header from /api/me
 (function(){
-  if(!document.getElementById('notiWrap'))return;
-  var open=false;
-  document.addEventListener('click',function(e){
-    if(open&&!document.getElementById('notiWrap').contains(e.target)){
-      open=false;document.getElementById('notiPanel').style.display='none';
-    }
-  });
-  document.getElementById('notiBtn').addEventListener('click',function(e){
-    e.stopPropagation();open=!open;
-    var panel=document.getElementById('notiPanel');
-    if(open){panel.style.display='block';loadNotiList();}
-    else{panel.style.display='none';}
-  });
+  function updateBadge(n){
+    var b=document.getElementById('notiBadge');if(!b)return;
+    if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}
+  }
+  window.updateBadge=updateBadge;
+
   function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
   function _timeDiff(s){
     if(!s)return '';var d=new Date(s.replace(' ','T')),now=new Date(),sec=Math.floor((now-d)/1000);
     if(sec<60)return 'Ahora';if(sec<3600)return 'hace '+Math.floor(sec/60)+'m';
     if(sec<86400)return 'hace '+Math.floor(sec/3600)+'h';return 'hace '+Math.floor(sec/86400)+'d';
   }
-  function updateBadge(n){
-    var b=document.getElementById('notiBadge');if(!b)return;
-    if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}
-  }
-  window.updateBadge=updateBadge;
+
+  // Hydrate header on page load
+  fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
+    if(!u.logged_in) return;
+
+    // Desktop: show logged-in actions, hide login btn
+    var loggedIn=document.getElementById('headerLoggedIn');
+    var loginBtn=document.getElementById('headerLoginBtn');
+    if(loggedIn) loggedIn.style.display='flex';
+    if(loginBtn) loginBtn.style.display='none';
+
+    // Mobile menu
+    var mLoggedIn=document.getElementById('mobileLoggedIn');
+    var mLoggedOut=document.getElementById('mobileLoggedOut');
+    var mUsername=document.getElementById('mobileUsername');
+    if(mLoggedIn) mLoggedIn.style.display='block';
+    if(mLoggedOut) mLoggedOut.style.display='none';
+    if(mUsername) mUsername.textContent=u.username||u.name;
+
+    // Notification badge
+    if(u.unread_count) updateBadge(u.unread_count);
+
+    // Expose user for other scripts
+    window.__user=u;
+  }).catch(function(){});
+
+  // Notification panel toggle
+  var notiOpen=false;
+  document.addEventListener('click',function(e){
+    var wrap=document.getElementById('notiWrap');
+    if(notiOpen&&wrap&&!wrap.contains(e.target)){
+      notiOpen=false;document.getElementById('notiPanel').style.display='none';
+    }
+  });
+  var notiBtn=document.getElementById('notiBtn');
+  if(notiBtn) notiBtn.addEventListener('click',function(e){
+    e.stopPropagation();notiOpen=!notiOpen;
+    var panel=document.getElementById('notiPanel');
+    if(notiOpen){panel.style.display='block';loadNotiList();}
+    else{panel.style.display='none';}
+  });
+
   function loadNotiList(){
     fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
       updateBadge(d.unread||0);
@@ -252,6 +284,7 @@
       }).join('');
     }).catch(function(){});
   }
+
   window.notiClick=function(el){
     var id=el.dataset.id,slug=el.dataset.slug,chapter=el.dataset.chapter;
     fetch('/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});
@@ -265,8 +298,5 @@
       document.getElementById('notiList').innerHTML='<div class="noti-empty">Sin notificaciones</div>';updateBadge(0);
     });
   };
-  document.addEventListener('DOMContentLoaded',function(){
-    fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){updateBadge(d.unread||0);}).catch(function(){});
-  });
 })();
 </script>
