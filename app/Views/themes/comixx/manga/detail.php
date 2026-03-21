@@ -796,9 +796,9 @@ var __timeLang = {
     var diff=Math.floor((Date.now()-d.getTime())/1000);
     var fmt=__timeLang.js_format;
     function fmt_time(n, unit){
-      var s=unit.replace('{n}','');
-      if(fmt==='prefix') return s+n;
-      return n+s;
+      if(unit.indexOf('{n}')!==-1) return unit.replace('{n}',n);
+      if(fmt==='prefix') return unit+n;
+      return n+unit;
     }
     if(diff<60) return __timeLang.now;
     if(diff<3600) return fmt_time(Math.floor(diff/60), __timeLang.js_min);

@@ -2025,11 +2025,15 @@ var __chapterLang = {
     function timeAgo(str){
       var d=new Date(str.replace(' ','T'));
       var diff=Math.floor((Date.now()-d.getTime())/1000);
+      function fmt(n,unit){
+        if(unit.indexOf('{n}')!==-1) return unit.replace('{n}',n);
+        return n+unit;
+      }
       if(diff<60) return __chapterLang.now;
-      if(diff<3600) return __chapterLang.js_format.replace('{n}',Math.floor(diff/60)).replace('{unit}',__chapterLang.js_min);
-      if(diff<86400) return __chapterLang.js_format.replace('{n}',Math.floor(diff/3600)).replace('{unit}',__chapterLang.js_hour);
-      if(diff<604800) return __chapterLang.js_format.replace('{n}',Math.floor(diff/86400)).replace('{unit}',__chapterLang.js_day);
-      return __chapterLang.js_format.replace('{n}',Math.floor(diff/604800)).replace('{unit}','w');
+      if(diff<3600) return fmt(Math.floor(diff/60),__chapterLang.js_min);
+      if(diff<86400) return fmt(Math.floor(diff/3600),__chapterLang.js_hour);
+      if(diff<604800) return fmt(Math.floor(diff/86400),__chapterLang.js_day);
+      return fmt(Math.floor(diff/604800),'w');
     }
     function rcAvatar(name, username, uid, sz){
       sz=sz||28;

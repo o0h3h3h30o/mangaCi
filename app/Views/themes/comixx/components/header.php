@@ -218,7 +218,7 @@ var __lang = {
 function _timeDiff(s){
   if(!s)return '';var d=new Date(s.replace(' ','T')),now=new Date(),sec=Math.floor((now-d)/1000);
   var fmt=__lang.js_format||'suffix';
-  function f(n,unit){return fmt==='prefix'?unit.replace('{n}',n):n+unit;}
+  function f(n,unit){if(unit.indexOf('{n}')!==-1)return unit.replace('{n}',n);return n+unit;}
   if(sec<60)return __lang.now;
   if(sec<3600){var m=Math.floor(sec/60);return f(m,__lang.js_min);}
   if(sec<86400){var h=Math.floor(sec/3600);return f(h,__lang.js_hour);}
