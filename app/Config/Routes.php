@@ -9,6 +9,17 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get ('install', 'Install::index');
 $routes->post('install', 'Install::run');
 
+// Temporary IP test - remove after checking
+$routes->get('test-ip', static function () {
+    return service('response')->setJSON([
+        'getIPAddress'     => service('request')->getIPAddress(),
+        'CF-Connecting-IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? 'N/A',
+        'X-Forwarded-For'  => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? 'N/A',
+        'X-Real-IP'        => $_SERVER['HTTP_X_REAL_IP'] ?? 'N/A',
+        'REMOTE_ADDR'      => $_SERVER['REMOTE_ADDR'] ?? 'N/A',
+    ]);
+});
+
 $routes->get('/', 'Home::index');
 $routes->get('manga/(:segment)', 'Manga::detail/$1');
 $routes->get('manga/(:segment)/(:segment)', 'Manga::chapter/$1/$2');
