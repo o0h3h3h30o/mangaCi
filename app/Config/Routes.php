@@ -165,3 +165,6 @@ $routes->get('sitemap-manga.xml',    'SitemapController::manga');
 $routes->get('sitemap-chapters.xml',          'SitemapController::chapters/1');
 $routes->get('sitemap-chapters-(:num).xml',  'SitemapController::chapters/$1');
 $routes->get('feed',                 'SitemapController::feed');
+
+// Cron
+$routes->get('cron/reset-views',     'CronController::resetViews');
