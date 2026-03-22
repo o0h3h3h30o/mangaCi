@@ -41,7 +41,7 @@ class SitemapController extends BaseController
                 ->orderBy('update_at', 'DESC')
                 ->limit(1)
                 ->get()->getRowArray();
-            $lastmod = $lastManga ? date('c', strtotime($lastManga['update_at'])) : date('c');
+            $lastmod = $lastManga && $lastManga['update_at'] ? date('c', (int) $lastManga['update_at']) : date('c');
 
             // Count chapters to determine pages
             $totalChapters = (int) $db->table('chapter c')
@@ -83,7 +83,7 @@ class SitemapController extends BaseController
 
             foreach ($rows as $m) {
                 $loc     = $base . '/manga/' . htmlspecialchars($m['slug'], ENT_XML1);
-                $lastmod = $m['update_at'] ? date('c', strtotime($m['update_at'])) : '';
+                $lastmod = $m['update_at'] ? date('c', (int) $m['update_at']) : '';
                 $xml .= "  <url>\n    <loc>{$loc}</loc>\n";
                 if ($lastmod) $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
                 $xml .= "    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n";
@@ -149,7 +149,7 @@ class SitemapController extends BaseController
                 ->limit(50)
                 ->get()->getResultArray();
 
-            $lastBuild = !empty($rows) ? date('r', strtotime($rows[0]['update_at'])) : date('r');
+            $lastBuild = !empty($rows) && $rows[0]['update_at'] ? date('r', (int) $rows[0]['update_at']) : date('r');
 
             $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">' . "\n";
@@ -165,7 +165,7 @@ class SitemapController extends BaseController
                 $link    = $base . '/manga/' . htmlspecialchars($m['slug'], ENT_XML1);
                 $title   = htmlspecialchars($m['name'], ENT_XML1);
                 $desc    = htmlspecialchars(strip_tags($m['summary'] ?? ''), ENT_XML1);
-                $pubDate = $m['update_at'] ? date('r', strtotime($m['update_at'])) : '';
+                $pubDate = $m['update_at'] ? date('r', (int) $m['update_at']) : '';
                 $cover   = htmlspecialchars(manga_cover_url($m, $cdnBase), ENT_XML1);
 
                 $xml .= "  <item>\n    <title>{$title}</title>\n    <link>{$link}</link>\n";
