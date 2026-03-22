@@ -43,11 +43,12 @@ function comixx_time_ago($datetime) {
       <p>• <?= lang('Comixx.announce_3') ?></p>
     </div>
 
-    <!-- Social Buttons -->
+    <!-- Share Buttons -->
+    <?php $homeUrl = rtrim(site_url(), '/'); $homeTitle = site_setting('home_heading', site_setting('site_title', 'MangaCI')); ?>
     <div class="social-buttons">
-      <a href="#" class="social-btn discord"><i class="fab fa-discord"></i> Discord</a>
-      <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
-      <a href="#" class="social-btn telegram"><i class="fab fa-telegram-plane"></i></a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($homeUrl) ?>" target="_blank" rel="noopener" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+      <a href="https://twitter.com/intent/tweet?url=<?= urlencode($homeUrl) ?>&text=<?= urlencode($homeTitle) ?>" target="_blank" rel="noopener" class="social-btn discord"><i class="fab fa-x-twitter"></i> Twitter</a>
+      <a href="https://t.me/share/url?url=<?= urlencode($homeUrl) ?>&text=<?= urlencode($homeTitle) ?>" target="_blank" rel="noopener" class="social-btn telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
     </div>
 
     <!-- Most Followed -->

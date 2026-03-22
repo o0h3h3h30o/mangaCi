@@ -7,16 +7,12 @@ use CodeIgniter\Controller;
 class CronController extends Controller
 {
     /**
-     * GET /cron/reset-views?key=SECRET
+     * GET /cron/reset-views
      * Reset view_day daily, view_week weekly (Monday), view_month on 1st.
-     * Set CRON_KEY in .env and call daily via cron.
+     * Call daily via cron: 0 0 * * * curl -s https://domain/cron/reset-views
      */
     public function resetViews()
     {
-        $secret = env('CRON_KEY', '');
-        if (!$secret || $this->request->getGet('key') !== $secret) {
-            return $this->response->setStatusCode(403)->setBody('Forbidden');
-        }
 
         $db = \Config\Database::connect();
         $actions = [];
