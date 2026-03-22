@@ -2014,9 +2014,12 @@ var __chapterLang = {
       });
     })();
 
-    // ===== Comment System =====
+    // ===== Track View (works with Cloudflare cache) =====
     var MANGA_ID = <?= (int)$manga['id'] ?>;
     var CHAPTER_ID = <?= (int)$chapter['id'] ?>;
+    fetch('/api/view',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'manga_id='+MANGA_ID+'&chapter_id='+CHAPTER_ID});
+
+    // ===== Comment System =====
     var MANGA_SLUG = <?= json_encode($manga['slug']) ?>;
     var CURRENT_UID = <?= !empty($currentUser) ? (int)$currentUser['id'] : 0 ?>;
     var BG_COLORS = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444'];

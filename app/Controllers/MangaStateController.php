@@ -88,6 +88,22 @@ class MangaStateController extends BaseController
     }
 
     /**
+     * POST /api/view — track chapter view via JS (bypasses Cloudflare cache)
+     */
+    public function trackView(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $mangaId   = (int) $this->request->getPost('manga_id');
+        $chapterId = (int) $this->request->getPost('chapter_id');
+
+        if ($mangaId && $chapterId) {
+            $mangaModel = new \App\Models\MangaModel();
+            $mangaModel->incrementViews($mangaId, $chapterId);
+        }
+
+        return $this->response->setJSON(['ok' => true]);
+    }
+
+    /**
      * Clear manga state cache (called after rate/like/bookmark actions)
      */
     public static function clearCache(int $mangaId): void

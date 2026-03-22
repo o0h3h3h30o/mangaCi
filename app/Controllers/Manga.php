@@ -67,7 +67,7 @@ class Manga extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $mangaModel->incrementViews((int) $manga['id'], (int) $chapter['id']);
+        // View tracking via JS POST /api/view (bypasses Cloudflare cache)
 
         $pages    = $mangaModel->getChapterPages((int) $chapter['id']);
         $chapters = $mangaModel->getChapters((int) $manga['id']);

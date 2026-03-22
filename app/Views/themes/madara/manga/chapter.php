@@ -557,6 +557,9 @@ window.addEventListener('scroll', function() {
   lastScrollY = y;
 }, {passive: true});
 
+// ===== Track View =====
+fetch('/api/view',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'manga_id=<?= (int)$manga['id'] ?>&chapter_id=<?= (int)$chapter['id'] ?>'});
+
 // ===== Comment section =====
 (function() {
   var CHAPTER_ID  = <?= (int) $chapter['id'] ?>;

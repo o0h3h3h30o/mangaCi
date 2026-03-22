@@ -51,6 +51,7 @@ $routes->get ('api/rating/(:num)',     'RatingController::stats/$1');
 
 // Manga state (dynamic data for Cloudflare cache)
 $routes->get('api/manga/(:num)/state', 'MangaStateController::index/$1');
+$routes->post('api/view',             'MangaStateController::trackView');
 
 // Admin
 $routes->group('admin', function ($routes) {
