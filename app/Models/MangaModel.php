@@ -157,7 +157,7 @@ class MangaModel extends Model
         );
 
         $this->db->query(
-            'UPDATE `manga` SET `views` = `views` + 1, `view_day` = `view_day` + 1, `view_week` = `view_week` + 1, `view_month` = `view_month` + 1 WHERE `id` = ?',
+            'UPDATE `manga` SET `views` = COALESCE(`views`,0) + 1, `view_day` = COALESCE(`view_day`,0) + 1, `view_week` = COALESCE(`view_week`,0) + 1, `view_month` = COALESCE(`view_month`,0) + 1 WHERE `id` = ?',
             [$mangaId]
         );
     }
