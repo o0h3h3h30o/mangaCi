@@ -18,7 +18,6 @@
         </div>
       </div>
       <div class="footer-brand">
-        <h2><?= lang('Comixx.footer_tagline') ?></h2>
         <div class="footer-bottom">
           <div class="footer-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
