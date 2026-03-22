@@ -2,15 +2,15 @@
   <!-- Header -->
   <header class="header">
     <div class="header-inner container">
+      <?php $_logo = site_setting('site_logo'); ?>
       <a href="/" class="logo">
+        <?php if ($_logo): ?>
+        <img src="<?= esc($_logo) ?>" alt="<?= esc(site_setting('site_title', 'COMIX')) ?>" style="height:40px">
+        <?php else: ?>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <rect x="2" y="3" width="20" height="18" rx="2" stroke="white" stroke-width="2"/>
           <path d="M8 3v18M16 3v18" stroke="white" stroke-width="2"/>
         </svg>
-        <?php $_logo = site_setting('site_logo'); ?>
-        <?php if ($_logo): ?>
-        <img src="<?= esc($_logo) ?>" alt="<?= esc(site_setting('site_title', 'COMIX')) ?>" style="height:22px">
-        <?php else: ?>
         <span><?= esc(site_setting('site_title', 'COMIX')) ?></span>
         <?php endif; ?>
       </a>
@@ -55,11 +55,15 @@
   <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-header">
       <a href="/" class="logo">
+        <?php if ($_logo): ?>
+        <img src="<?= esc($_logo) ?>" alt="<?= esc(site_setting('site_title', 'COMIX')) ?>" style="height:40px">
+        <?php else: ?>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <rect x="2" y="3" width="20" height="18" rx="2" stroke="white" stroke-width="2"/>
           <path d="M8 3v18M16 3v18" stroke="white" stroke-width="2"/>
         </svg>
         <span><?= esc(site_setting('site_title', 'COMIX')) ?></span>
+        <?php endif; ?>
       </a>
       <button class="mobile-menu-close" id="mobileMenuClose"><i class="fas fa-times"></i></button>
     </div>
