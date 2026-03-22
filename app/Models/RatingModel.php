@@ -57,6 +57,11 @@ class RatingModel extends Model
         $stats = $this->getStats($itemId);
         $stats['your_score'] = $score;
 
+        // Update cached rating in manga table
+        $this->db->table('manga')
+            ->where('id', $itemId)
+            ->update(['rating' => $stats['avg']]);
+
         return $stats;
     }
 }
