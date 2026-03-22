@@ -10,11 +10,11 @@ return [
     'years_ago'   => 'hace {n} año(s)',
 
     // JS time format
-    'js_min'    => 'hace {n}m',
-    'js_hour'   => 'hace {n}h',
-    'js_day'    => 'hace {n}d',
-    'js_week'   => 'hace {n}sem',
-    'js_month'  => 'hace {n}mes',
-    'js_year'   => 'hace {n}año',
+    'js_min'    => 'hace {n} min',
+    'js_hour'   => 'hace {n} h',
+    'js_day'    => 'hace {n} d',
+    'js_week'   => 'hace {n} sem',
+    'js_month'  => 'hace {n} mes',
+    'js_year'   => 'hace {n} año',
     'js_format' => 'prefix', // "prefix" = "hace 5m"
 ];
