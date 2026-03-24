@@ -17,11 +17,11 @@ class Home extends BaseController
         $data = [
             'title'       => '',
             'description' => '',
-            'newestManga' => $mangaModel->getNewestManga(24),
+            'newestManga' => $mangaModel->getNewestManga(10),
             'hotToday' => $hotToday,
             'recentlyUpdated' => $mangaModel->where('is_public', 1)
                 ->orderBy('update_at', 'DESC')
-                ->paginate(28),
+                ->paginate(30),
             'pager' => $mangaModel->pager,
             'topDay' => array_slice($hotToday, 0, 10),
             'topMonth' => $mangaModel->getTopMonth(10),
@@ -30,7 +30,7 @@ class Home extends BaseController
             'categories'     => $this->categories,
             'currentUser'    => $this->currentUser,
             'recentComments' => $commentModel->getRecentComments(5),
-        ];
+        ];  
         return $this->themeView('home/index', $data);
     }
 

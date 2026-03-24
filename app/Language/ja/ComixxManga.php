@@ -3,6 +3,8 @@
 return [
     // Detail
     'start_reading'       => '読み始める',
+    'read_first'          => '最初から読む',
+    'read_last'           => '最新話を読む',
     'ongoing'             => '連載中',
     'completed'           => '完結',
     'unknown_status'      => '不明',
@@ -16,6 +18,8 @@ return [
     'chapters'            => '章一覧',
     'chapter'             => '章',
     'date'                => '日付',
+    'updated'             => '更新日',
+    'reverse_order'       => '逆順',
     'no_chapters'         => 'まだ章がありません。',
     'recommendations'     => 'おすすめ',
     'followers'           => 'フォロワー',
@@ -44,6 +48,7 @@ return [
     'settings'            => '設定',
     'prev_chapter'        => '前の章',
     'next_chapter'        => '次の章',
+    'end_of_chapter'      => '終了',
     'prev_page'           => '前のページ',
     'next_page'           => '次のページ',
     'back_to_top'         => 'トップへ',

@@ -3,6 +3,8 @@
 return [
     // Detail
     'start_reading'       => 'START READING',
+    'read_first'          => 'Read First',
+    'read_last'           => 'Read Last',
     'ongoing'             => 'Ongoing',
     'completed'           => 'Completed',
     'unknown_status'      => 'Unknown',
@@ -16,6 +18,8 @@ return [
     'chapters'            => 'Chapters',
     'chapter'             => 'Chapter',
     'date'                => 'Date',
+    'updated'             => 'Updated',
+    'reverse_order'       => 'Reverse',
     'no_chapters'         => 'No chapters available yet.',
     'recommendations'     => 'Recommendations',
     'followers'           => 'Followers',
@@ -44,6 +48,7 @@ return [
     'settings'            => 'Settings',
     'prev_chapter'        => 'Previous Chapter',
     'next_chapter'        => 'Next Chapter',
+    'end_of_chapter'      => 'End of',
     'prev_page'           => 'Previous Page',
     'next_page'           => 'Next Page',
     'back_to_top'         => 'Back to top',

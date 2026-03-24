@@ -20,7 +20,7 @@
         <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> <?= lang('Comixx.filter') ?></a>
         <div class="search-dropdown" id="headerSearchDropdown"></div>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" id="headerAuthArea" style="opacity:0;transition:opacity 0.3s ease">
         <!-- Logged-in actions (hidden by default, shown by JS) -->
         <div id="headerLoggedIn" style="display:none;align-items:center;gap:4px">
           <div class="noti-wrap" id="notiWrap">
@@ -37,8 +37,8 @@
           </div>
           <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
         </div>
-        <!-- Logged-out (shown by default) -->
-        <a href="/login" class="login-btn" id="headerLoginBtn"><?= lang('Comixx.login') ?></a>
+        <!-- Logged-out (hidden by default, shown after /api/me) -->
+        <a href="/login" class="login-btn" id="headerLoginBtn" style="display:none"><?= lang('Comixx.login') ?></a>
       </div>
       <button class="mobile-search-btn" id="mobileSearchBtn"><i class="fas fa-search"></i></button>
       <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
@@ -240,29 +240,40 @@ function _timeDiff(s){
   function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
 
   // Hydrate header on page load
-  fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
-    if(!u.logged_in) return;
+  var authArea=document.getElementById('headerAuthArea');
+  function fadeIn(){if(authArea)authArea.style.opacity='1';}
 
-    // Desktop: show logged-in actions, hide login btn
+  fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
     var loggedIn=document.getElementById('headerLoggedIn');
     var loginBtn=document.getElementById('headerLoginBtn');
-    if(loggedIn) loggedIn.style.display='flex';
-    if(loginBtn) loginBtn.style.display='none';
 
-    // Mobile menu
-    var mLoggedIn=document.getElementById('mobileLoggedIn');
-    var mLoggedOut=document.getElementById('mobileLoggedOut');
-    var mUsername=document.getElementById('mobileUsername');
-    if(mLoggedIn) mLoggedIn.style.display='block';
-    if(mLoggedOut) mLoggedOut.style.display='none';
-    if(mUsername) mUsername.textContent=u.username||u.name;
+    if(u.logged_in){
+      // Desktop: show logged-in actions
+      if(loggedIn) loggedIn.style.display='flex';
 
-    // Notification badge
-    if(u.unread_count) updateBadge(u.unread_count);
+      // Mobile menu
+      var mLoggedIn=document.getElementById('mobileLoggedIn');
+      var mLoggedOut=document.getElementById('mobileLoggedOut');
+      var mUsername=document.getElementById('mobileUsername');
+      if(mLoggedIn) mLoggedIn.style.display='block';
+      if(mLoggedOut) mLoggedOut.style.display='none';
+      if(mUsername) mUsername.textContent=u.username||u.name;
 
-    // Expose user for other scripts
-    window.__user=u;
-  }).catch(function(){});
+      // Notification badge
+      if(u.unread_count) updateBadge(u.unread_count);
+
+      // Expose user for other scripts
+      window.__user=u;
+    }else{
+      // Guest: show login button
+      if(loginBtn) loginBtn.style.display='';
+    }
+    fadeIn();
+  }).catch(function(){
+    var loginBtn=document.getElementById('headerLoginBtn');
+    if(loginBtn) loginBtn.style.display='';
+    fadeIn();
+  });
 
   // Notification panel toggle
   var notiOpen=false;

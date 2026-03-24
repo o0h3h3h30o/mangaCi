@@ -124,6 +124,16 @@ class MangaModel extends Model
             ->getResultArray();
     }
 
+    public function getTags(int $mangaId): array
+    {
+        return $this->db->table('tag t')
+            ->select('t.id, t.name, t.slug')
+            ->join('manga_tag mt', 't.id = mt.tag_id')
+            ->where('mt.manga_id', $mangaId)
+            ->get()
+            ->getResultArray();
+    }
+
     public function getAuthors(int $mangaId): array
     {
         return $this->db->table('author a')
@@ -272,6 +282,20 @@ class MangaModel extends Model
         // Caution / 18+ filter
         if (isset($f['caution']) && $f['caution'] !== '') {
             $this->where('caution', (int) $f['caution']);
+        }
+
+        // Tag filter
+        if (!empty($f['tag'])) {
+            $tagRow = $this->db->table('tag')->where('slug', $f['tag'])->get()->getRowArray();
+            if ($tagRow) {
+                $mtRows = $this->db->table('manga_tag')
+                    ->select('manga_id')
+                    ->where('tag_id', (int) $tagRow['id'])
+                    ->get()->getResultArray();
+                $this->whereIn('id', array_column($mtRows, 'manga_id') ?: [0]);
+            } else {
+                $this->where('id', 0);
+            }
         }
 
         $sortMap = [

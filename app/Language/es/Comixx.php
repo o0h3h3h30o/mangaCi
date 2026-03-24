@@ -11,8 +11,11 @@ return [
     'logout'              => 'SALIR',
     'home'                => 'Inicio',
     'explore'             => 'Explorar',
+    'random'              => 'Aleatorio',
     'popular'             => 'Populares',
     'genres'              => 'Géneros',
+    'select_chapter'      => 'Seleccionar Capítulo',
+    'search_chapter'      => 'Buscar capítulo...',
     'newest'              => 'Más Nuevos',
     'latest_updates'      => 'Últimas Actualizaciones',
     'browse_all'          => 'Ver Todo',
@@ -48,4 +51,10 @@ return [
     'follow'              => 'Seguir',
     'following'           => 'Siguiendo',
     'views'               => 'Vistas',
+
+    // Manhwaread home
+    'release'             => 'Lanzamiento',
+    'new'                 => 'Nuevo',
+    'manga'               => 'Manga',
+    'register'            => 'REGISTRO',
 ];

@@ -27,6 +27,7 @@ class Pager extends BaseConfig
         'mangahub_full'  => 'App\Views\themes\mangahub\pager\mangahub',
         'mangahub_light' => 'App\Views\themes\mangahub\pager\tailwind',
         'comixx_full'    => 'App\Views\themes\comixx\pager\comixx',
+        'manhwaread'     => 'App\Views\themes\manhwaread\pager\manhwaread',
     ];
 
     /**

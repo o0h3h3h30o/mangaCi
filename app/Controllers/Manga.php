@@ -8,6 +8,20 @@ use App\Models\BookmarkModel;
 
 class Manga extends BaseController
 {
+    public function random()
+    {
+        $manga = $this->db->table('manga')
+            ->select('slug')
+            ->where('is_public', 1)
+            ->orderBy('RAND()')
+            ->limit(1)
+            ->get()
+            ->getRowArray();
+
+        if (!$manga) return redirect()->to('/');
+        return redirect()->to('/manga/' . $manga['slug']);
+    }
+
     public function detail(string $slug = ''): string
     {
         $mangaModel = new MangaModel();
@@ -35,8 +49,8 @@ class Manga extends BaseController
             'authors'      => $mangaModel->getAuthors($id),
             'artists'      => $mangaModel->getArtists($id),
             'recommended'  => !empty($mangaCats)
-                ? $mangaModel->getRelatedByCategory($id, (int) $mangaCats[0]['id'], 5)
-                : $mangaModel->getHotToday(5),
+                ? $mangaModel->getRelatedByCategory($id, (int) $mangaCats[0]['id'], 6)
+                : $mangaModel->getHotToday(6),
             'categories'   => $this->categories,
             'currentUser'  => $this->currentUser,
             'ratingAvg'    => $ratingStats['avg'],
@@ -46,6 +60,7 @@ class Manga extends BaseController
                 ? ($bm = new BookmarkModel())->isBookmarked((int) $this->currentUser['id'], $id)
                 : false,
             'followCount'  => (isset($bm) ? $bm : new BookmarkModel())->getMangaBookmarkCount($id),
+            'mangaTags'    => $mangaModel->getTags($id),
         ];
 
         return $this->themeView('manga/detail', $data);

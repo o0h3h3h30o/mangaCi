@@ -11,8 +11,11 @@ return [
     'logout'              => 'ログアウト',
     'home'                => 'ホーム',
     'explore'             => '探索',
+    'random'              => 'ランダム',
     'popular'             => '人気',
     'genres'              => 'ジャンル',
+    'select_chapter'      => '章を選択',
+    'search_chapter'      => '章を検索...',
     'newest'              => '最新',
     'latest_updates'      => '最新更新',
     'browse_all'          => 'すべて見る',
@@ -48,4 +51,10 @@ return [
     'follow'              => 'フォロー',
     'following'           => 'フォロー中',
     'views'               => '閲覧数',
+
+    // Manhwaread home
+    'release'             => 'リリース',
+    'new'                 => '新着',
+    'manga'               => 'マンガ',
+    'register'            => '登録',
 ];

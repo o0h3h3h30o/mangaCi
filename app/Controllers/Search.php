@@ -35,6 +35,9 @@ class Search extends BaseController
             }
         }
 
+        // ?tag=slug from detail page
+        $tagSlug = trim($this->request->getGet('tag') ?? '');
+
         $filterStatus  = $this->request->getGet('status') ?? '';
         $filterType    = trim($this->request->getGet('type') ?? '');
         $filterCaution = $this->request->getGet('caution');
@@ -48,6 +51,7 @@ class Search extends BaseController
             'status'        => $filterStatus,
             'type'          => $filterType,
             'caution'       => $filterCaution,
+            'tag'           => $tagSlug,
         ])->paginate(24);
 
         // Dynamic title / description
@@ -62,6 +66,11 @@ class Search extends BaseController
         } elseif ($filterArtist !== '') {
             $pageTitle = lang('ComixxSearch.artist_title', ['name' => $filterArtist]);
             $pageDesc  = lang('ComixxSearch.artist_desc', ['name' => $filterArtist]);
+        } elseif ($tagSlug !== '') {
+            $tagRow = db_connect()->table('tag')->where('slug', $tagSlug)->get()->getRowArray();
+            $tagName = $tagRow['name'] ?? ucfirst(str_replace('-', ' ', $tagSlug));
+            $pageTitle = $tagName . ' Manga';
+            $pageDesc  = 'Manga tagged with ' . $tagName;
         } else {
             $pageTitle = lang('ComixxSearch.manga_list');
             $pageDesc  = lang('ComixxSearch.manga_list_desc');

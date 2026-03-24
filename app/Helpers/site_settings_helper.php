@@ -6,7 +6,7 @@ if (!function_exists('manga_cover_url')) {
      * - cover == 1 → ảnh đã trên CDN S3, dùng pattern CDN
      * - cover != 1 → dùng trường image (URL tự upload), fallback CDN nếu image rỗng
      */
-    function manga_cover_url(array $manga, string $cdnBase = ''): string
+    function manga_cover_url(array $manga, string $cdnBase = '', bool $full = false): string
     {
         static $cachedCdnBase = null;
         static $cachedCoverDir = null;
@@ -21,7 +21,8 @@ if (!function_exists('manga_cover_url')) {
 
         $base = $cdnBase ?: $cachedCdnBase;
         $id = $manga['id'] ?? '';
-        $cdnUrl = $base . '/' . $id . '-thumb.jpg';
+        $suffix = $full ? '' : '-thumb';
+        $cdnUrl = $base . '/' . $id . $suffix . '.jpg';
 
         if (($manga['cover'] ?? 0) == 1) {
             return $cdnUrl;
@@ -31,21 +32,23 @@ if (!function_exists('manga_cover_url')) {
         }
 
         // Check local cover dir with cache
-        if (isset($coverFileCache[$id])) {
-            return $coverFileCache[$id];
+        $cacheKey = $id . ($full ? '_full' : '_thumb');
+        if (isset($coverFileCache[$cacheKey])) {
+            return $coverFileCache[$cacheKey];
         }
 
-        foreach (['-thumb', ''] as $suffix) {
+        $suffixes = $full ? ['', '-thumb'] : ['-thumb', ''];
+        foreach ($suffixes as $s) {
             foreach (['jpg', 'png', 'webp'] as $ext) {
-                if (is_file($cachedCoverDir . $id . $suffix . '.' . $ext)) {
-                    $url = base_url('cover/' . $id . $suffix . '.' . $ext);
-                    $coverFileCache[$id] = $url;
+                if (is_file($cachedCoverDir . $id . $s . '.' . $ext)) {
+                    $url = base_url('cover/' . $id . $s . '.' . $ext);
+                    $coverFileCache[$cacheKey] = $url;
                     return $url;
                 }
             }
         }
 
-        $coverFileCache[$id] = $cdnUrl;
+        $coverFileCache[$cacheKey] = $cdnUrl;
         return $cdnUrl;
     }
 }

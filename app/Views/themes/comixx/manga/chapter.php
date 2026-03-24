@@ -2062,13 +2062,14 @@ var __chapterLang = {
     }
 
     function rcReplyFormHtml(parentId, parentName, replyToId){
+      var rCa=Math.floor(Math.random()*10)+1, rCb=Math.floor(Math.random()*10)+1;
       return '<div class="rc-reply-form" id="rc-rf-'+parentId+'">'+
         '<input type="hidden" class="rc-reply-to-id" value="'+(replyToId||0)+'">'+
         '<textarea class="rc-reply-input" rows="2" maxlength="1000">@'+escHtml(parentName)+' </textarea>'+
-        '<div class="rc-captcha-wrap rc-reply-captcha" style="display:none">'+
+        '<div class="rc-captcha-wrap rc-reply-captcha" data-a="'+rCa+'" data-b="'+rCb+'" style="display:none">'+
           '<span class="rc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></span>'+
-          '<span class="rc-captcha-q rc-reply-captcha-q"></span>'+
-          '<input type="text" class="rc-captcha-ans rc-reply-captcha-ans" placeholder="?" inputmode="numeric" style="font-size:16px">'+
+          '<span class="rc-captcha-q rc-reply-captcha-q">'+rCa+' + '+rCb+'</span>'+
+          '<input type="number" class="rc-captcha-ans rc-reply-captcha-ans" min="0" max="99" placeholder="0">'+
         '</div>'+
         '<div class="rc-reply-form-actions">'+
         '<button class="rc-reply-cancel" data-parent="'+parentId+'">'+__chapterLang.cancel+'</button>'+
@@ -2084,7 +2085,7 @@ var __chapterLang = {
         .then(function(r){return r.json();})
         .then(function(d){
           if(!d.replies||!d.replies.length){
-            if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',cnt);}
+            if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',' '+cnt+' ');}
             return;
           }
           var LIMIT=3,visible=d.replies.slice(0,LIMIT),hidden=d.replies.slice(LIMIT);
@@ -2098,14 +2099,14 @@ var __chapterLang = {
           }
           if(btn){btn.textContent=__chapterLang.hide_replies;btn.disabled=false;btn.dataset.open='1';}
         })
-        .catch(function(){if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',cnt);}});
+        .catch(function(){if(btn){btn.disabled=false;var cnt=btn.dataset.count;btn.textContent=__chapterLang.view_replies.replace('{n}',' '+cnt+' ');}});
     }
 
     function rcRenderCmt(c){
       var name=c.user_name||c.user_username||'?';
       var rb=CURRENT_UID>0?'<button class="rc-reply-btn" data-id="'+c.id+'" data-name="'+escHtml(name)+'">'+__chapterLang.reply+'</button>':'';
       var replyCount=parseInt(c.reply_count||0);
-      var rt=replyCount>0?'<button class="rc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">'+__chapterLang.view_replies.replace('{n}',replyCount)+'</button>':'';
+      var rt=replyCount>0?'<button class="rc-toggle-replies" data-id="'+c.id+'" data-count="'+replyCount+'">'+__chapterLang.view_replies.replace('{n}',' '+replyCount+' ')+'</button>':'';
       return '<div class="rc-item" data-id="'+c.id+'"><div class="rc-item-body">'+
         rcAvatar(c.user_name,c.user_username,c.user_id)+
         '<div class="rc-content"><div class="rc-bubble"><span class="rc-user">'+escHtml(name)+'</span><div class="rc-text">'+escHtml(c.comment)+'</div></div>'+
@@ -2147,7 +2148,7 @@ var __chapterLang = {
             listCh.innerHTML=(!data.comments||!data.comments.length)
               ?'<p class="rc-loading">'+__chapterLang.no_comments+'</p>'
               :data.comments.map(rcRenderCmt).join('');
-            if(data.comments) data.comments.forEach(function(c){if(parseInt(c.reply_count||0)>0) rcFetchReplies(c.id,null,listCh);});
+            // Replies hidden by default
             rcRenderPg(pgCh,p,state.chTotal);
             state.loadingCh=false;
           }).catch(function(){state.loadingCh=false;});
@@ -2163,7 +2164,7 @@ var __chapterLang = {
             listAll.innerHTML=(!data.comments||!data.comments.length)
               ?'<p class="rc-loading">'+__chapterLang.no_comments+'</p>'
               :data.comments.map(rcRenderCmt).join('');
-            if(data.comments) data.comments.forEach(function(c){if(parseInt(c.reply_count||0)>0) rcFetchReplies(c.id,null,listAll);});
+            // Replies hidden by default
             rcRenderPg(pgAll,p,state.allTotal);
             state.loadingAll=false;
           }).catch(function(){state.loadingAll=false;});
@@ -2242,14 +2243,15 @@ var __chapterLang = {
             if(!rc) return;
             if(target.dataset.open==='1'){
               rc.innerHTML=''; target.dataset.open='0';
-              var cnt=target.dataset.count; target.textContent=__chapterLang.view_replies.replace('{n}',cnt);
+              var cnt=target.dataset.count; target.textContent=__chapterLang.view_replies.replace('{n}',' '+cnt+' ');
             } else { rcFetchReplies(parseInt(cid),target,listEl); }
             return;
           }
 
           // Reply button
           if(target.classList.contains('rc-reply-btn')&&!target.classList.contains('rc-toggle-replies')){
-            var parentId=target.dataset.id;
+            var repliesWrap=target.closest('[id^="rc-replies-"]');
+            var parentId=repliesWrap?repliesWrap.id.replace('rc-replies-',''):target.dataset.id;
             var parentName=target.dataset.name;
             var replyToId=target.dataset.replyTo||0;
             var area=listEl.querySelector('#rc-reply-area-'+parentId);
@@ -2279,38 +2281,58 @@ var __chapterLang = {
             if(!text) return;
             var rcCaptchaWrap=rf.querySelector('.rc-reply-captcha');
             var rcCaptchaAns=rf.querySelector('.rc-reply-captcha-ans');
-            if(rcCaptchaWrap&&rcCaptchaWrap.style.display!=='none'&&rcCaptchaAns&&!rcCaptchaAns.value.trim()){rcCaptchaAns.focus();return;}
-            target.disabled=true;target.textContent='...';
-            var replyToInput=rf.querySelector('.rc-reply-to-id');
-            var fd=new FormData();
-            fd.append('manga_id',MANGA_ID);
-            fd.append('chapter_id',CHAPTER_ID);
-            fd.append('comment',text);
-            fd.append('parent_comment',parentId);
-            fd.append('reply_to_id',replyToInput?replyToInput.value:0);
-            if(rcCaptchaAns&&rcCaptchaAns.value.trim()){
-              fd.append('captcha_answer',rcCaptchaAns.value.trim());
+            if(rcCaptchaWrap&&rcCaptchaWrap.style.display!=='none'&&rcCaptchaAns){
+              var rCa=parseInt(rcCaptchaWrap.dataset.a), rCb=parseInt(rcCaptchaWrap.dataset.b);
+              if(parseInt(rcCaptchaAns.value)!==rCa+rCb){
+                rcCaptchaAns.style.borderColor='red';
+                rcCaptchaAns.focus();
+                return;
+              }
             }
-            fetch('/api/comments',{method:'POST',body:fd})
-              .then(function(r){return r.json();})
-              .then(function(c){
-                if(c.need_captcha){
-                  fetch('/api/captcha').then(function(r){return r.json();}).then(function(d){
-                    var cq=rf.querySelector('.rc-reply-captcha-q');
-                    if(cq) cq.textContent=d.question;
-                    if(rcCaptchaWrap) rcCaptchaWrap.style.display='flex';
-                    if(rcCaptchaAns){rcCaptchaAns.value='';rcCaptchaAns.focus();}
-                    if(rcCaptchaWrap) rcCaptchaWrap.scrollIntoView({behavior:'smooth',block:'center'});
+            target.disabled=true;target.textContent='...';
+            var body='manga_id='+MANGA_ID+'&chapter_id='+CHAPTER_ID+'&comment='+encodeURIComponent(text)+'&parent_comment='+parentId;
+            if(rcCaptchaWrap&&rcCaptchaWrap.style.display!=='none') body+='&captcha_passed=1';
+            fetch('/api/comments',{
+              method:'POST',
+              headers:{'Content-Type':'application/x-www-form-urlencoded','X-Requested-With':'XMLHttpRequest'},
+              body:body,
+              credentials:'same-origin'
+            })
+            .then(function(r){
+              if(r.status===429) return r.json().then(function(d){throw d;});
+              return r.json();
+            })
+            .then(function(c){
+              if(c.error){alert(c.error);target.disabled=false;target.textContent=__chapterLang.reply;return;}
+              rf.remove();
+              // Reload replies for parent
+              var rc=listEl.querySelector('#rc-replies-'+parentId);
+              if(rc){
+                fetch('/api/comments/'+parentId+'/replies')
+                  .then(function(r){return r.json();})
+                  .then(function(rd){
+                    if(rd.replies&&rd.replies.length){
+                      rc.innerHTML=rd.replies.map(function(r){return rcRenderReply(r,parentId);}).join('');
+                    }
+                    var toggleBtn=listEl.querySelector('.rc-toggle-replies[data-id="'+parentId+'"]');
+                    if(toggleBtn){
+                      toggleBtn.dataset.open='1';
+                      toggleBtn.textContent=__chapterLang.hide_replies;
+                    }
                   });
-                  target.disabled=false;target.textContent=__chapterLang.reply;
-                  return;
-                }
-                if(c.error){alert(c.error);target.disabled=false;target.textContent=__chapterLang.reply;return;}
-                rf.remove();
-                var rc=listEl.querySelector('#rc-replies-'+parentId);
-                if(rc) rc.insertAdjacentHTML('beforeend',rcRenderReply(c,parentId));
-              })
-              .catch(function(){target.disabled=false;target.textContent=__chapterLang.reply;});
+              }
+            })
+            .catch(function(d){
+              if(d&&d.need_captcha&&rcCaptchaWrap){
+                var rCa2=Math.floor(Math.random()*10)+1, rCb2=Math.floor(Math.random()*10)+1;
+                rcCaptchaWrap.dataset.a=rCa2; rcCaptchaWrap.dataset.b=rCb2;
+                var cq=rf.querySelector('.rc-reply-captcha-q');
+                if(cq) cq.textContent=rCa2+' + '+rCb2;
+                rcCaptchaWrap.style.display='flex';
+                if(rcCaptchaAns){rcCaptchaAns.value='';rcCaptchaAns.focus();}
+              }
+              target.disabled=false;target.textContent=__chapterLang.reply;
+            });
             return;
           }
         });
@@ -2322,51 +2344,57 @@ var __chapterLang = {
       var captchaWrap=document.getElementById(prefix+'-captcha');
       var captchaQ=document.getElementById(prefix+'-captcha-q');
       var captchaAns=document.getElementById(prefix+'-captcha-ans');
-      var captchaReady=false;
+      var captchaA, captchaB;
+      var captchaShown=false;
+
+      function newCaptcha(){
+        captchaA=Math.floor(Math.random()*10)+1;
+        captchaB=Math.floor(Math.random()*10)+1;
+        if(captchaQ) captchaQ.textContent=captchaA+' + '+captchaB;
+        if(captchaAns) captchaAns.value='';
+      }
 
       if(inp&&sendBtn){
-        function showCaptcha(question){
-          if(captchaWrap&&captchaQ){
-            captchaQ.textContent=question;
-            captchaWrap.style.display='flex';
-            captchaReady=true;
-            if(captchaAns){captchaAns.value='';captchaAns.focus();}
-            captchaWrap.scrollIntoView({behavior:'smooth',block:'center'});
-          }
-        }
-        function hideCaptcha(){
-          if(captchaWrap) captchaWrap.style.display='none';
-          if(captchaAns) captchaAns.value='';
-          captchaReady=false;
-        }
+        newCaptcha();
         function postComment(){
           var text=inp.value.trim();
           if(!text) return;
-          if(captchaReady&&captchaAns&&!captchaAns.value.trim()){captchaAns.focus();return;}
-          sendBtn.disabled=true;
-          var fd=new FormData();
-          fd.append('manga_id',MANGA_ID);
-          fd.append('chapter_id',CHAPTER_ID);
-          fd.append('comment',text);
-          if(captchaReady&&captchaAns&&captchaAns.value.trim()){
-            fd.append('captcha_answer',captchaAns.value.trim());
+          if(captchaShown&&captchaAns){
+            if(parseInt(captchaAns.value)!==captchaA+captchaB){
+              captchaAns.style.borderColor='red';
+              captchaAns.focus();
+              return;
+            }
           }
-          fetch('/api/comments',{method:'POST',body:fd})
-            .then(function(r){return r.json();})
-            .then(function(c){
-              sendBtn.disabled=false;
-              if(c.need_captcha){
-                fetch('/api/captcha').then(function(r){return r.json();}).then(function(d){showCaptcha(d.question);});
-                return;
-              }
-              if(c.error){alert(c.error);return;}
-              hideCaptcha();
-              c.reply_count=0;
-              var ph=listCh.querySelector('.rc-loading'); if(ph) ph.remove();
-              listCh.insertAdjacentHTML('afterbegin',rcRenderCmt(c));
-              inp.value='';
-            })
-            .catch(function(){sendBtn.disabled=false;alert(__chapterLang.error);});
+          sendBtn.disabled=true;
+          var body='manga_id='+MANGA_ID+'&chapter_id='+CHAPTER_ID+'&comment='+encodeURIComponent(text);
+          if(captchaShown) body+='&captcha_passed=1';
+          fetch('/api/comments',{
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded','X-Requested-With':'XMLHttpRequest'},
+            body:body,
+            credentials:'same-origin'
+          })
+          .then(function(r){
+            if(r.status===401){window.location.href='/login';return null;}
+            return r.json().then(function(d){d._status=r.status;return d;});
+          })
+          .then(function(d){
+            sendBtn.disabled=false;
+            if(!d) return;
+            if(d.need_captcha){
+              captchaShown=true;
+              if(captchaWrap){captchaWrap.style.display='flex';newCaptcha();if(captchaAns) captchaAns.focus();}
+              return;
+            }
+            if(d.error){alert(d.error);return;}
+            captchaShown=false;
+            if(captchaWrap) captchaWrap.style.display='none';
+            newCaptcha();
+            fetchCh(1);
+            inp.value='';
+          })
+          .catch(function(){sendBtn.disabled=false;});
         }
         sendBtn.addEventListener('click',postComment);
         inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();postComment();}});

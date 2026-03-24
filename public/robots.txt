@@ -1,7 +1,11 @@
 User-agent: *
+Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
 Disallow: /register
+Disallow: /profile/
+Disallow: /history
+Disallow: /bookmarks
 
-Sitemap: /sitemap.xml
+Sitemap: https://manhwas.me/sitemap.xml

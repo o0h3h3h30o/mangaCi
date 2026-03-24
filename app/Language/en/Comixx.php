@@ -11,8 +11,11 @@ return [
     'logout'              => 'LOGOUT',
     'home'                => 'Home',
     'explore'             => 'Explore',
+    'random'              => 'Random',
     'popular'             => 'Popular',
     'genres'              => 'Genres',
+    'select_chapter'      => 'Select Chapter',
+    'search_chapter'      => 'Search chapter...',
     'newest'              => 'Newest',
     'latest_updates'      => 'Latest Updates',
     'browse_all'          => 'Browse All',
@@ -42,6 +45,12 @@ return [
     'announce_1'          => 'This site is new, so it may have bugs, please report to us if you found any. Thanks!',
     'announce_2'          => 'Bookmarks/follow features added.',
     'announce_3'          => 'Help us share the site to more people if you like it.',
+
+    // Manhwaread home
+    'release'             => 'Release',
+    'new'                 => 'New',
+    'manga'               => 'Manga',
+    'register'            => 'REGISTER',
 
     // Common
     'reply'               => 'Reply',

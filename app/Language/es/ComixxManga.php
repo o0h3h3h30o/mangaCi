@@ -3,6 +3,8 @@
 return [
     // Detail
     'start_reading'       => 'EMPEZAR A LEER',
+    'read_first'          => 'Leer Primero',
+    'read_last'           => 'Leer Último',
     'ongoing'             => 'En Curso',
     'completed'           => 'Completado',
     'unknown_status'      => 'Desconocido',
@@ -16,6 +18,8 @@ return [
     'chapters'            => 'Capítulos',
     'chapter'             => 'Capítulo',
     'date'                => 'Fecha',
+    'updated'             => 'Actualizado',
+    'reverse_order'       => 'Invertir',
     'no_chapters'         => 'Aún no hay capítulos disponibles.',
     'recommendations'     => 'Recomendados',
     'followers'           => 'Seguidores',
@@ -44,6 +48,7 @@ return [
     'settings'            => 'Configuración',
     'prev_chapter'        => 'Capítulo Anterior',
     'next_chapter'        => 'Capítulo Siguiente',
+    'end_of_chapter'      => 'Fin de',
     'prev_page'           => 'Página Anterior',
     'next_page'           => 'Página Siguiente',
     'back_to_top'         => 'Ir arriba',

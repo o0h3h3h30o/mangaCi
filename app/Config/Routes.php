@@ -21,6 +21,7 @@ $routes->get('test-ip', static function () {
 });
 
 $routes->get('/', 'Home::index');
+$routes->get('random', 'Manga::random');
 $routes->get('manga/(:segment)', 'Manga::detail/$1');
 $routes->get('manga/(:segment)/(:segment)', 'Manga::chapter/$1/$2');
 $routes->get('search', 'Search::index');

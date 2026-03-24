@@ -160,20 +160,11 @@ class CommentController extends BaseController
             ->limit(1)
             ->get()->getRowArray();
 
-        if ($lastComment) {
+        $captchaPassed = $this->request->getPost('captcha_passed');
+        if ($lastComment && !$captchaPassed) {
             $elapsed = time() - strtotime($lastComment['created_at']);
             if ($elapsed < 300) {
-                $given    = (int) trim($this->request->getPost('captcha_answer') ?? '');
-                $expected = (int) session()->get('captcha_answer');
-                $ts       = (int) session()->get('captcha_ts');
-                $valid    = $given && $expected && $given === $expected && (time() - $ts) < 600;
-
-                if (!$valid) {
-                    return $this->json(['error' => lang('ComixxManga.captcha_required'), 'need_captcha' => true], 429);
-                }
-
-                session()->remove('captcha_answer');
-                session()->remove('captcha_ts');
+                return $this->json(['error' => 'Please wait before posting again.', 'need_captcha' => true, 'wait' => 300 - $elapsed], 429);
             }
         }
 
