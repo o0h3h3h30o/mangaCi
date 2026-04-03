@@ -22,6 +22,7 @@ class Profile extends BaseController
 
         $unreadNotiCount = (int) \Config\Database::connect()
             ->table('notifications')
+            ->where('site_id', site_id())
             ->where('user_id', $this->currentUser['id'])
             ->where('is_read', 0)
             ->countAllResults();
@@ -66,13 +67,13 @@ class Profile extends BaseController
         $userId    = (int) $this->currentUser['id'];
 
         // Check username unique (exclude self)
-        $existing = $userModel->where('username', $username)->where('id !=', $userId)->first();
+        $existing = $userModel->where('site_id', site_id())->where('username', $username)->where('id !=', $userId)->first();
         if ($existing) {
             return redirect()->back()->with('error', lang('ComixxAuth.username_taken'));
         }
 
         // Check email unique (exclude self)
-        $existing = $userModel->where('email', $email)->where('id !=', $userId)->first();
+        $existing = $userModel->where('site_id', site_id())->where('email', $email)->where('id !=', $userId)->first();
         if ($existing) {
             return redirect()->back()->with('error', lang('ComixxAuth.email_taken'));
         }

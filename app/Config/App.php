@@ -11,25 +11,25 @@ class App extends BaseConfig
      * Base Site URL
      * --------------------------------------------------------------------------
      *
-     * URL to your CodeIgniter root. Typically, this will be your base URL,
-     * WITH a trailing slash:
-     *
-     * E.g., http://example.com/
+     * Auto-detected from request for multi-site support.
      */
     public string $baseURL = 'http://localhost:8080/';
 
     /**
-     * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
-     * If you want to accept multiple Hostnames, set this.
-     *
-     * E.g.,
-     * When your site URL ($baseURL) is 'http://example.com/', and your site
-     * also accepts 'http://media.example.com/' and 'http://accounts.example.com/':
-     *     ['media.example.com', 'accounts.example.com']
-     *
      * @var list<string>
      */
     public array $allowedHostnames = [];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Multi-site: auto-detect baseURL from current request
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $this->baseURL = $scheme . '://' . $_SERVER['HTTP_HOST'] . '/';
+        }
+    }
 
     /**
      * --------------------------------------------------------------------------

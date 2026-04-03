@@ -167,9 +167,7 @@ $statusMap = [1 => lang('ComixxManga.ongoing'), 2 => lang('ComixxManga.completed
   </div>
 
   <?php if (!empty($pager)): ?>
-  <div class="pagination">
     <?= $pager->links('default', 'manhwaread') ?>
-  </div>
   <?php endif; ?>
 </section>
 
@@ -200,22 +198,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Carousel drag-to-scroll (distinguish drag from click)
+  // Carousel drag-to-scroll (mouse + touch)
   document.querySelectorAll('.carousel-track').forEach(function(track) {
     var isDown = false, startX, scrollLeft, dragged = false;
-    track.addEventListener('mousedown', function(e) {
+
+    function onStart(x) {
       isDown = true; dragged = false;
-      startX = e.pageX - track.offsetLeft;
+      startX = x;
       scrollLeft = track.scrollLeft;
-    });
-    track.addEventListener('mouseleave', function() { isDown = false; });
-    track.addEventListener('mouseup', function() { isDown = false; });
-    track.addEventListener('mousemove', function(e) {
+      track.classList.add('dragging');
+    }
+    function onMove(x, e) {
       if (!isDown) return;
-      var x = e.pageX - track.offsetLeft;
-      if (Math.abs(x - startX) > 5) { dragged = true; e.preventDefault(); }
-      track.scrollLeft = scrollLeft - (x - startX) * 1.5;
-    });
+      var diff = x - startX;
+      if (Math.abs(diff) > 5) { dragged = true; if (e.cancelable) e.preventDefault(); }
+      track.scrollLeft = scrollLeft - diff;
+    }
+    function onEnd() {
+      isDown = false;
+      track.classList.remove('dragging');
+    }
+
+    // Mouse events
+    track.addEventListener('mousedown', function(e) { onStart(e.pageX); });
+    track.addEventListener('mousemove', function(e) { onMove(e.pageX, e); });
+    track.addEventListener('mouseup', onEnd);
+    track.addEventListener('mouseleave', onEnd);
+
+    // Touch events
+    track.addEventListener('touchstart', function(e) { onStart(e.touches[0].pageX); }, { passive: true });
+    track.addEventListener('touchmove', function(e) { onMove(e.touches[0].pageX, e); }, { passive: false });
+    track.addEventListener('touchend', onEnd);
+
     // Block click only if user dragged
     track.addEventListener('click', function(e) {
       if (dragged) { e.preventDefault(); e.stopPropagation(); }

@@ -40,7 +40,7 @@ if (!function_exists('manga_cover_url')) {
         $suffixes = $full ? ['', '-thumb'] : ['-thumb', ''];
         foreach ($suffixes as $s) {
             foreach (['jpg', 'png', 'webp'] as $ext) {
-                if (is_file($cachedCoverDir . $id . $s . '.' . $ext)) {
+                if (@is_file($cachedCoverDir . $id . $s . '.' . $ext)) {
                     $url = base_url('cover/' . $id . $s . '.' . $ext);
                     $coverFileCache[$cacheKey] = $url;
                     return $url;
@@ -65,6 +65,7 @@ if (!function_exists('site_setting')) {
             try {
                 $rows = \Config\Database::connect()
                     ->table('site_settings')
+                    ->where('site_id', site_id())
                     ->get()
                     ->getResultArray();
                 $settings = array_column($rows, 'value', 'key');

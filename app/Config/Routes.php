@@ -100,9 +100,17 @@ $routes->group('admin', function ($routes) {
     $routes->post('groups/(:num)/edit', 'Admin::updateGroup/$1');
     $routes->post('groups/(:num)/delete','Admin::deleteGroup/$1');
 
+    // Sites
+    $routes->get ('sites',                      'Admin::sites');
+    $routes->get ('sites/new',                  'Admin::newSite');
+    $routes->post('sites/new',                  'Admin::createSite');
+    $routes->get ('sites/(:num)/edit',          'Admin::editSite/$1');
+    $routes->post('sites/(:num)/edit',          'Admin::updateSite/$1');
+    $routes->post('sites/(:num)/delete',        'Admin::deleteSite/$1');
+
     // Settings
     $routes->get ('settings',                   'Admin::settings');
-    $routes->post('settings',                   'Admin::updateSettings');
+    $routes->post('settings/(:num)',            'Admin::updateSettings/$1');
 
     // Reports
     $routes->get ('reports',                    'Admin::reports');

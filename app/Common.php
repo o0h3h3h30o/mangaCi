@@ -13,3 +13,13 @@
  *
  * @see: https://codeigniter.com/user_guide/extending/common.html
  */
+
+if (! function_exists('site_id')) {
+    /**
+     * Return the current site ID based on the request domain.
+     */
+    function site_id(): int
+    {
+        return \App\Libraries\SiteResolver::resolve();
+    }
+}

@@ -98,7 +98,7 @@
     </a>
 
     <?php
-      try { $pendingReports = \Config\Database::connect()->table('chapter_reports')->where('status','pending')->countAllResults(); }
+      try { $pendingReports = \Config\Database::connect()->table('chapter_reports')->where('site_id', site_id())->where('status','pending')->countAllResults(); }
       catch (\Throwable $e) { $pendingReports = 0; }
     ?>
     <a href="/admin/reports" class="nav-link <?= ($activePage??'')==='reports' ? 'active' : '' ?>">
@@ -128,6 +128,13 @@
         <line x1="7" y1="7" x2="7.01" y2="7"/>
       </svg>
       Groups
+    </a>
+
+    <a href="/admin/sites" class="nav-link <?= ($activePage??'')==='sites' ? 'active' : '' ?>">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      Sites
     </a>
 
     <a href="/admin/settings" class="nav-link <?= ($activePage??'')==='settings' ? 'active' : '' ?>">

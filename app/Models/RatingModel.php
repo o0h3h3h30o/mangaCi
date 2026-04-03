@@ -8,14 +8,15 @@ class RatingModel extends Model
 {
     protected $table         = 'item_ratings';
     protected $primaryKey    = 'id';
-    protected $allowedFields = ['item_id', 'score', 'ip_address'];
+    protected $allowedFields = ['site_id', 'item_id', 'score', 'ip_address'];
 
     /**
      * Get average score and vote count for a manga.
      */
     public function getStats(int $itemId): array
     {
-        $row = $this->selectAvg('score', 'avg_score')
+        $row = $this->where('site_id', site_id())
+                    ->selectAvg('score', 'avg_score')
                     ->selectCount('id', 'votes')
                     ->where('item_id', $itemId)
                     ->get()
@@ -32,7 +33,8 @@ class RatingModel extends Model
      */
     public function findByIp(int $itemId, string $ip): ?array
     {
-        return $this->where('item_id', $itemId)
+        return $this->where('site_id', site_id())
+                    ->where('item_id', $itemId)
                     ->where('ip_address', $ip)
                     ->first();
     }
@@ -48,6 +50,7 @@ class RatingModel extends Model
             $this->update($existing['id'], ['score' => $score]);
         } else {
             $this->insert([
+                'site_id'    => site_id(),
                 'item_id'    => $itemId,
                 'score'      => $score,
                 'ip_address' => $ip,

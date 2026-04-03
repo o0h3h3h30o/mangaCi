@@ -37,7 +37,10 @@ class ContentLikeController extends BaseController
         $db     = $this->db();
         $userId = (int) $this->currentUser['id'];
 
+        $sid = site_id();
+
         $existing = $db->table('content_likes')
+            ->where('site_id', $sid)
             ->where('content_type', $contentType)
             ->where('content_id', $contentId)
             ->where('user_id', $userId)
@@ -45,6 +48,7 @@ class ContentLikeController extends BaseController
 
         if (!$existing) {
             $db->table('content_likes')->insert([
+                'site_id'      => $sid,
                 'content_type' => $contentType,
                 'content_id'   => $contentId,
                 'user_id'      => $userId,
@@ -54,6 +58,7 @@ class ContentLikeController extends BaseController
         } elseif ($existing['type'] === $type) {
             // Same type → remove (toggle off)
             $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', $contentType)
                 ->where('content_id', $contentId)
                 ->where('user_id', $userId)
@@ -62,6 +67,7 @@ class ContentLikeController extends BaseController
         } else {
             // Different type → switch
             $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', $contentType)
                 ->where('content_id', $contentId)
                 ->where('user_id', $userId)
@@ -70,12 +76,14 @@ class ContentLikeController extends BaseController
         }
 
         $likes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
             ->where('content_type', $contentType)
             ->where('content_id', $contentId)
             ->where('type', 'like')
             ->countAllResults();
 
         $dislikes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
             ->where('content_type', $contentType)
             ->where('content_id', $contentId)
             ->where('type', 'dislike')
@@ -102,15 +110,18 @@ class ContentLikeController extends BaseController
         $contentId   = (int) ($this->request->getGet('content_id') ?? 0);
         $userId      = (int) ($this->currentUser['id'] ?? 0);
 
-        $db = $this->db();
+        $db  = $this->db();
+        $sid = site_id();
 
         $likes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
             ->where('content_type', $contentType)
             ->where('content_id', $contentId)
             ->where('type', 'like')
             ->countAllResults();
 
         $dislikes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
             ->where('content_type', $contentType)
             ->where('content_id', $contentId)
             ->where('type', 'dislike')
@@ -119,6 +130,7 @@ class ContentLikeController extends BaseController
         $myReaction = null;
         if ($userId > 0) {
             $row = $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', $contentType)
                 ->where('content_id', $contentId)
                 ->where('user_id', $userId)

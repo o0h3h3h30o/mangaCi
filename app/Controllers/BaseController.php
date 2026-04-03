@@ -58,7 +58,7 @@ abstract class BaseController extends Controller
             if ($decoded && substr_count($decoded, '|') >= 1) {
                 [$userId, $mac] = explode('|', $decoded, 2);
                 $userModel = new \App\Models\UserModel();
-                $user = $userModel->where('active', 1)->find((int) $userId);
+                $user = $userModel->where('active', 1)->where('site_id', site_id())->find((int) $userId);
                 if ($user) {
                     $expected = hash_hmac('sha256', $user['id'] . '|' . $user['password'], env('encryption.key', 'fallback-secret'));
                     if (hash_equals($expected, $mac)) {

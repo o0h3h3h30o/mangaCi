@@ -8,7 +8,7 @@ class CommentModel extends Model
 {
     protected $table         = 'comments';
     protected $primaryKey    = 'id';
-    protected $allowedFields = ['comment', 'post_type', 'post_id', 'manga_id', 'user_id', 'parent_comment'];
+    protected $allowedFields = ['site_id', 'comment', 'post_type', 'post_id', 'manga_id', 'user_id', 'parent_comment'];
     protected $useTimestamps = true;
 
     public function getRecentComments(int $limit = 15): array
@@ -21,6 +21,7 @@ class CommentModel extends Model
             ->join('manga m', 'c.manga_id = m.id', 'left')
             ->join('users u', 'c.user_id = u.id', 'left')
             ->join('chapter ch', 'c.post_id = ch.id AND c.post_type = \'chapter\'', 'left')
+            ->where('c.site_id', site_id())
             ->where('m.is_public', 1)
             ->whereNotIn('c.comment', [''])
             ->orderBy('c.created_at', 'DESC')
@@ -54,12 +55,12 @@ class CommentModel extends Model
                 (SELECT COUNT(*) FROM comments r WHERE r.parent_comment = c.id)                            AS reply_count
             FROM comments c
             LEFT JOIN users u ON c.user_id = u.id
-            WHERE c.manga_id = ? AND c.post_type = 'manga' AND c.parent_comment IS NULL
+            WHERE c.site_id = ? AND c.manga_id = ? AND c.post_type = 'manga' AND c.parent_comment IS NULL
             ORDER BY {$orderSql}
             LIMIT ? OFFSET ?
         ";
 
-        return $this->db->query($sql, [$userId, $mangaId, $limit, $offset])->getResultArray();
+        return $this->db->query($sql, [site_id(), $userId, $mangaId, $limit, $offset])->getResultArray();
     }
 
     /**
@@ -68,6 +69,7 @@ class CommentModel extends Model
     public function getCount(int $mangaId): int
     {
         return (int) $this->db->table('comments')
+            ->where('site_id', site_id())
             ->where('manga_id', $mangaId)
             ->where('post_type', 'manga')
             ->where('parent_comment', null)
@@ -89,11 +91,11 @@ class CommentModel extends Model
                 (SELECT cl.type  FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = ?)      AS my_reaction
             FROM comments c
             LEFT JOIN users u ON c.user_id = u.id
-            WHERE c.parent_comment = ?
+            WHERE c.site_id = ? AND c.parent_comment = ?
             ORDER BY c.created_at ASC
         ";
 
-        return $this->db->query($sql, [$userId, $parentId])->getResultArray();
+        return $this->db->query($sql, [site_id(), $userId, $parentId])->getResultArray();
     }
 
     /**
@@ -123,17 +125,18 @@ class CommentModel extends Model
             FROM comments c
             LEFT JOIN users u ON c.user_id = u.id
             LEFT JOIN chapter ch ON c.post_type = 'chapter' AND c.post_id = ch.id
-            WHERE c.manga_id = ? AND c.parent_comment IS NULL
+            WHERE c.site_id = ? AND c.manga_id = ? AND c.parent_comment IS NULL
             ORDER BY {$orderSql}
             LIMIT ? OFFSET ?
         ";
 
-        return $this->db->query($sql, [$userId, $mangaId, $limit, $offset])->getResultArray();
+        return $this->db->query($sql, [site_id(), $userId, $mangaId, $limit, $offset])->getResultArray();
     }
 
     public function getAllCountByManga(int $mangaId): int
     {
         return (int) $this->db->table('comments')
+            ->where('site_id', site_id())
             ->where('manga_id', $mangaId)
             ->where('parent_comment', null)
             ->countAllResults();
@@ -164,12 +167,12 @@ class CommentModel extends Model
                 (SELECT COUNT(*) FROM comments r WHERE r.parent_comment = c.id)                            AS reply_count
             FROM comments c
             LEFT JOIN users u ON c.user_id = u.id
-            WHERE c.post_id = ? AND c.post_type = 'chapter' AND c.parent_comment IS NULL
+            WHERE c.site_id = ? AND c.post_id = ? AND c.post_type = 'chapter' AND c.parent_comment IS NULL
             ORDER BY {$orderSql}
             LIMIT ? OFFSET ?
         ";
 
-        return $this->db->query($sql, [$userId, $chapterId, $limit, $offset])->getResultArray();
+        return $this->db->query($sql, [site_id(), $userId, $chapterId, $limit, $offset])->getResultArray();
     }
 
     /**
@@ -178,6 +181,7 @@ class CommentModel extends Model
     public function getCountByChapter(int $chapterId): int
     {
         return (int) $this->db->table('comments')
+            ->where('site_id', site_id())
             ->where('post_id', $chapterId)
             ->where('post_type', 'chapter')
             ->where('parent_comment', null)

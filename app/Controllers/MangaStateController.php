@@ -13,7 +13,8 @@ class MangaStateController extends BaseController
     public function index(int $id): \CodeIgniter\HTTP\ResponseInterface
     {
         $cache    = \Config\Services::cache();
-        $cacheKey = 'manga_state_' . $id;
+        $sid      = site_id();
+        $cacheKey = 'manga_state_' . $sid . '_' . $id;
 
         // Public data (rating, follow count, likes) — cached 15s
         $public = $cache->get($cacheKey);
@@ -26,17 +27,20 @@ class MangaStateController extends BaseController
 
             // Follow count
             $followCount = (int) $db->table('bookmarks')
+                ->where('site_id', $sid)
                 ->where('manga_id', $id)
                 ->countAllResults();
 
             // Likes / Dislikes
             $likes = (int) $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', 'manga')
                 ->where('content_id', $id)
                 ->where('type', 'like')
                 ->countAllResults();
 
             $dislikes = (int) $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', 'manga')
                 ->where('content_id', $id)
                 ->where('type', 'dislike')
@@ -68,11 +72,13 @@ class MangaStateController extends BaseController
             $userId = (int) $this->currentUser['id'];
 
             $isBookmarked = $db->table('bookmarks')
+                ->where('site_id', $sid)
                 ->where('manga_id', $id)
                 ->where('user_id', $userId)
                 ->countAllResults() > 0;
 
             $likeRow = $db->table('content_likes')
+                ->where('site_id', $sid)
                 ->where('content_type', 'manga')
                 ->where('content_id', $id)
                 ->where('user_id', $userId)
@@ -108,6 +114,7 @@ class MangaStateController extends BaseController
      */
     public static function clearCache(int $mangaId): void
     {
-        \Config\Services::cache()->delete('manga_state_' . $mangaId);
+        $sid = site_id();
+        \Config\Services::cache()->delete('manga_state_' . $sid . '_' . $mangaId);
     }
 }

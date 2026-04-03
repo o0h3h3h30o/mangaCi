@@ -31,6 +31,7 @@ class ChapterReportController extends BaseController
 
         // Rate limit: 1 report/chapter/IP per hour
         $recent = $db->table('chapter_reports')
+            ->where('site_id', site_id())
             ->where('chapter_id', $chapterId)
             ->where('ip_address', $ip)
             ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 hour')))
@@ -41,6 +42,7 @@ class ChapterReportController extends BaseController
         }
 
         $db->table('chapter_reports')->insert([
+            'site_id'    => site_id(),
             'chapter_id' => $chapterId,
             'user_id'    => $userId,
             'reason'     => $reason,

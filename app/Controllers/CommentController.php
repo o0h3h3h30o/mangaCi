@@ -155,6 +155,7 @@ class CommentController extends BaseController
 
         // Rate limiting: kiểm tra comment gần nhất trong 5 phút
         $lastComment = $this->db()->table('comments')
+            ->where('site_id', site_id())
             ->where('user_id', $user['id'])
             ->orderBy('created_at', 'DESC')
             ->limit(1)
@@ -171,6 +172,7 @@ class CommentController extends BaseController
         $isChapter = $chapterId > 0;
         $model = new CommentModel();
         $row   = [
+            'site_id'        => site_id(),
             'comment'        => $comment,
             'post_type'      => $isChapter ? 'chapter' : 'manga',
             'post_id'        => $isChapter ? $chapterId : $mangaId,
@@ -207,6 +209,7 @@ class CommentController extends BaseController
                 }
 
                 $this->db()->table('notifications')->insert([
+                    'site_id'      => site_id(),
                     'user_id'      => (int) $target['user_id'],
                     'actor_id'     => $user['id'],
                     'type'         => 'reply',
@@ -249,28 +252,30 @@ class CommentController extends BaseController
         $userId = $user['id'];
 
         $existing = $db->table('comment_likes')
+            ->where('site_id', site_id())
             ->where('comment_id', $id)
             ->where('user_id', $userId)
             ->get()->getRowArray();
 
         if (!$existing) {
             $db->table('comment_likes')->insert([
+                'site_id'    => site_id(),
                 'comment_id' => $id,
                 'user_id'    => $userId,
                 'type'       => $type,
             ]);
             $myReaction = $type;
         } elseif ($existing['type'] === $type) {
-            $db->table('comment_likes')->where('comment_id', $id)->where('user_id', $userId)->delete();
+            $db->table('comment_likes')->where('site_id', site_id())->where('comment_id', $id)->where('user_id', $userId)->delete();
             $myReaction = null;
         } else {
-            $db->table('comment_likes')->where('comment_id', $id)->where('user_id', $userId)
+            $db->table('comment_likes')->where('site_id', site_id())->where('comment_id', $id)->where('user_id', $userId)
                 ->update(['type' => $type]);
             $myReaction = $type;
         }
 
-        $likes    = (int) $db->table('comment_likes')->where('comment_id', $id)->where('type', 'like')->countAllResults();
-        $dislikes = (int) $db->table('comment_likes')->where('comment_id', $id)->where('type', 'dislike')->countAllResults();
+        $likes    = (int) $db->table('comment_likes')->where('site_id', site_id())->where('comment_id', $id)->where('type', 'like')->countAllResults();
+        $dislikes = (int) $db->table('comment_likes')->where('site_id', site_id())->where('comment_id', $id)->where('type', 'dislike')->countAllResults();
 
         return $this->json([
             'my_reaction'    => $myReaction,

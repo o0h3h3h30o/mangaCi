@@ -62,6 +62,7 @@ class Admin extends BaseController
             return redirect()->to('/login');
         }
 
+        // Admin is global — check any site where user has admin role
         $ok = $this->db()
             ->table('users_groups ug')
             ->join('groups g', 'g.id = ug.group_id')
@@ -88,15 +89,25 @@ class Admin extends BaseController
     public function settings(): ResponseInterface
     {
         if ($r = $this->guard()) return $r;
+        $db = $this->db();
 
-        $settings = [];
-        $tableError = false;
+        // Load all sites
+        $sites = $db->table('sites')->orderBy('id')->get()->getResultArray();
+
+        // Load settings for each site
+        $allSettings = [];
+        $tableError  = false;
         try {
-            $rows     = $this->db()->table('site_settings')->get()->getResultArray();
-            $settings = array_column($rows, 'value', 'key');
+            $rows = $db->table('site_settings')->get()->getResultArray();
+            foreach ($rows as $row) {
+                $allSettings[(int) $row['site_id']][$row['key']] = $row['value'];
+            }
         } catch (\Throwable $e) {
             $tableError = true;
         }
+
+        // Active tab from query string
+        $activeTab = (int) ($this->request->getGet('site') ?? ($sites[0]['id'] ?? 1));
 
         // Liệt kê các theme có sẵn
         $themeDir = APPPATH . 'Views/themes/';
@@ -111,19 +122,25 @@ class Admin extends BaseController
 
         return $this->response->setBody(
             $this->render('admin/settings', [
-                'title'      => 'Site Settings',
-                'activePage' => 'settings',
-                'settings'   => $settings,
-                'tableError' => $tableError,
-                'themes'     => $themes,
+                'title'       => 'Site Settings',
+                'activePage'  => 'settings',
+                'sites'       => $sites,
+                'allSettings' => $allSettings,
+                'activeTab'   => $activeTab,
+                'tableError'  => $tableError,
+                'themes'      => $themes,
             ])
         );
     }
 
-    public function updateSettings(): ResponseInterface
+    public function updateSettings(int $siteId): ResponseInterface
     {
         if ($r = $this->guard()) return $r;
         $db = $this->db();
+
+        // Verify site exists
+        $site = $db->table('sites')->where('id', $siteId)->get()->getRowArray();
+        if (!$site) return $this->response->setStatusCode(404)->setBody('Site not found');
 
         $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
 
@@ -156,16 +173,156 @@ class Admin extends BaseController
         }
 
         foreach ($values as $key => $value) {
-            $exists = $db->table('site_settings')->where('key', $key)->countAllResults() > 0;
+            $exists = $db->table('site_settings')->where('site_id', $siteId)->where('key', $key)->countAllResults() > 0;
             if ($exists) {
-                $db->table('site_settings')->where('key', $key)->update(['value' => $value]);
+                $db->table('site_settings')->where('site_id', $siteId)->where('key', $key)->update(['value' => $value]);
             } else {
-                $db->table('site_settings')->insert(['key' => $key, 'value' => $value]);
+                $db->table('site_settings')->insert(['site_id' => $siteId, 'key' => $key, 'value' => $value]);
             }
         }
 
-        session()->setFlashdata('flash', ['type' => 'success', 'msg' => 'Settings saved successfully.']);
-        return redirect()->to('/admin/settings');
+        session()->setFlashdata('flash', ['type' => 'success', 'msg' => 'Settings saved for "' . esc($site['name']) . '".' ]);
+        return redirect()->to('/admin/settings?site=' . $siteId);
+    }
+
+    // ── Sites ─────────────────────────────────────────────────
+
+    public function sites(): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+
+        $sites = $this->db()->table('sites')->orderBy('id')->get()->getResultArray();
+
+        return $this->response->setBody(
+            $this->render('admin/sites_list', [
+                'title'      => 'Sites',
+                'activePage' => 'sites',
+                'sites'      => $sites,
+                'flash'      => session()->getFlashdata('flash'),
+            ])
+        );
+    }
+
+    public function newSite(): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+        return $this->response->setBody(
+            $this->render('admin/site_form', [
+                'title'      => 'New Site',
+                'activePage' => 'sites',
+                'site'       => null,
+                'flash'      => session()->getFlashdata('flash'),
+            ])
+        );
+    }
+
+    public function createSite(): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+
+        $domain = strtolower(trim($this->request->getPost('domain') ?? ''));
+        $name   = trim($this->request->getPost('name') ?? '');
+        $active = (int) ($this->request->getPost('is_active') ?? 1);
+
+        if ($domain === '') {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Domain is required.']);
+            return redirect()->to('/admin/sites/new');
+        }
+
+        $db = $this->db();
+
+        // Check unique
+        if ($db->table('sites')->where('domain', $domain)->countAllResults() > 0) {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Domain already exists.']);
+            return redirect()->to('/admin/sites/new');
+        }
+
+        $siteId = $db->table('sites')->insert([
+            'domain'    => $domain,
+            'name'      => $name ?: $domain,
+            'is_active' => $active,
+        ]);
+        $siteId = $db->insertID();
+
+        // Copy default settings from site 1
+        $rows = $db->table('site_settings')->where('site_id', 1)->get()->getResultArray();
+        foreach ($rows as $row) {
+            $value = $row['key'] === 'site_title' ? ($name ?: $domain) : $row['value'];
+            $db->table('site_settings')->insert([
+                'site_id' => $siteId,
+                'key'     => $row['key'],
+                'value'   => $value,
+            ]);
+        }
+
+        session()->setFlashdata('flash', ['type' => 'success', 'msg' => "Site \"{$domain}\" created."]);
+        return redirect()->to('/admin/sites');
+    }
+
+    public function editSite(int $id): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+        $site = $this->db()->table('sites')->where('id', $id)->get()->getRowArray();
+        if (!$site) return $this->response->setStatusCode(404)->setBody('Site not found');
+
+        return $this->response->setBody(
+            $this->render('admin/site_form', [
+                'title'      => 'Edit Site #' . $id,
+                'activePage' => 'sites',
+                'site'       => $site,
+                'flash'      => session()->getFlashdata('flash'),
+            ])
+        );
+    }
+
+    public function updateSite(int $id): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+        $db   = $this->db();
+        $site = $db->table('sites')->where('id', $id)->get()->getRowArray();
+        if (!$site) return $this->response->setStatusCode(404)->setBody('Site not found');
+
+        $domain = strtolower(trim($this->request->getPost('domain') ?? ''));
+        $name   = trim($this->request->getPost('name') ?? '');
+        $active = (int) ($this->request->getPost('is_active') ?? 1);
+
+        if ($domain === '') {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Domain is required.']);
+            return redirect()->to("/admin/sites/{$id}/edit");
+        }
+
+        // Check unique (exclude self)
+        $dup = $db->table('sites')->where('domain', $domain)->where('id !=', $id)->countAllResults();
+        if ($dup > 0) {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Domain already exists.']);
+            return redirect()->to("/admin/sites/{$id}/edit");
+        }
+
+        $db->table('sites')->where('id', $id)->update([
+            'domain'    => $domain,
+            'name'      => $name ?: $domain,
+            'is_active' => $active,
+        ]);
+
+        session()->setFlashdata('flash', ['type' => 'success', 'msg' => 'Site updated.']);
+        return redirect()->to('/admin/sites');
+    }
+
+    public function deleteSite(int $id): ResponseInterface
+    {
+        if ($r = $this->guard()) return $r;
+
+        if ($id === 1) {
+            session()->setFlashdata('flash', ['type' => 'error', 'msg' => 'Cannot delete the default site.']);
+            return redirect()->to('/admin/sites');
+        }
+
+        $db = $this->db();
+        $db->table('site_settings')->where('site_id', $id)->delete();
+        $db->table('sites')->where('id', $id)->delete();
+
+        session()->setFlashdata('flash', ['type' => 'success', 'msg' => 'Site deleted.']);
+        return redirect()->to('/admin/sites');
     }
 
     // ── Dashboard ─────────────────────────────────────────────
@@ -175,10 +332,11 @@ class Admin extends BaseController
         if ($r = $this->guard()) return $r;
         $db = $this->db();
 
+        $sid = site_id();
         $stats = [
-            'users'        => (int) $db->table('users')->countAllResults(),
+            'users'        => (int) $db->table('users')->where('site_id', $sid)->countAllResults(),
             'manga'        => (int) $db->table('manga')->countAllResults(),
-            'comments'     => (int) $db->table('comments')->countAllResults(),
+            'comments'     => (int) $db->table('comments')->where('site_id', $sid)->countAllResults(),
             'groups'       => (int) $db->table('groups')->countAllResults(),
             'chapters'     => (int) $db->table('chapter')->countAllResults(),
             'chapters_pub' => (int) $db->table('chapter')->where('is_show', 1)->countAllResults(),
@@ -186,6 +344,7 @@ class Admin extends BaseController
 
         $recentUsers = $db->table('users')
             ->select('id, name, username, email, active, created_at, last_login')
+            ->where('site_id', $sid)
             ->orderBy('id', 'DESC')
             ->limit(10)
             ->get()->getResultArray();
@@ -211,8 +370,9 @@ class Admin extends BaseController
         $page  = max(1, (int) ($this->request->getGet('page') ?? 1));
         $limit = 20;
 
-        $conditions = [];
-        $params     = [];
+        $sid        = site_id();
+        $conditions = ['u.site_id = ?'];
+        $params     = [$sid];
 
         if ($q !== '') {
             $conditions[] = '(u.name LIKE ? OR u.username LIKE ? OR u.email LIKE ?)';
@@ -224,8 +384,8 @@ class Admin extends BaseController
             $params[]     = $gf;
         }
 
-        $where   = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
-        $gfJoin  = $gf > 0 ? 'INNER JOIN users_groups ug2 ON ug2.user_id = u.id' : '';
+        $where   = 'WHERE ' . implode(' AND ', $conditions);
+        $gfJoin  = $gf > 0 ? 'INNER JOIN users_groups ug2 ON ug2.user_id = u.id AND ug2.site_id = ' . $sid : '';
 
         $countSql = "SELECT COUNT(DISTINCT u.id) AS cnt FROM users u {$gfJoin} {$where}";
         $total    = (int) $db->query($countSql, $params)->getRow()->cnt;
@@ -271,7 +431,7 @@ class Admin extends BaseController
 
         $allGroups  = $db->table('groups')->orderBy('name')->get()->getResultArray();
         $userGroups = array_map('intval', array_column(
-            $db->table('users_groups')->select('group_id')->where('user_id', $id)->get()->getResultArray(),
+            $db->table('users_groups')->select('group_id')->where('site_id', site_id())->where('user_id', $id)->get()->getResultArray(),
             'group_id'
         ));
 
@@ -318,10 +478,11 @@ class Admin extends BaseController
         $db->table('users')->where('id', $id)->update($update);
 
         // Sync groups
-        $db->table('users_groups')->where('user_id', $id)->delete();
+        $sid = site_id();
+        $db->table('users_groups')->where('site_id', $sid)->where('user_id', $id)->delete();
         foreach ($groupIds as $gid) {
             if ($gid > 0) {
-                $db->table('users_groups')->insert(['user_id' => $id, 'group_id' => $gid]);
+                $db->table('users_groups')->insert(['site_id' => $sid, 'user_id' => $id, 'group_id' => $gid]);
             }
         }
 
@@ -335,11 +496,13 @@ class Admin extends BaseController
     {
         if ($r = $this->guard()) return $r;
 
+        $sid = site_id();
         $groups = $this->db()->query(
             'SELECT g.id, g.name, COUNT(ug.user_id) AS member_count
              FROM groups g
-             LEFT JOIN users_groups ug ON ug.group_id = g.id
-             GROUP BY g.id ORDER BY g.name'
+             LEFT JOIN users_groups ug ON ug.group_id = g.id AND ug.site_id = ?
+             GROUP BY g.id ORDER BY g.name',
+            [$sid]
         )->getResultArray();
 
         return $this->response->setBody(
@@ -1526,6 +1689,7 @@ class Admin extends BaseController
         $limit  = 30;
         $offset = ($page - 1) * $limit;
 
+        $sid = site_id();
         $builder = $db->table('chapter_reports cr')
             ->select('cr.id, cr.reason, cr.note, cr.ip_address, cr.created_at, cr.status,
                       ch.id AS chapter_id, ch.name AS chapter_name, ch.slug AS chapter_slug,
@@ -1534,6 +1698,7 @@ class Admin extends BaseController
             ->join('chapter ch', 'cr.chapter_id = ch.id', 'left')
             ->join('manga m', 'ch.manga_id = m.id', 'left')
             ->join('users u', 'cr.user_id = u.id', 'left')
+            ->where('cr.site_id', $sid)
             ->orderBy('cr.created_at', 'DESC');
 
         if ($status === 'pending') {
@@ -1544,7 +1709,7 @@ class Admin extends BaseController
         $totalPages = max(1, (int) ceil($total / $limit));
         $rows       = $builder->limit($limit, $offset)->get()->getResultArray();
 
-        $pendingCount = (int) $db->table('chapter_reports')->where('status', 'pending')->countAllResults();
+        $pendingCount = (int) $db->table('chapter_reports')->where('site_id', $sid)->where('status', 'pending')->countAllResults();
 
         return $this->response->setBody(
             $this->render('admin/reports_list', [
@@ -1590,6 +1755,7 @@ class Admin extends BaseController
             $reasonLabel = $reasonLabels[$report['reason']] ?? $report['reason'];
 
             $db->table('notifications')->insert([
+                'site_id'      => site_id(),
                 'user_id'      => (int) $report['user_id'],
                 'actor_id'     => $this->currentUser['id'] ?? 0,
                 'type'         => 'report_resolved',

@@ -95,15 +95,16 @@ class Auth extends BaseController
 
         $userModel = new UserModel();
 
-        if ($userModel->where('username', $username)->first()) {
+        if ($userModel->where('site_id', site_id())->where('username', $username)->first()) {
             return redirect()->back()->withInput()->with('error', lang('ComixxAuth.username_taken'));
         }
-        if ($userModel->where('email', $email)->first()) {
+        if ($userModel->where('site_id', site_id())->where('email', $email)->first()) {
             return redirect()->back()->withInput()->with('error', lang('ComixxAuth.email_taken'));
         }
 
         $now = date('Y-m-d H:i:s');
         $id  = $userModel->insert([
+            'site_id'    => site_id(),
             'name'       => $name,
             'username'   => $username,
             'email'      => $email,
@@ -118,7 +119,7 @@ class Auth extends BaseController
 
         // Thêm vào group Members mặc định (id = 2)
         try {
-            db_connect()->table('users_groups')->insert(['user_id' => $id, 'group_id' => 2]);
+            db_connect()->table('users_groups')->insert(['site_id' => site_id(), 'user_id' => $id, 'group_id' => 2]);
         } catch (\Throwable $e) {}
 
         session()->set([

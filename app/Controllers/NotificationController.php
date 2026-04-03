@@ -25,6 +25,7 @@ class NotificationController extends BaseController
             ->select('n.id, n.type, n.manga_slug, n.chapter_slug, n.manga_name, n.preview, n.is_read, n.created_at,
                       u.name AS actor_name, u.username AS actor_username')
             ->join('users u', 'n.actor_id = u.id', 'left')
+            ->where('n.site_id', site_id())
             ->where('n.user_id', $user['id'])
             ->orderBy('n.created_at', 'DESC')
             ->limit(50)
@@ -56,6 +57,7 @@ class NotificationController extends BaseController
             ->select('n.id, n.type, n.comment_id, n.manga_id, n.manga_slug, n.chapter_slug, n.manga_name, n.preview, n.created_at,
                       u.name AS actor_name, u.username AS actor_username')
             ->join('users u', 'n.actor_id = u.id', 'left')
+            ->where('n.site_id', site_id())
             ->where('n.user_id', $user['id'])
             ->where('n.is_read', 0)
             ->orderBy('n.created_at', 'DESC')
@@ -73,6 +75,7 @@ class NotificationController extends BaseController
         }
 
         $this->db()->table('notifications')
+            ->where('site_id', site_id())
             ->where('user_id', $user['id'])
             ->update(['is_read' => 1]);
 
@@ -88,6 +91,7 @@ class NotificationController extends BaseController
 
         $this->db()->table('notifications')
             ->where('id', $id)
+            ->where('site_id', site_id())
             ->where('user_id', $user['id'])
             ->update(['is_read' => 1]);
 

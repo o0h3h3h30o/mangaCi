@@ -31,7 +31,7 @@ class SitemapController extends BaseController
      */
     public function index(): \CodeIgniter\HTTP\ResponseInterface
     {
-        return $this->cached('sitemap_index', 3600, function () {
+        return $this->cached('sitemap_index_' . site_id(), 3600, function () {
             $base = rtrim(site_url(), '/');
             $db = $this->db();
 
@@ -69,7 +69,7 @@ class SitemapController extends BaseController
      */
     public function manga(): \CodeIgniter\HTTP\ResponseInterface
     {
-        return $this->cached('sitemap_manga', 3600, function () {
+        return $this->cached('sitemap_manga_' . site_id(), 3600, function () {
             $base = rtrim(site_url(), '/');
             $rows = $this->db()->table('manga')
                 ->select('slug, update_at')
@@ -101,7 +101,7 @@ class SitemapController extends BaseController
     public function chapters(int $page = 1): \CodeIgniter\HTTP\ResponseInterface
     {
         $page = max(1, $page);
-        return $this->cached('sitemap_chapters_' . $page, 3600, function () use ($page) {
+        return $this->cached('sitemap_chapters_' . site_id() . '_' . $page, 3600, function () use ($page) {
             $base   = rtrim(site_url(), '/');
             $offset = ($page - 1) * self::CHAPTER_PER_PAGE;
 
@@ -136,7 +136,7 @@ class SitemapController extends BaseController
      */
     public function feed(): \CodeIgniter\HTTP\ResponseInterface
     {
-        return $this->cached('rss_feed', 1800, function () {
+        return $this->cached('rss_feed_' . site_id(), 1800, function () {
             $base      = rtrim(site_url(), '/');
             $siteTitle = site_setting('site_title', 'MangaHub');
             $siteDesc  = site_setting('meta_description', 'Read manga online');

@@ -1,20 +1,11 @@
 <?php
-$s   = $settings ?? [];
-$get = fn(string $k, string $d = '') => $s[$k] ?? $d;
 $flash = session()->getFlashdata('flash');
+$activeSiteId = $activeTab ?? 1;
 ?>
 
 <?php if (!empty($tableError)): ?>
 <div class="a-flash a-flash-err">
-  <p style="font-weight:600;margin-bottom:0.5rem">⚠ Bảng <code>site_settings</code> chưa tồn tại trong database.</p>
-  <p style="font-size:12px;margin-bottom:0.75rem">Chạy SQL dưới đây trong phpMyAdmin hoặc MySQL client, sau đó reload trang:</p>
-  <pre style="background:#111827;border-radius:0.375rem;padding:0.75rem;font-size:12px;overflow-x:auto">CREATE TABLE `site_settings` (
-  `key`   VARCHAR(100) NOT NULL PRIMARY KEY,
-  `value` TEXT NULL
-);
-INSERT INTO `site_settings` (`key`, `value`) VALUES
-  ('site_title', 'MangaCI'), ('site_logo', ''),
-  ('meta_description', ''), ('meta_keywords', '');</pre>
+  <p style="font-weight:600;margin-bottom:0.5rem">Table <code>site_settings</code> not found.</p>
 </div>
 <?php endif; ?>
 
@@ -24,7 +15,27 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
 </div>
 <?php endif; ?>
 
-<form method="post" action="/admin/settings" enctype="multipart/form-data" class="a-max-w-2xl a-space-y-6">
+<!-- Site Tabs -->
+<div style="display:flex;gap:0;border-bottom:2px solid #374151;margin-bottom:1.5rem;overflow-x:auto">
+  <?php foreach ($sites as $site): ?>
+    <?php $isActive = (int) $site['id'] === $activeSiteId; ?>
+    <a href="/admin/settings?site=<?= $site['id'] ?>"
+       style="padding:0.5rem 1rem;font-size:13px;font-weight:<?= $isActive ? '600' : '400' ?>;
+              color:<?= $isActive ? '#818cf8' : '#9ca3af' ?>;
+              border-bottom:2px solid <?= $isActive ? '#818cf8' : 'transparent' ?>;
+              margin-bottom:-2px;white-space:nowrap;text-decoration:none;transition:color .15s">
+      <?= esc($site['name'] ?: $site['domain']) ?>
+      <span style="color:#4b5563;font-size:11px;margin-left:4px">(<?= esc($site['domain']) ?>)</span>
+    </a>
+  <?php endforeach; ?>
+</div>
+
+<?php
+$s   = $allSettings[$activeSiteId] ?? [];
+$get = fn(string $k, string $d = '') => $s[$k] ?? $d;
+?>
+
+<form method="post" action="/admin/settings/<?= $activeSiteId ?>" enctype="multipart/form-data" class="a-max-w-2xl a-space-y-6">
   <?= csrf_field() ?>
 
   <!-- General -->
@@ -59,7 +70,6 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
       <div>
         <label class="a-label">Site Logo</label>
 
-        <!-- Preview hiện tại -->
         <?php $currentLogo = $get('site_logo'); ?>
         <div id="logo-preview" class="<?= $currentLogo ? '' : 'a-hidden' ?>" style="margin-bottom:0.75rem">
           <div style="display:flex;align-items:center;gap:0.75rem">
@@ -69,7 +79,6 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
           </div>
         </div>
 
-        <!-- Upload file -->
         <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
           <label class="a-btn-sec a-btn-sm" style="cursor:pointer;display:flex;align-items:center;gap:0.5rem">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -81,7 +90,7 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
                  placeholder="https://example.com/logo.png"
                  class="a-input" style="flex:1;font-size:12px">
         </div>
-        <p class="a-hint">PNG, JPG, WebP, SVG. Để trống dùng favicon.ico.</p>
+        <p class="a-hint">PNG, JPG, WebP, SVG.</p>
       </div>
     </div>
   </div>
@@ -99,10 +108,10 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
       <div>
         <label class="a-label">
           Meta Description
-          <span style="color:#4b5563;font-weight:normal;margin-left:0.25rem">(120–160 chars recommended)</span>
+          <span style="color:#4b5563;font-weight:normal;margin-left:0.25rem">(120-160 chars recommended)</span>
         </label>
         <textarea name="meta_description" rows="3" maxlength="300" id="meta-desc-input"
-                  placeholder="Mô tả ngắn về website..."
+                  placeholder="Short description..."
                   class="a-textarea"><?= esc($get('meta_description')) ?></textarea>
         <p class="a-hint"><span id="meta-desc-count"><?= mb_strlen($get('meta_description')) ?></span> / 300</p>
       </div>
@@ -135,7 +144,6 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
       <input type="text" name="ga_id" value="<?= esc($get('ga_id')) ?>"
              placeholder="G-XXXXXXXXXX"
              class="a-input mono">
-      <p class="a-hint">Để trống để tắt tracking. Tìm ID tại Google Analytics → Admin → Data Streams.</p>
     </div>
   </div>
 
@@ -180,9 +188,8 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
       <div>
         <label class="a-label">Copyright Text</label>
         <input type="text" name="footer_copyright" value="<?= esc($get('footer_copyright')) ?>"
-               placeholder="© 2026 MangaCI. All rights reserved."
+               placeholder="&copy; 2026 MangaCI. All rights reserved."
                class="a-input">
-        <p class="a-hint">Shown in the footer below the logo.</p>
       </div>
 
       <!-- Footer URL -->
@@ -191,7 +198,6 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
         <input type="text" name="footer_url" value="<?= esc($get('footer_url', '/')) ?>"
                placeholder="/"
                class="a-input">
-        <p class="a-hint">URL the footer logo/text links to.</p>
       </div>
     </div>
   </div>
@@ -216,7 +222,7 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
           <option value="default" selected>default</option>
         <?php endif; ?>
       </select>
-      <p class="a-hint">Mỗi theme là một thư mục trong <code style="color:#6b7280">app/Views/themes/</code>.</p>
+      <p class="a-hint">Each theme is a folder in <code style="color:#6b7280">app/Views/themes/</code>.</p>
     </div>
     <div style="margin-top:16px">
       <label class="a-label">Site Language</label>
@@ -225,7 +231,6 @@ INSERT INTO `site_settings` (`key`, `value`) VALUES
         <option value="es" <?= $get('site_language', 'en') === 'es' ? 'selected' : '' ?>>Español</option>
         <option value="ja" <?= $get('site_language', 'en') === 'ja' ? 'selected' : '' ?>>日本語</option>
       </select>
-      <p class="a-hint">Language for the frontend theme. Language files in <code style="color:#6b7280">app/Language/</code>.</p>
     </div>
   </div>
 
@@ -250,7 +255,6 @@ document.getElementById('logo-file-input').addEventListener('change', function()
   reader.readAsDataURL(file);
 });
 
-// URL preview
 document.getElementById('logo-url-input').addEventListener('input', function(){
   var url = this.value.trim();
   var preview = document.getElementById('logo-preview');
@@ -262,19 +266,16 @@ document.getElementById('logo-url-input').addEventListener('input', function(){
   }
 });
 
-// Remove logo
 document.getElementById('logo-remove-btn').addEventListener('click', function(){
   document.getElementById('logo-url-input').value = '';
   document.getElementById('logo-file-input').value = '';
   document.getElementById('logo-preview').classList.add('a-hidden');
 });
 
-// Char counter
 document.getElementById('meta-desc-input').addEventListener('input', function(){
   document.getElementById('meta-desc-count').textContent = this.value.length;
 });
 
-// Footer logo: Upload preview
 document.getElementById('footer-logo-file-input').addEventListener('change', function(){
   var file = this.files[0];
   if(!file) return;
@@ -287,7 +288,6 @@ document.getElementById('footer-logo-file-input').addEventListener('change', fun
   reader.readAsDataURL(file);
 });
 
-// Footer logo: URL preview
 document.getElementById('footer-logo-url-input').addEventListener('input', function(){
   var url = this.value.trim();
   var preview = document.getElementById('footer-logo-preview');
@@ -299,7 +299,6 @@ document.getElementById('footer-logo-url-input').addEventListener('input', funct
   }
 });
 
-// Footer logo: Remove
 document.getElementById('footer-logo-remove-btn').addEventListener('click', function(){
   document.getElementById('footer-logo-url-input').value = '';
   document.getElementById('footer-logo-file-input').value = '';

@@ -96,6 +96,9 @@ class Install extends Controller
             }
         }
 
+        // Insert default site
+        $mysqli->query("INSERT IGNORE INTO `sites` (`id`, `domain`, `name`, `is_active`) VALUES (1, 'localhost', 'Default', 1)");
+
         // Insert default comic types
         $mysqli->query("INSERT IGNORE INTO `comictype` (`id`, `label`) VALUES (1, 'Manga'), (2, 'Manhwa'), (3, 'Manhua')");
 
@@ -103,26 +106,26 @@ class Install extends Controller
         $mysqli->query("INSERT IGNORE INTO `groups` (`id`, `name`) VALUES (1, 'admin'), (2, 'members')");
 
         // Insert default site_settings
-        $mysqli->query("INSERT IGNORE INTO `site_settings` (`key`, `value`) VALUES
-            ('site_title', 'MangaCI'),
-            ('meta_description', ''),
-            ('meta_keywords', ''),
-            ('active_theme', 'default'),
-            ('site_language', 'en'),
-            ('home_heading', ''),
-            ('site_logo', ''),
-            ('footer_logo', ''),
-            ('footer_copyright', ''),
-            ('footer_url', '/'),
-            ('ga_id', '')");
+        $mysqli->query("INSERT IGNORE INTO `site_settings` (`site_id`, `key`, `value`) VALUES
+            (1, 'site_title', 'MangaCI'),
+            (1, 'meta_description', ''),
+            (1, 'meta_keywords', ''),
+            (1, 'active_theme', 'default'),
+            (1, 'site_language', 'en'),
+            (1, 'home_heading', ''),
+            (1, 'site_logo', ''),
+            (1, 'footer_logo', ''),
+            (1, 'footer_copyright', ''),
+            (1, 'footer_url', '/'),
+            (1, 'ga_id', '')");
 
         // Insert admin user
         $now        = date('Y-m-d H:i:s');
         $passHash   = password_hash($admin_pass, PASSWORD_BCRYPT);
         $adminName  = $admin_name ?: $admin_username;
 
-        $stmt = $mysqli->prepare("INSERT INTO `users` (`ip_address`, `username`, `password`, `email`, `name`, `active`, `last_login`, `created_on`, `created_at`, `updated_at`)
-            VALUES ('127.0.0.1', ?, ?, ?, ?, 1, ?, ?, ?, ?)");
+        $stmt = $mysqli->prepare("INSERT INTO `users` (`site_id`, `ip_address`, `username`, `password`, `email`, `name`, `active`, `last_login`, `created_on`, `created_at`, `updated_at`)
+            VALUES (1, '127.0.0.1', ?, ?, ?, ?, 1, ?, ?, ?, ?)");
         $createdOn = time();
         $stmt->bind_param('sssssiss', $admin_username, $passHash, $admin_email, $adminName, $now, $createdOn, $now, $now);
         $stmt->execute();
@@ -130,7 +133,7 @@ class Install extends Controller
         $adminId = (int) $stmt->insert_id;
 
         // Add admin to admin group
-        $mysqli->query("INSERT IGNORE INTO `users_groups` (`user_id`, `group_id`) VALUES ({$adminId}, 1)");
+        $mysqli->query("INSERT IGNORE INTO `users_groups` (`site_id`, `user_id`, `group_id`) VALUES (1, {$adminId}, 1)");
 
         $mysqli->close();
 
@@ -151,8 +154,18 @@ class Install extends Controller
     private function schema(): array
     {
         return [
+            "CREATE TABLE IF NOT EXISTS `sites` (
+                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `domain` varchar(255) NOT NULL,
+                `name` varchar(255) DEFAULT '',
+                `is_active` tinyint(1) DEFAULT 1,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_domain` (`domain`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+
             "CREATE TABLE IF NOT EXISTS `users` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `name` varchar(255) DEFAULT NULL,
                 `username` varchar(255) NOT NULL,
                 `email` varchar(255) NOT NULL,
@@ -164,8 +177,8 @@ class Install extends Controller
                 `created_on` int(11) unsigned NOT NULL DEFAULT 0,
                 `active` tinyint(1) unsigned DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `users_username_unique` (`username`),
-                UNIQUE KEY `users_email_unique` (`email`)
+                UNIQUE KEY `users_site_username_unique` (`site_id`, `username`),
+                UNIQUE KEY `users_site_email_unique` (`site_id`, `email`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
 
             "CREATE TABLE IF NOT EXISTS `groups` (
@@ -176,10 +189,11 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `users_groups` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `user_id` int(11) unsigned NOT NULL,
                 `group_id` mediumint(8) unsigned NOT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `uc_users_groups` (`user_id`, `group_id`),
+                UNIQUE KEY `uc_users_groups` (`site_id`, `user_id`, `group_id`),
                 KEY `fk_users_groups_users1_idx` (`user_id`),
                 KEY `fk_users_groups_groups1_idx` (`group_id`),
                 CONSTRAINT `fk_users_groups_groups1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
@@ -187,9 +201,10 @@ class Install extends Controller
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci",
 
             "CREATE TABLE IF NOT EXISTS `site_settings` (
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `key` varchar(100) NOT NULL,
                 `value` text DEFAULT NULL,
-                PRIMARY KEY (`key`)
+                PRIMARY KEY (`site_id`, `key`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
 
             "CREATE TABLE IF NOT EXISTS `comictype` (
@@ -336,6 +351,7 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `comments` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `comment` text DEFAULT NULL,
                 `post_id` int(10) unsigned DEFAULT NULL,
                 `post_type` varchar(255) DEFAULT NULL,
@@ -355,16 +371,18 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `comment_likes` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `comment_id` int(10) unsigned NOT NULL,
                 `user_id` int(10) unsigned NOT NULL,
                 `type` enum('like','dislike') NOT NULL,
                 `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `uq_comment_user` (`comment_id`, `user_id`)
+                UNIQUE KEY `uq_comment_user` (`site_id`, `comment_id`, `user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
 
             "CREATE TABLE IF NOT EXISTS `bookmarks` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `manga_id` int(10) unsigned NOT NULL,
                 `user_id` int(10) unsigned NOT NULL,
                 `created_at` timestamp NULL DEFAULT NULL,
@@ -378,17 +396,20 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `item_ratings` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `item_id` int(11) NOT NULL,
                 `score` tinyint(4) NOT NULL DEFAULT 1,
                 `added_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `ip_address` varchar(255) NOT NULL,
                 PRIMARY KEY (`id`),
                 KEY `item_ratings_item_id_index` (`item_id`),
-                KEY `item_ratings_ip_address_index` (`ip_address`)
+                KEY `item_ratings_ip_address_index` (`ip_address`),
+                KEY `idx_site_item` (`site_id`, `item_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
 
             "CREATE TABLE IF NOT EXISTS `notifications` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `user_id` int(10) unsigned NOT NULL,
                 `actor_id` int(10) unsigned NOT NULL,
                 `type` varchar(50) NOT NULL DEFAULT 'reply',
@@ -406,6 +427,7 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `chapter_reports` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `chapter_id` int(10) unsigned NOT NULL,
                 `user_id` int(10) unsigned DEFAULT NULL,
                 `reason` varchar(50) NOT NULL DEFAULT '',
@@ -419,13 +441,14 @@ class Install extends Controller
 
             "CREATE TABLE IF NOT EXISTS `content_likes` (
                 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `site_id` int(10) unsigned NOT NULL DEFAULT 1,
                 `content_type` varchar(10) NOT NULL COMMENT 'manga or chapter',
                 `content_id` int(11) unsigned NOT NULL,
                 `user_id` int(11) unsigned NOT NULL,
                 `type` varchar(10) NOT NULL DEFAULT 'like',
                 `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `uk_content_user` (`content_type`, `content_id`, `user_id`),
+                UNIQUE KEY `uk_content_user` (`site_id`, `content_type`, `content_id`, `user_id`),
                 KEY `idx_content` (`content_type`, `content_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
         ];
