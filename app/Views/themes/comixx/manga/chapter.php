@@ -1310,8 +1310,8 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
 
 <!-- Mobile Top Like/Dislike (before images) -->
 <div class="reader-mobile-top-likes">
-  <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count">0</span></button>
-  <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count">0</span></button>
+  <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count"><?= (int)($likes ?? 0) ?></span></button>
+  <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count"><?= (int)($dislikes ?? 0) ?></span></button>
 </div>
 
 <!-- Reader Layout -->
@@ -1389,8 +1389,8 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
         <span id="readerFollowLabel"><?= !empty($isBookmarked) ? lang('Comixx.following') : lang('Comixx.follow') ?></span>
       </button>
       <div class="reader-like-row">
-        <button class="reader-like-btn" id="chLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="chLikeCount">0</span></button>
-        <button class="reader-like-btn" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="chDislikeCount">0</span></button>
+        <button class="reader-like-btn<?= ($myReaction ?? '') === 'like' ? ' active' : '' ?>" id="chLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="chLikeCount"><?= (int)($likes ?? 0) ?></span></button>
+        <button class="reader-like-btn<?= ($myReaction ?? '') === 'dislike' ? ' active' : '' ?>" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="chDislikeCount"><?= (int)($dislikes ?? 0) ?></span></button>
       </div>
       <button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> <?= lang('Comixx.report') ?></button>
     </div>
@@ -1455,8 +1455,8 @@ $lastChapter = !empty($chapters) ? end($chapters) : null;
   </div>
 
   <div class="reader-like-row" id="mobileLikeRow">
-    <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count">0</span></button>
-    <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count">0</span></button>
+    <button class="reader-like-btn mobile-like-btn" data-type="like"><span class="like-emoji">😍</span> <span class="ml-like-count"><?= (int)($likes ?? 0) ?></span></button>
+    <button class="reader-like-btn mobile-like-btn" data-type="dislike"><span class="like-emoji">😤</span> <span class="ml-dislike-count"><?= (int)($dislikes ?? 0) ?></span></button>
   </div>
   <div style="text-align:center"><button class="rpt-btn rpt-open-btn"><i class="fas fa-flag"></i> <?= lang('Comixx.report_error') ?></button></div>
 
@@ -1991,8 +1991,7 @@ var __chapterLang = {
         document.querySelectorAll('.ml-dislike-count, #chDislikeCount').forEach(function(el){el.textContent=d.dislikes;});
       }
 
-      fetch('/api/content-like?content_type=chapter&content_id='+chapterId)
-        .then(function(r){return r.json();}).then(updateAllUI).catch(function(){});
+      // Initial state loaded from PHP
 
       function toggle(type){
         fetch('/api/content-like',{

@@ -5,12 +5,13 @@ namespace App\Controllers;
 use App\Models\MangaModel;
 use App\Models\RatingModel;
 use App\Models\BookmarkModel;
+use Config\Database;
 
 class Manga extends BaseController
 {
     public function random()
     {
-        $manga = $this->db->table('manga')
+        $manga = db_connect()->table('manga')
             ->select('slug')
             ->where('is_public', 1)
             ->orderBy('RAND()')
@@ -61,7 +62,7 @@ class Manga extends BaseController
                 : false,
             'followCount'  => (isset($bm) ? $bm : new BookmarkModel())->getMangaBookmarkCount($id),
             'mangaTags'    => $mangaModel->getTags($id),
-        ];
+        ] + $this->getContentLikes('manga', $id);
 
         return $this->themeView('manga/detail', $data);
     }
@@ -113,8 +114,50 @@ class Manga extends BaseController
             'isBookmarked' => $this->currentUser
                 ? $bm->isBookmarked((int) $this->currentUser['id'], $id)
                 : false,
-        ];
+        ] + $this->getContentLikes('chapter', (int) $chapter['id']);
                 return $this->themeView('manga/chapter', $data);
+    }
+
+    /**
+     * Get likes/dislikes/myReaction for a content item (manga or chapter).
+     */
+    private function getContentLikes(string $contentType, int $contentId): array
+    {
+        $db  = Database::connect();
+        $sid = site_id();
+
+        $likes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
+            ->where('content_type', $contentType)
+            ->where('content_id', $contentId)
+            ->where('type', 'like')
+            ->countAllResults();
+
+        $dislikes = (int) $db->table('content_likes')
+            ->where('site_id', $sid)
+            ->where('content_type', $contentType)
+            ->where('content_id', $contentId)
+            ->where('type', 'dislike')
+            ->countAllResults();
+
+        $myReaction = null;
+        if ($this->currentUser) {
+            $row = $db->table('content_likes')
+                ->where('site_id', $sid)
+                ->where('content_type', $contentType)
+                ->where('content_id', $contentId)
+                ->where('user_id', (int) $this->currentUser['id'])
+                ->get()->getRowArray();
+            if ($row) {
+                $myReaction = $row['type'];
+            }
+        }
+
+        return [
+            'likes'      => $likes,
+            'dislikes'   => $dislikes,
+            'myReaction' => $myReaction,
+        ];
     }
 
     private function saveHistory(array $manga, string $chapSlug): void

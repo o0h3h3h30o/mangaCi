@@ -71,7 +71,7 @@ function manhwaread_detail_time_ago($datetime) {
         </p>
       </div>
       <div class="detail-actions-top">
-        <button class="detail-icon-btn" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>">
+        <button class="detail-icon-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>">
           <i class="<?= !empty($isBookmarked) ? 'fas' : 'far' ?> fa-bookmark"></i>
         </button>
         <button class="detail-icon-btn"><i class="fas fa-flag"></i></button>
@@ -90,8 +90,8 @@ function manhwaread_detail_time_ago($datetime) {
         <span style="font-size:11px;color:var(--text-secondary);"><span class="detailVotes"><?= (int)$ratingVotes ?></span> votes</span>
       </div>
       <div id="mangaLikeRow" style="flex:1;display:flex;flex-direction:column;gap:8px;">
-        <button class="detail-like-btn" id="mangaLikeBtn" data-type="like" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:border-color .2s;"><span style="font-size:22px;">&#x1F60D;</span><span id="mangaLikeCount">0</span></button>
-        <button class="detail-like-btn" id="mangaDislikeBtn" data-type="dislike" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:border-color .2s;"><span style="font-size:22px;">&#x1F624;</span><span id="mangaDislikeCount">0</span></button>
+        <button class="detail-like-btn<?= ($myReaction ?? '') === 'like' ? ' active' : '' ?>" id="mangaLikeBtn" data-type="like" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:border-color .2s;"><span style="font-size:22px;">&#x1F60D;</span><span id="mangaLikeCount"><?= (int)($likes ?? 0) ?></span></button>
+        <button class="detail-like-btn<?= ($myReaction ?? '') === 'dislike' ? ' active' : '' ?>" id="mangaDislikeBtn" data-type="dislike" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:border-color .2s;"><span style="font-size:22px;">&#x1F624;</span><span id="mangaDislikeCount"><?= (int)($dislikes ?? 0) ?></span></button>
       </div>
     </div>
 
@@ -380,9 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     else dislikeBtn.classList.remove('active');
   }
 
-  // Fetch initial state
-  fetch('/api/content-like?content_type=manga&content_id=' + mangaId)
-    .then(function(r){ return r.json(); }).then(updateUI).catch(function(){});
+  // Initial state loaded from PHP
 
   function toggle(type) {
     fetch('/api/content-like', {
@@ -409,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var mangaId = <?= (int)($manga['id'] ?? 0) ?>;
   var currentRating = <?= (int)$myRating ?>;
 
-  // Hydrate state from API
+  // Update score/votes in UI after rating
   function reloadMangaState() {
     fetch('/api/manga/' + mangaId + '/state')
       .then(function(r) { return r.json(); })
@@ -427,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(function(){});
   }
   window.reloadMangaState = reloadMangaState;
-  reloadMangaState();
 
   function submitRating(rating, starsEls) {
     fetch('/api/rating', {

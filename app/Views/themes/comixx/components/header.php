@@ -20,9 +20,9 @@
         <a href="/search" class="filter-btn"><i class="fas fa-sliders-h"></i> <?= lang('Comixx.filter') ?></a>
         <div class="search-dropdown" id="headerSearchDropdown"></div>
       </div>
-      <div class="header-actions" id="headerAuthArea" style="opacity:0;transition:opacity 0.3s ease">
-        <!-- Logged-in actions (hidden by default, shown by JS) -->
-        <div id="headerLoggedIn" style="display:none;align-items:center;gap:4px">
+      <div class="header-actions" id="headerAuthArea">
+        <?php if (!empty($currentUser)): ?>
+        <div id="headerLoggedIn" style="display:flex;align-items:center;gap:4px">
           <div class="noti-wrap" id="notiWrap">
             <button class="icon-btn" id="notiBtn" aria-label="<?= lang('Comixx.notifications') ?>"><i class="far fa-bell"></i><span class="noti-badge" id="notiBadge" style="display:none">0</span></button>
             <div class="noti-panel" id="notiPanel" style="display:none">
@@ -37,8 +37,9 @@
           </div>
           <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
         </div>
-        <!-- Logged-out (hidden by default, shown after /api/me) -->
-        <a href="/login" class="login-btn" id="headerLoginBtn" style="display:none"><?= lang('Comixx.login') ?></a>
+        <?php else: ?>
+        <a href="/login" class="login-btn"><?= lang('Comixx.login') ?></a>
+        <?php endif; ?>
       </div>
       <button class="mobile-search-btn" id="mobileSearchBtn"><i class="fas fa-search"></i></button>
       <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
@@ -83,13 +84,12 @@
       <?php endif; ?>
     </nav>
     <div class="mobile-menu-actions">
-      <div id="mobileLoggedIn" style="display:none">
-        <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;" id="mobileUsername"></a>
-        <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;"><?= lang('Comixx.logout') ?></a>
-      </div>
-      <div id="mobileLoggedOut">
-        <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= lang('Comixx.login') ?></a>
-      </div>
+      <?php if (!empty($currentUser)): ?>
+      <a href="/profile" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= esc($currentUser['username'] ?? $currentUser['name'] ?? '') ?></a>
+      <a href="/logout" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;background:transparent;border:1px solid var(--border);margin-top:8px;"><?= lang('Comixx.logout') ?></a>
+      <?php else: ?>
+      <a href="/login" class="login-btn" style="width:100%;text-align:center;padding:10px;display:block;"><?= lang('Comixx.login') ?></a>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -229,7 +229,7 @@ function _timeDiff(s){
   var dd=Math.floor(sec/86400);return f(dd,__lang.js_day);
 }
 
-// Hydrate header from /api/me
+// Notification system
 (function(){
   function updateBadge(n){
     var b=document.getElementById('notiBadge');if(!b)return;
@@ -239,41 +239,12 @@ function _timeDiff(s){
 
   function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
 
-  // Hydrate header on page load
-  var authArea=document.getElementById('headerAuthArea');
-  function fadeIn(){if(authArea)authArea.style.opacity='1';}
-
-  fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
-    var loggedIn=document.getElementById('headerLoggedIn');
-    var loginBtn=document.getElementById('headerLoginBtn');
-
-    if(u.logged_in){
-      // Desktop: show logged-in actions
-      if(loggedIn) loggedIn.style.display='flex';
-
-      // Mobile menu
-      var mLoggedIn=document.getElementById('mobileLoggedIn');
-      var mLoggedOut=document.getElementById('mobileLoggedOut');
-      var mUsername=document.getElementById('mobileUsername');
-      if(mLoggedIn) mLoggedIn.style.display='block';
-      if(mLoggedOut) mLoggedOut.style.display='none';
-      if(mUsername) mUsername.textContent=u.username||u.name;
-
-      // Notification badge
-      if(u.unread_count) updateBadge(u.unread_count);
-
-      // Expose user for other scripts
-      window.__user=u;
-    }else{
-      // Guest: show login button
-      if(loginBtn) loginBtn.style.display='';
-    }
-    fadeIn();
-  }).catch(function(){
-    var loginBtn=document.getElementById('headerLoginBtn');
-    if(loginBtn) loginBtn.style.display='';
-    fadeIn();
-  });
+  // Load unread count on page load
+  <?php if (!empty($currentUser)): ?>
+  fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
+    updateBadge(d.unread||0);
+  }).catch(function(){});
+  <?php endif; ?>
 
   // Notification panel toggle
   var notiOpen=false;

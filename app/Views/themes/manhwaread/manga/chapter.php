@@ -61,8 +61,8 @@ $totalPages = count($pages);
 
     <!-- Like/Dislike -->
     <div class="reader-end-likes">
-      <button class="reader-like-btn" id="chLikeBtn" data-type="like"><span class="like-emoji">&#x1F60D;</span> <span class="ch-like-count">0</span></button>
-      <button class="reader-like-btn" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">&#x1F624;</span> <span class="ch-dislike-count">0</span></button>
+      <button class="reader-like-btn<?= ($myReaction ?? '') === 'like' ? ' active' : '' ?>" id="chLikeBtn" data-type="like"><span class="like-emoji">&#x1F60D;</span> <span class="ch-like-count"><?= (int)($likes ?? 0) ?></span></button>
+      <button class="reader-like-btn<?= ($myReaction ?? '') === 'dislike' ? ' active' : '' ?>" id="chDislikeBtn" data-type="dislike"><span class="like-emoji">&#x1F624;</span> <span class="ch-dislike-count"><?= (int)($dislikes ?? 0) ?></span></button>
     </div>
   </div>
 
@@ -334,9 +334,7 @@ $totalPages = count($pages);
       });
     }
 
-    // Fetch initial state
-    fetch('/api/content-like?content_type=chapter&content_id=' + chapterId)
-      .then(function(r) { return r.json(); }).then(updateAllUI).catch(function(){});
+    // Initial state loaded from PHP
 
     function toggle(type) {
       fetch('/api/content-like', {

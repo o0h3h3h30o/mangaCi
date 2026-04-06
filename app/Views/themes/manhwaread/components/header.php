@@ -27,10 +27,11 @@
       <!-- Theme toggle -->
       <button class="icon-btn" data-theme-toggle><i class="fas fa-moon"></i></button>
 
-      <!-- Auth area: opacity 0 initially, fade in after /api/me resolves -->
-      <div id="headerAuthArea" style="display:flex;align-items:center;gap:12px;opacity:0;transition:opacity 0.3s ease">
-        <!-- Notifications (logged-in only) -->
-        <div class="noti-wrap" id="notiWrap" style="display:none">
+      <!-- Auth area -->
+      <div id="headerAuthArea" style="display:flex;align-items:center;gap:12px;">
+        <?php if (!empty($currentUser)): ?>
+        <!-- Notifications -->
+        <div class="noti-wrap" id="notiWrap">
           <button class="icon-btn" id="notiBtn" aria-label="<?= lang('Comixx.notifications') ?>">
             <i class="far fa-bell"></i>
             <span class="noti-badge" id="notiBadge" style="display:none">0</span>
@@ -47,13 +48,14 @@
           </div>
         </div>
 
-        <!-- User profile (logged-in only) -->
-        <a href="/profile" class="icon-btn" id="headerProfileBtn" style="display:none"><i class="far fa-user"></i></a>
-        <a href="/logout" class="icon-btn" id="headerLogoutBtn" style="display:none" title="<?= lang('Comixx.logout') ?>"><i class="fas fa-sign-out-alt"></i></a>
-
-        <!-- Login/Register (guest only) -->
-        <a href="/login" class="btn-login" id="headerLoginBtn" style="display:none"><i class="fas fa-user"></i> <span><?= lang('Comixx.login') ?></span></a>
-        <a href="/register" class="btn-register" id="headerRegisterBtn" style="display:none"><?= lang('Comixx.register') ?></a>
+        <!-- User profile -->
+        <a href="/profile" class="icon-btn"><i class="far fa-user"></i></a>
+        <a href="/logout" class="icon-btn" title="<?= lang('Comixx.logout') ?>"><i class="fas fa-sign-out-alt"></i></a>
+        <?php else: ?>
+        <!-- Login/Register -->
+        <a href="/login" class="btn-login"><i class="fas fa-user"></i> <span><?= lang('Comixx.login') ?></span></a>
+        <a href="/register" class="btn-register"><?= lang('Comixx.register') ?></a>
+        <?php endif; ?>
       </div>
     </div>
   </header>
@@ -96,7 +98,7 @@ function _timeDiff(s){
 
 function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
 
-// Hydrate header from /api/me
+// Notification panel
 (function(){
   function updateBadge(n){
     var b=document.getElementById('notiBadge');if(!b)return;
@@ -104,35 +106,12 @@ function _esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').r
   }
   window.updateBadge=updateBadge;
 
-  var authArea=document.getElementById('headerAuthArea');
-  function fadeIn(){if(authArea)authArea.style.opacity='1';}
-
-  fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(u){
-    var notiWrap=document.getElementById('notiWrap');
-    var profileBtn=document.getElementById('headerProfileBtn');
-    var loginBtn=document.getElementById('headerLoginBtn');
-    var registerBtn=document.getElementById('headerRegisterBtn');
-
-    var logoutBtn=document.getElementById('headerLogoutBtn');
-    if(u.logged_in){
-      if(notiWrap) notiWrap.style.display='';
-      if(profileBtn) profileBtn.style.display='';
-      if(logoutBtn) logoutBtn.style.display='';
-      if(u.unread_count) updateBadge(u.unread_count);
-      window.__user=u;
-    }else{
-      if(loginBtn) loginBtn.style.display='';
-      if(registerBtn) registerBtn.style.display='';
-    }
-    fadeIn();
-  }).catch(function(){
-    // On error, show login buttons
-    var loginBtn=document.getElementById('headerLoginBtn');
-    var registerBtn=document.getElementById('headerRegisterBtn');
-    if(loginBtn) loginBtn.style.display='';
-    if(registerBtn) registerBtn.style.display='';
-    fadeIn();
-  });
+  // Load unread count on page load
+  <?php if (!empty($currentUser)): ?>
+  fetch('/api/notifications',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
+    updateBadge(d.unread||0);
+  }).catch(function(){});
+  <?php endif; ?>
 
   // Notification panel toggle
   var notiOpen=false;

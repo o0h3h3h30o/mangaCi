@@ -44,12 +44,12 @@ $shareText = esc($manga['name']);
         <?php endif; ?>
         <div class="detail-actions">
           <a href="<?= $firstChapterLink ?>" class="detail-read-btn"><i class="fas fa-play"></i> <?= lang('ComixxManga.start_reading') ?></a>
-          <button class="detail-icon-btn" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="far fa-bookmark"></i></button>
+          <button class="detail-icon-btn<?= !empty($isBookmarked) ? ' active' : '' ?>" id="bookmarkBtn" data-manga-id="<?= esc($manga['id']) ?>"><i class="<?= !empty($isBookmarked) ? 'fas' : 'far' ?> fa-bookmark"></i></button>
           <button class="detail-icon-btn"><i class="fas fa-flag"></i></button>
         </div>
         <div class="detail-like-row" id="mangaLikeRow">
-          <button class="detail-like-btn" id="mangaLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="mangaLikeCount">0</span></button>
-          <button class="detail-like-btn" id="mangaDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="mangaDislikeCount">0</span></button>
+          <button class="detail-like-btn<?= ($myReaction ?? '') === 'like' ? ' active' : '' ?>" id="mangaLikeBtn" data-type="like"><span class="like-emoji">😍</span> <span id="mangaLikeCount"><?= (int)($likes ?? 0) ?></span></button>
+          <button class="detail-like-btn<?= ($myReaction ?? '') === 'dislike' ? ' active' : '' ?>" id="mangaDislikeBtn" data-type="dislike"><span class="like-emoji">😤</span> <span id="mangaDislikeCount"><?= (int)($dislikes ?? 0) ?></span></button>
         </div>
         <div class="detail-synopsis clamped" id="synopsisBox">
           <p><?= $manga['summary'] ?? '' ?></p>
@@ -72,18 +72,18 @@ $shareText = esc($manga['name']);
       <div class="detail-rating-section">
         <div class="detail-stars" id="mobileRatingStars">
           <?php for ($i = 1; $i <= 5; $i++): ?>
-            <i class="far fa-star" data-rating="<?= $i ?>"></i>
+            <i class="<?= $i <= round($ratingAvg) ? 'fas' : 'far' ?> fa-star" data-rating="<?= $i ?>"></i>
           <?php endfor; ?>
         </div>
-        <div class="detail-score detailScore">0.0</div>
+        <div class="detail-score detailScore"><?= number_format((float)$ratingAvg, 1) ?></div>
         <div class="detail-stats-list">
           <div class="detail-stat-row">
             <span class="detail-stat-label"><?= lang('ComixxManga.followers') ?></span>
-            <span class="detail-stat-value detailFollowCount">0 <?= lang('ComixxManga.users') ?></span>
+            <span class="detail-stat-value detailFollowCount"><?= (int)$followCount ?> <?= lang('ComixxManga.users') ?></span>
           </div>
           <div class="detail-stat-row">
             <span class="detail-stat-label"><?= lang('ComixxManga.score') ?></span>
-            <span class="detail-stat-value detailRatingText">0.0 <?= lang('ComixxManga.by') ?> 0 <?= lang('ComixxManga.users') ?></span>
+            <span class="detail-stat-value detailRatingText"><?= number_format((float)$ratingAvg, 1) ?> <?= lang('ComixxManga.by') ?> <?= (int)$ratingVotes ?> <?= lang('ComixxManga.users') ?></span>
           </div>
           <?php if (!empty($authors)): ?>
             <div class="detail-stat-row">
@@ -182,8 +182,10 @@ $shareText = esc($manga['name']);
         </div>
       </div>
 
+      <?php if (empty($currentUser)): ?>
       <p class="detail-comment-login" id="dcLoginPrompt"><a href="/login"><?= lang('ComixxManga.login_to_comment') ?></a> o <a href="/register"><?= lang('ComixxAuth.register_link') ?></a> <?= lang('ComixxManga.join_conversation') ?></p>
-      <form id="dc-form" class="detail-comment-form" style="display:none">
+      <?php endif; ?>
+      <form id="dc-form" class="detail-comment-form" style="<?= empty($currentUser) ? 'display:none' : '' ?>">
         <textarea id="dc-input" rows="3" maxlength="1000" placeholder="<?= lang('ComixxManga.write_comment') ?>"></textarea>
         <div id="dc-captcha-box" class="dc-captcha" style="display:none">
           <p class="dc-captcha-label"><?= lang('ComixxManga.captcha_label') ?></p>
@@ -214,18 +216,18 @@ $shareText = esc($manga['name']);
     <div class="detail-rating-section">
       <div class="detail-stars" id="ratingStars">
         <?php for ($i = 1; $i <= 5; $i++): ?>
-            <i class="far fa-star" data-rating="<?= $i ?>"></i>
+            <i class="<?= $i <= round($ratingAvg) ? 'fas' : 'far' ?> fa-star" data-rating="<?= $i ?>"></i>
         <?php endfor; ?>
       </div>
-      <div class="detail-score detailScore">0.0</div>
+      <div class="detail-score detailScore"><?= number_format((float)$ratingAvg, 1) ?></div>
       <div class="detail-stats-list">
         <div class="detail-stat-row">
           <span class="detail-stat-label"><?= lang('ComixxManga.followers') ?></span>
-          <span class="detail-stat-value detailFollowCount">0 <?= lang('ComixxManga.users') ?></span>
+          <span class="detail-stat-value detailFollowCount"><?= (int)$followCount ?> <?= lang('ComixxManga.users') ?></span>
         </div>
         <div class="detail-stat-row">
           <span class="detail-stat-label"><?= lang('ComixxManga.score') ?></span>
-          <span class="detail-stat-value detailRatingText">0.0 <?= lang('ComixxManga.by') ?> 0 <?= lang('ComixxManga.users') ?></span>
+          <span class="detail-stat-value detailRatingText"><?= number_format((float)$ratingAvg, 1) ?> <?= lang('ComixxManga.by') ?> <?= (int)$ratingVotes ?> <?= lang('ComixxManga.users') ?></span>
         </div>
         <?php if (!empty($authors)): ?>
           <div class="detail-stat-row">
@@ -520,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 (function(){
   var mangaId = <?= (int)($manga['id'] ?? 0) ?>;
-  var currentRating = 0;
+  var currentRating = <?= (int)($myRating ?? 0) ?>;
 
   function submitRating(rating, starsEls) {
     fetch('/api/rating', {
@@ -1183,7 +1185,7 @@ var __timeLang = {
   });
 })();
 
-// ── Hydrate dynamic data from API ──
+// ── Re-fetch state after user actions (rating, bookmark, etc.) ──
 (function(){
   var MID = <?= (int) $manga['id'] ?>;
 
@@ -1196,59 +1198,8 @@ var __timeLang = {
     });
   }
 
-  fetch('/api/manga/'+MID+'/state',{credentials:'same-origin'})
-  .then(function(r){return r.json()})
-  .then(function(d){
-    // Rating
-    var avg = parseFloat(d.rating_avg) || 0;
-    var votes = parseInt(d.rating_votes) || 0;
-    updateStars('mobileRatingStars', avg);
-    updateStars('ratingStars', avg);
-    document.querySelectorAll('.detailScore').forEach(function(el){el.textContent=avg.toFixed(1);});
-    document.querySelectorAll('.detailRatingText').forEach(function(el){el.textContent=avg.toFixed(1)+' '+__mangaLang.by+' '+votes+' '+__mangaLang.users;});
-    currentRating = parseInt(d.my_rating) || 0;
+  // Initial state loaded from PHP — no fetch needed
 
-    // Follow count
-    document.querySelectorAll('.detailFollowCount').forEach(function(el){el.textContent=d.follow_count+' '+__mangaLang.users;});
-
-    // Bookmark
-    var bmBtn=document.getElementById('bookmarkBtn');
-    if(bmBtn && d.is_bookmarked){
-      bmBtn.classList.add('active');
-      bmBtn.querySelector('i').className='fas fa-bookmark';
-    }
-
-    // Likes
-    var lc=document.getElementById('mangaLikeCount');
-    var dc=document.getElementById('mangaDislikeCount');
-    if(lc) lc.textContent=d.likes;
-    if(dc) dc.textContent=d.dislikes;
-    if(d.my_reaction==='like') document.getElementById('mangaLikeBtn').classList.add('active');
-    if(d.my_reaction==='dislike') document.getElementById('mangaDislikeBtn').classList.add('active');
-
-    // Comment form: show if user has bookmark/reaction data (means logged in)
-    // Also check is_bookmarked or my_reaction as signals, plus explicit logged_in from state
-    if(d.is_bookmarked || d.my_reaction){
-      var form=document.getElementById('dc-form');
-      var prompt=document.getElementById('dcLoginPrompt');
-      if(form) form.style.display='';
-      if(prompt) prompt.style.display='none';
-    }
-    // Also try window.__user (from /api/me)
-    function checkUserForComments(){
-      if(window.__user && window.__user.logged_in){
-        CURRENT_UID = window.__user.id;
-        var form=document.getElementById('dc-form');
-        var prompt=document.getElementById('dcLoginPrompt');
-        if(form) form.style.display='';
-        if(prompt) prompt.style.display='none';
-      }
-    }
-    if(window.__user) checkUserForComments();
-    else setTimeout(checkUserForComments, 500);
-  }).catch(function(){});
-
-  // Re-fetch state after actions
   window.reloadMangaState = function(){
     fetch('/api/manga/'+MID+'/state',{credentials:'same-origin'})
     .then(function(r){return r.json()})
