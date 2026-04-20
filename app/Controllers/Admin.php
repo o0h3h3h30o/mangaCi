@@ -1781,15 +1781,23 @@ class Admin extends BaseController
         }
 
         $url = trim($this->request->getPost('url') ?? '');
-        if (!$url) {
+        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
             return $this->response->setJSON(['success' => false, 'error' => 'Invalid URL']);
         }
 
-        try {
-            [$data, $httpCode, $mime] = ssrf_safe_curl_fetch($url, 30);
-        } catch (\RuntimeException $e) {
-            return $this->response->setJSON(['success' => false, 'error' => $e->getMessage()]);
-        }
+        // Download image
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+        $data = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $mime     = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        curl_close($ch);
 
         if (!$data || $httpCode !== 200) {
             return $this->response->setJSON(['success' => false, 'error' => 'Failed to download (HTTP ' . $httpCode . ')']);
@@ -2021,6 +2029,7 @@ class Admin extends BaseController
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
         return $httpCode === 200 || $httpCode === 204;
     }
