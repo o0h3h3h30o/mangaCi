@@ -24,7 +24,7 @@ abstract class BaseController extends Controller
     protected array   $categories  = [];
     protected ?array  $currentUser = null;
     protected string  $activeTheme = 'default';
-    protected $helpers = ['site_settings', 'lang_helper'];
+    protected $helpers = ['site_settings', 'lang_helper', 'ssrf'];
 
     /**
      * @return void
