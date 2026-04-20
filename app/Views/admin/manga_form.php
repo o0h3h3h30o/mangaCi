@@ -607,14 +607,23 @@ Typeahead({
       extBtn.disabled = true;
       extBtn.textContent = 'Fetching…';
       var fd = new FormData();
-      fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+      var csrfName = (document.querySelector('meta[name="csrf-name"]') || {}).content || '<?= csrf_token() ?>';
+      var csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).content || '<?= csrf_hash() ?>';
+      fd.append(csrfName, csrfToken);
       fd.append('url', url);
       fetch('/admin/manga/<?= $mangaId ?>/fetch-cover', {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
         body: fd
       })
-      .then(function(r){ return r.json(); })
+      .then(function(r){
+        return r.json().catch(function(){ return {}; }).then(function(data){
+          data.__status = r.status;
+          data.__ok = r.ok;
+          return data;
+        });
+      })
       .then(function(data){
         extBtn.disabled = false;
         extBtn.textContent = 'Fetch';
@@ -627,7 +636,7 @@ Typeahead({
           urlInput.value = '';
           extUrlInput.value = '';
         } else {
-          alert('Lỗi: ' + (data.error || 'Unknown'));
+          alert('Lỗi: ' + (data.error || data.message || data.title || ('HTTP ' + (data.__status || 0))));
         }
       })
       .catch(function(){
