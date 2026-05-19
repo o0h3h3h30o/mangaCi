@@ -142,14 +142,18 @@ class Admin extends BaseController
         $site = $db->table('sites')->where('id', $siteId)->get()->getRowArray();
         if (!$site) return $this->response->setStatusCode(404)->setBody('Site not found');
 
-        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        $allowedExts = [
+            'image/jpeg' => 'jpg', 'image/png' => 'png',
+            'image/gif' => 'gif', 'image/webp' => 'webp', 'image/svg+xml' => 'svg',
+        ];
 
         // Xử lý upload site logo
         $logoUrl = trim($this->request->getPost('site_logo') ?? '');
         $logoFile = $this->request->getFile('site_logo_file');
         if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
-            if (in_array($logoFile->getMimeType(), $allowed)) {
-                $newName = 'logo_' . time() . '.' . $logoFile->getExtension();
+            $mime = $logoFile->getMimeType();
+            if (isset($allowedExts[$mime])) {
+                $newName = 'logo_' . time() . '.' . $allowedExts[$mime];
                 $logoFile->move(FCPATH . 'images/', $newName);
                 $logoUrl = base_url('images/' . $newName);
             }
@@ -159,8 +163,9 @@ class Admin extends BaseController
         $footerLogoUrl = trim($this->request->getPost('footer_logo') ?? '');
         $footerLogoFile = $this->request->getFile('footer_logo_file');
         if ($footerLogoFile && $footerLogoFile->isValid() && !$footerLogoFile->hasMoved()) {
-            if (in_array($footerLogoFile->getMimeType(), $allowed)) {
-                $newName = 'footer_logo_' . time() . '.' . $footerLogoFile->getExtension();
+            $mime = $footerLogoFile->getMimeType();
+            if (isset($allowedExts[$mime])) {
+                $newName = 'footer_logo_' . time() . '.' . $allowedExts[$mime];
                 $footerLogoFile->move(FCPATH . 'images/', $newName);
                 $footerLogoUrl = base_url('images/' . $newName);
             }
@@ -925,10 +930,13 @@ class Admin extends BaseController
         $imageUrl  = trim($this->request->getPost('image_url') ?? '');
         $imageFile = $this->request->getFile('image_file');
         $pendingImageFile = null;
+        $pendingImageExt  = 'jpg';
+        $imgExts = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
         if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
-            $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
-            if (in_array($imageFile->getMimeType(), $imgTypes)) {
+            $mime = $imageFile->getMimeType();
+            if (isset($imgExts[$mime])) {
                 $pendingImageFile = $imageFile;
+                $pendingImageExt  = $imgExts[$mime];
                 $coverCdn = 0;
             }
         }
@@ -955,7 +963,7 @@ class Admin extends BaseController
         // Save uploaded image with ID-based filename
         $coverDir = $this->coverDir();
         if ($pendingImageFile) {
-            $ext = $pendingImageFile->getExtension();
+            $ext = $pendingImageExt;
             $pendingImageFile->move($coverDir, $mangaId . '.' . $ext, true);
             $this->createThumb($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
             $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
@@ -964,12 +972,20 @@ class Admin extends BaseController
         // Move fetched tmp image
         $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
         if ($tmpFile && !$pendingImageFile) {
-            $tmpPath = $coverDir . 'tmp/' . basename($tmpFile);
+            $safeName = basename($tmpFile);
+            $tmpPath = $coverDir . 'tmp/' . $safeName;
             if (is_file($tmpPath)) {
-                $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
-                rename($tmpPath, $coverDir . $mangaId . '.' . $ext);
-                $this->createThumb($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
-                $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $detected = $finfo->file($tmpPath);
+                $safeExts = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+                $ext = $safeExts[$detected] ?? null;
+                if ($ext) {
+                    rename($tmpPath, $coverDir . $mangaId . '.' . $ext);
+                    $this->createThumb($coverDir . $mangaId . '.' . $ext, $coverDir . $mangaId . '-thumb.' . $ext);
+                    $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
+                } else {
+                    @unlink($tmpPath);
+                }
             }
         }
 
@@ -1051,9 +1067,10 @@ class Admin extends BaseController
         $imageFile = $this->request->getFile('image_file');
         $coverDir = $this->coverDir();
         if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
-            $imgTypes = ['image/jpeg','image/png','image/gif','image/webp'];
-            if (in_array($imageFile->getMimeType(), $imgTypes)) {
-                $ext = $imageFile->getExtension();
+            $imgExts = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+            $mime = $imageFile->getMimeType();
+            if (isset($imgExts[$mime])) {
+                $ext = $imgExts[$mime];
                 $imageFile->move($coverDir, $id . '.' . $ext, true);
                 $this->createThumb($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
                 $imageUrl = '';
@@ -1079,13 +1096,21 @@ class Admin extends BaseController
         // Move fetched tmp image
         $tmpFile = trim($this->request->getPost('tmp_file') ?? '');
         if ($tmpFile) {
-            $tmpPath = $coverDir . 'tmp/' . basename($tmpFile);
+            $safeName = basename($tmpFile);
+            $tmpPath = $coverDir . 'tmp/' . $safeName;
             if (is_file($tmpPath)) {
-                $ext = pathinfo($tmpFile, PATHINFO_EXTENSION) ?: 'jpg';
-                rename($tmpPath, $coverDir . $id . '.' . $ext);
-                $this->createThumb($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
-                $row['image'] = '';
-                $row['cover'] = 0;
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $detected = $finfo->file($tmpPath);
+                $safeExts = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+                $ext = $safeExts[$detected] ?? null;
+                if ($ext) {
+                    rename($tmpPath, $coverDir . $id . '.' . $ext);
+                    $this->createThumb($coverDir . $id . '.' . $ext, $coverDir . $id . '-thumb.' . $ext);
+                    $row['image'] = '';
+                    $row['cover'] = 0;
+                } else {
+                    @unlink($tmpPath);
+                }
             }
         }
 
@@ -1451,10 +1476,16 @@ class Admin extends BaseController
             foreach ($files as $i => $file) {
                 if (!$file || !$file->isValid() || $file->hasMoved()) continue;
 
-                $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-                if (!in_array($file->getMimeType(), $allowedMimes)) continue;
+                $allowedMimes = [
+                    'image/jpeg' => 'jpg',
+                    'image/png'  => 'png',
+                    'image/webp' => 'webp',
+                    'image/gif'  => 'gif',
+                ];
+                $mime = $file->getMimeType();
+                if (!isset($allowedMimes[$mime])) continue;
 
-                $ext      = strtolower($file->getClientExtension() ?: 'jpg');
+                $ext      = $allowedMimes[$mime];
                 $slug     = $startSlug + $i;
                 $filename = str_pad($slug, 3, '0', STR_PAD_LEFT) . '.' . $ext;
 
@@ -1785,14 +1816,27 @@ class Admin extends BaseController
             return $this->response->setJSON(['success' => false, 'error' => 'Invalid URL']);
         }
 
+        $parsed = parse_url($url);
+        $scheme = strtolower($parsed['scheme'] ?? '');
+        if (!in_array($scheme, ['http', 'https'])) {
+            return $this->response->setJSON(['success' => false, 'error' => 'Only http/https allowed']);
+        }
+        $host = $parsed['host'] ?? '';
+        $ip = gethostbyname($host);
+        if ($ip === $host || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            return $this->response->setJSON(['success' => false, 'error' => 'URL points to private/reserved network']);
+        }
+
         // Download image
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 3,
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_USERAGENT      => 'Mozilla/5.0',
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_MAXFILESIZE    => 10 * 1024 * 1024, // 10MB
         ]);
         $data = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1803,20 +1847,13 @@ class Admin extends BaseController
             return $this->response->setJSON(['success' => false, 'error' => 'Failed to download (HTTP ' . $httpCode . ')']);
         }
 
-        // Validate mime
+        // Validate mime from actual file content, not HTTP header
         $mimeMap = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
-        $ext = null;
-        foreach ($mimeMap as $m => $e) {
-            if (stripos($mime, $m) !== false) { $ext = $e; break; }
-        }
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $detected = $finfo->buffer($data);
+        $ext = $mimeMap[$detected] ?? null;
         if (!$ext) {
-            // Try detect from data
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $detected = $finfo->buffer($data);
-            $ext = $mimeMap[$detected] ?? null;
-        }
-        if (!$ext) {
-            return $this->response->setJSON(['success' => false, 'error' => 'Not a valid image (mime: ' . $mime . ')']);
+            return $this->response->setJSON(['success' => false, 'error' => 'Not a valid image (detected: ' . $detected . ')']);
         }
 
         // Save to tmp inside cover dir
