@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', function () {
   font-size: 12px; line-height: 1.5; margin-top: 8px; padding: 0 4px;
 }
 .dc-actions-left { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
-.dc-actions small { font-size: 12px; line-height: 1.5; letter-spacing: .01em; white-space: nowrap; }
+.dc-actions small, .dc-time { font-size: 12px; line-height: 1.5; letter-spacing: .02em; word-spacing: .1em; white-space: nowrap; color: var(--text-muted); }
 .dc-sep { color: var(--text-muted); opacity: .5; font-size: 12px; user-select: none; }
 .dc-react {
   display: inline-flex; align-items: center; gap: 3px;
@@ -852,7 +852,7 @@ var __timeLang = {
       '<div class="dc-text">'+esc(c.comment)+'</div>'+
       '</div>'+
       '<div class="dc-actions">'+
-      '<div class="dc-actions-left">'+likeBtnHtml(c)+'<span class="dc-sep">·</span><small>'+timeAgo(c.created_at)+'</small></div>'+
+      '<div class="dc-actions-left">'+likeBtnHtml(c)+'<span class="dc-sep">·</span><span class="dc-time">'+timeAgo(c.created_at)+'</span></div>'+
       (replyBtn?'<div>'+replyBtn+'</div>':'')+
       '</div>'+
       '</div></div></div>';
@@ -924,7 +924,7 @@ var __timeLang = {
       '<div class="dc-text">'+esc(c.comment)+'</div>'+
       '</div>'+
       '<div class="dc-actions">'+
-      '<div class="dc-actions-left">'+likeBtnHtml(c)+'<span class="dc-sep">·</span><small>'+timeAgo(c.created_at)+'</small>'+(repliesToggle?'<span class="dc-sep">·</span>'+repliesToggle:'')+'</div>'+
+      '<div class="dc-actions-left">'+likeBtnHtml(c)+'<span class="dc-sep">·</span><span class="dc-time">'+timeAgo(c.created_at)+'</span>'+(repliesToggle?'<span class="dc-sep">·</span>'+repliesToggle:'')+'</div>'+
       (replyBtn?'<div>'+replyBtn+'</div>':'')+
       '</div>'+
       '<div id="dc-reply-area-'+c.id+'"></div>'+

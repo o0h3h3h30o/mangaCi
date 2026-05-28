@@ -1179,7 +1179,7 @@ if (!empty($pages) && isset($pages[0])):
     .rc-user { font-weight: 700; font-size: 11px; color: var(--text-primary); }
     .rc-text { font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: pre-wrap; word-break: break-word; line-height: 1.4; }
     .rc-actions { display: flex; align-items: center; gap: 8px; font-size: 11px; line-height: 1.5; margin-top: 3px; padding: 0 2px; }
-    .rc-actions small { font-size: 11px; line-height: 1.5; letter-spacing: .01em; white-space: nowrap; }
+    .rc-actions small, .rc-time { font-size: 12px; line-height: 1.5; letter-spacing: .02em; word-spacing: .1em; white-space: nowrap; color: var(--text-muted); }
     .rc-sep { color: var(--text-muted); opacity: .5; font-size: 11px; user-select: none; }
     .rc-react {
       display: inline-flex; align-items: center; gap: 2px;
@@ -2059,7 +2059,7 @@ var __chapterLang = {
       return '<div class="rc-item" data-id="'+c.id+'"><div class="rc-item-body">'+
         rcAvatar(c.user_name,c.user_username,c.user_id,22)+
         '<div class="rc-content"><div class="rc-bubble"><span class="rc-user">'+escHtml(name)+'</span><div class="rc-text">'+escHtml(c.comment)+'</div></div>'+
-        '<div class="rc-actions">'+rcLikeBtn(c)+'<span class="rc-sep">·</span><small style="color:var(--text-muted)">'+timeAgo(c.created_at)+'</small>'+(rb?'<span class="rc-sep">·</span>'+rb:'')+'</div></div></div></div>';
+        '<div class="rc-actions">'+rcLikeBtn(c)+'<span class="rc-sep">·</span><span class="rc-time">'+timeAgo(c.created_at)+'</span>'+(rb?'<span class="rc-sep">·</span>'+rb:'')+'</div></div></div></div>';
     }
 
     function rcReplyFormHtml(parentId, parentName, replyToId){
@@ -2111,7 +2111,7 @@ var __chapterLang = {
       return '<div class="rc-item" data-id="'+c.id+'"><div class="rc-item-body">'+
         rcAvatar(c.user_name,c.user_username,c.user_id)+
         '<div class="rc-content"><div class="rc-bubble"><span class="rc-user">'+escHtml(name)+'</span><div class="rc-text">'+escHtml(c.comment)+'</div></div>'+
-        '<div class="rc-actions">'+rcLikeBtn(c)+'<span class="rc-sep">·</span><small style="color:var(--text-muted)">'+timeAgo(c.created_at)+'</small>'+(rt?'<span class="rc-sep">·</span>'+rt:'')+(rb?'<span class="rc-sep">·</span>'+rb:'')+'</div>'+
+        '<div class="rc-actions">'+rcLikeBtn(c)+'<span class="rc-sep">·</span><span class="rc-time">'+timeAgo(c.created_at)+'</span>'+(rt?'<span class="rc-sep">·</span>'+rt:'')+(rb?'<span class="rc-sep">·</span>'+rb:'')+'</div>'+
         '<div id="rc-reply-area-'+c.id+'"></div>'+
         '<div id="rc-replies-'+c.id+'" class="rc-replies"></div>'+
         '</div></div></div>';
