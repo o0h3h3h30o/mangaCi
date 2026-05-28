@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 .detail-comment-list { min-height: 60px; }
 .dc-loading { text-align: center; padding: 20px 0; color: var(--text-muted); font-size: 13px; }
-.dc-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.dc-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
 .dc-item:last-child { border-bottom: none; }
 .dc-item-body { display: flex; gap: 10px; }
 .dc-avatar {
@@ -654,9 +654,9 @@ document.addEventListener('DOMContentLoaded', function () {
 .dc-bubble {
   background: var(--bg-card);
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 10px 14px;
 }
-.dc-user { font-weight: 700; font-size: 13px; color: var(--text-primary); }
+.dc-user { font-weight: 700; font-size: 13px; line-height: 1.4; color: var(--text-primary); }
 .dc-chapter-tag {
   font-size: 11px;
   background: rgba(52,211,153,.12);
@@ -667,10 +667,10 @@ document.addEventListener('DOMContentLoaded', function () {
   text-decoration: none;
 }
 .dc-chapter-tag:hover { text-decoration: underline; }
-.dc-text { font-size: 13px; color: var(--text-secondary); margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+.dc-text { font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }
 .dc-actions {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; margin-top: 4px; padding: 0 4px;
+  font-size: 12px; margin-top: 8px; padding: 0 4px;
 }
 .dc-actions-left { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
 .dc-react {

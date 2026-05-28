@@ -3,7 +3,7 @@
 return [
     'now'         => 'Just now',
     'minutes_ago' => '{n} min ago',
-    'hours_ago'   => '{n}h ago',
+    'hours_ago'   => '{n} h ago',
     'days_ago'    => '{n} day(s) ago',
     'weeks_ago'   => '{n} week(s) ago',
     'months_ago'  => '{n} month(s) ago',
@@ -16,6 +16,6 @@ return [
     'js_day'    => '{n} d ago',
     'js_week'   => '{n} w ago',
     'js_month'  => '{n} mo ago',
-    'js_year'   => ' y ago',
+    'js_year'   => '{n} y ago',
     'js_format' => 'suffix', // "suffix" = "5m ago", "prefix" = "hace 5m"
 ];

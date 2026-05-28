@@ -3,7 +3,7 @@
 return [
     'now'         => 'Just now',
     'minutes_ago' => '{n} min ago',
-    'hours_ago'   => '{n}h ago',
+    'hours_ago'   => '{n} h ago',
     'days_ago'    => '{n} day(s) ago',
     'weeks_ago'   => '{n} week(s) ago',
     'months_ago'  => '{n} month(s) ago',
