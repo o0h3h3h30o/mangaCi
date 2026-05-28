@@ -670,9 +670,10 @@ document.addEventListener('DOMContentLoaded', function () {
 .dc-text { font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }
 .dc-actions {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; margin-top: 8px; padding: 0 4px;
+  font-size: 12px; line-height: 1.5; margin-top: 8px; padding: 0 4px;
 }
-.dc-actions-left { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+.dc-actions-left { display: flex; align-items: center; gap: 12px; color: var(--text-muted); }
+.dc-actions small { font-size: 12px; line-height: 1.5; letter-spacing: .01em; white-space: nowrap; }
 .dc-react {
   display: inline-flex; align-items: center; gap: 3px;
   background: none; border: none; font-size: 12px; font-family: var(--font);
