@@ -36,6 +36,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'maintenance'   => \App\Filters\Maintenance::class,
     ];
 
     /**
@@ -53,8 +54,9 @@ class Filters extends BaseFilters
      */
     public array $required = [
         'before' => [
-            'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
+            'maintenance', // Short-circuits to maintenance page before pagecache
+            'forcehttps',  // Force Global Secure Requests
+            'pagecache',   // Web Page Caching
         ],
         'after' => [
             'pagecache',   // Web Page Caching

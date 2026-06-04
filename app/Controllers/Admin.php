@@ -171,11 +171,13 @@ class Admin extends BaseController
             }
         }
 
-        $fields = ['site_title', 'home_heading', 'meta_description', 'meta_keywords', 'footer_copyright', 'footer_url', 'active_theme', 'site_language', 'ga_id'];
+        $fields = ['site_title', 'home_heading', 'meta_description', 'meta_keywords', 'footer_copyright', 'footer_url', 'active_theme', 'site_language', 'ga_id', 'maintenance_message', 'maintenance_allow_ips', 'maintenance_retry_after'];
         $values = ['site_logo' => $logoUrl, 'footer_logo' => $footerLogoUrl];
         foreach ($fields as $key) {
             $values[$key] = trim($this->request->getPost($key) ?? '');
         }
+        // Checkbox: present in POST => "1", absent => "0"
+        $values['maintenance_mode'] = $this->request->getPost('maintenance_mode') ? '1' : '0';
 
         foreach ($values as $key => $value) {
             $exists = $db->table('site_settings')->where('site_id', $siteId)->where('key', $key)->countAllResults() > 0;

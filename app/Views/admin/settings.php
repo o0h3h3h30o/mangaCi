@@ -234,6 +234,43 @@ $get = fn(string $k, string $d = '') => $s[$k] ?? $d;
     </div>
   </div>
 
+  <!-- Maintenance Mode -->
+  <div class="a-panel" style="padding:1.25rem">
+    <h3 class="a-label" style="font-size:0.875rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f59e0b">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Maintenance Mode
+    </h3>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <input type="checkbox" id="maintenance_mode" name="maintenance_mode" value="1"
+             <?= $get('maintenance_mode', '0') === '1' ? 'checked' : '' ?>
+             style="width:18px;height:18px;cursor:pointer">
+      <label for="maintenance_mode" style="cursor:pointer;font-weight:600">Enable maintenance mode</label>
+    </div>
+    <p class="a-hint" style="margin-bottom:14px">When enabled, visitors see a 503 maintenance page. Admins and <code style="color:#6b7280">/admin</code>, <code style="color:#6b7280">/login</code> routes always bypass.</p>
+
+    <div style="margin-bottom:14px">
+      <label class="a-label">Message shown to visitors</label>
+      <textarea name="maintenance_message" rows="3" class="a-textarea" placeholder="We&rsquo;re performing scheduled maintenance. Back shortly."><?= esc($get('maintenance_message', '')) ?></textarea>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label class="a-label">Allowed IPs (comma-separated, optional)</label>
+      <input type="text" name="maintenance_allow_ips" class="a-input"
+             value="<?= esc($get('maintenance_allow_ips', '')) ?>"
+             placeholder="203.0.113.10, 198.51.100.42">
+      <p class="a-hint">These IPs bypass the maintenance page (e.g. your office IP).</p>
+    </div>
+
+    <div>
+      <label class="a-label">Retry-After (seconds)</label>
+      <input type="number" name="maintenance_retry_after" class="a-input" min="60"
+             value="<?= esc($get('maintenance_retry_after', '3600')) ?>">
+      <p class="a-hint">Sent as the HTTP <code style="color:#6b7280">Retry-After</code> header to bots/CDNs.</p>
+    </div>
+  </div>
+
   <div style="display:flex;justify-content:flex-end">
     <button type="submit" class="a-btn">
       Save Settings
