@@ -13,6 +13,9 @@ use Config\Database;
  *   Auth: none (open endpoint).
  *   Body (JSON):
  *     { "url": "https://submanhwa.com/serie/conexion-suave",
+ *       "html":            "<...>",     // optional: page HTML; skips the
+ *                                       //   server fetch (use when the host
+ *                                       //   Cloudflare-403s the server IP)
  *       "import_chapters": true,        // default true
  *       "download_cover":  true,        // default true
  *       "is_public":       0 }          // default 0 (draft)
@@ -51,10 +54,14 @@ class ImportController extends Controller
         $importChapters = (bool) ($body['import_chapters'] ?? true);
         $downloadCover  = (bool) ($body['download_cover']  ?? true);
         $isPublic       = (int)  ($body['is_public']       ?? 0);
+        // Optional: caller supplies the page HTML directly (e.g. from a
+        // browser/userscript), bypassing the server-side fetch which
+        // Cloudflare may 403 from a datacenter IP.
+        $html           = (string) ($body['html'] ?? '');
 
         // ── Dispatch to source-specific scraper ──────────────────
         try {
-            $data = $this->scrapeSubmanhwa($url);
+            $data = $this->scrapeSubmanhwa($url, $html !== '' ? $html : null);
         } catch (\Throwable $e) {
             log_message('error', 'Import scrape failed: ' . $e->getMessage());
             return $this->json(['ok' => false, 'error' => 'Scrape failed: ' . $e->getMessage()], 500);
@@ -168,12 +175,15 @@ class ImportController extends Controller
 
     // ── Source scrapers ──────────────────────────────────────────
 
-    private function scrapeSubmanhwa(string $url): array
+    private function scrapeSubmanhwa(string $url, ?string $html = null): array
     {
-        $html = $this->httpGet($url);
         if ($html === null) {
+            $html = $this->httpGet($url);
+        }
+        if ($html === null || trim($html) === '') {
             throw new \RuntimeException('Could not fetch page'
-                . ($this->lastFetchError !== '' ? ' (' . $this->lastFetchError . ')' : '') . '.');
+                . ($this->lastFetchError !== '' ? ' (' . $this->lastFetchError . ')' : '')
+                . '. Tip: pass the page HTML in the `html` field to bypass Cloudflare.');
         }
 
         $doc = new \DOMDocument();
