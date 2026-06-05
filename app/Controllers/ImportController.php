@@ -10,7 +10,7 @@ use Config\Database;
  * Manga import API.
  *
  * POST /api/admin/import-manga
- *   Auth: must be logged in as an admin user.
+ *   Auth: none (open endpoint).
  *   Body (JSON):
  *     { "url": "https://submanhwa.com/serie/conexion-suave",
  *       "import_chapters": true,        // default true
@@ -26,13 +26,6 @@ class ImportController extends Controller
 
     public function importManga(): ResponseInterface
     {
-        helper(['site_settings']);
-
-        // ── Auth ──────────────────────────────────────────────────
-        if (!$this->authorize()) {
-            return $this->json(['ok' => false, 'error' => 'Unauthorized'], 401);
-        }
-
         // ── Input ─────────────────────────────────────────────────
         $body = $this->request->getJSON(true) ?? [];
         $url  = trim((string) ($body['url'] ?? ''));
@@ -522,27 +515,6 @@ class ImportController extends Controller
             if ($i > 50) { $slug = $base . '-' . substr(md5(uniqid('', true)), 0, 6); break; }
         }
         return $slug;
-    }
-
-    /** Admin session only. */
-    private function authorize(): bool
-    {
-        $session = session();
-        if (!$session->get('isLoggedIn')) return false;
-
-        $userId = (int) $session->get('user_id');
-        if ($userId <= 0) return false;
-
-        try {
-            return Database::connect()
-                ->table('users_groups ug')
-                ->join('groups g', 'g.id = ug.group_id')
-                ->where('ug.user_id', $userId)
-                ->where('g.name', 'admin')
-                ->countAllResults() > 0;
-        } catch (\Throwable $e) {
-            return false;
-        }
     }
 
     private function json(array $payload, int $code = 200): ResponseInterface
