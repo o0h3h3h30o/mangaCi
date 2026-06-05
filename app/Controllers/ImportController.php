@@ -480,23 +480,21 @@ class ImportController extends Controller
             if ($row) { $row['match_field'] = 'slug'; return $row; }
         }
 
-        // 3. from_manga18fx contains this exact URL (token match, so
-        //    "https://foo.com/a" doesn't accidentally match
-        //    "https://foo.com/a-very-long").
+        // 3. from_manga18fx contains this exact URL as a token. We use
+        //    FIND_IN_SET on a normalized version of the column so URL
+        //    "secret-class" never accidentally matches "secret-class-color".
+        //    Normalize handles all our separator styles (",", " ,", ", ").
         if ($sourceUrl !== '') {
-            $needle = '%' . $db->escapeLikeString($sourceUrl) . '%';
-            $candidates = $db->table('manga')
+            $row = $db->table('manga')
                 ->select('id, name, slug, from_manga18fx')
-                ->like('from_manga18fx', $sourceUrl, 'both', null, true)
-                ->limit(5)->get()->getResultArray();
-            foreach ($candidates as $cand) {
-                $parts = array_map('trim', explode(',', (string) ($cand['from_manga18fx'] ?? '')));
-                if (in_array($sourceUrl, $parts, true)) {
-                    $cand['match_field'] = 'from_manga18fx';
-                    return $cand;
-                }
-            }
-            unset($needle); // keep static analyzers quiet
+                ->where(
+                    "FIND_IN_SET(" . $db->escape($sourceUrl) . ", "
+                    . "REPLACE(REPLACE(REPLACE(from_manga18fx, ' , ', ','), ' ,', ','), ', ', ',')"
+                    . ") > 0",
+                    null, false
+                )
+                ->limit(1)->get()->getRowArray();
+            if ($row) { $row['match_field'] = 'from_manga18fx'; return $row; }
         }
 
         return null;
