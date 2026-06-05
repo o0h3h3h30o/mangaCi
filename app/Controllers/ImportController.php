@@ -66,11 +66,11 @@ class ImportController extends Controller
         $sourceSlug = $this->slugify($data['slug'] ?? $data['name']);
 
         // De-dup: if a manga with the same name OR same source-slug already
-        // exists, don't insert again — append the new source identifier to
-        // its from_manga18fx field and return the existing record.
+        // exists, don't insert again — append the new source URL to its
+        // from_manga18fx field and return the existing record.
         $existing = $this->findDuplicate($db, $data['name'], $sourceSlug);
         if ($existing) {
-            $merged = $this->appendSource($existing['from_manga18fx'] ?? '', $sourceSlug);
+            $merged = $this->appendSource($existing['from_manga18fx'] ?? '', $url);
             if ($merged !== ($existing['from_manga18fx'] ?? '')) {
                 $db->table('manga')->where('id', $existing['id'])->update(['from_manga18fx' => $merged]);
             }
@@ -480,12 +480,18 @@ class ImportController extends Controller
         return null;
     }
 
-    /** Append a new source slug to a comma-separated from_manga18fx list, deduped. */
-    private function appendSource(string $current, string $newSlug): string
+    /**
+     * Append a new source URL to a comma-separated from_manga18fx list,
+     * deduped. Existing entries (which may be slugs/paths from older imports)
+     * are preserved as-is.
+     */
+    private function appendSource(string $current, string $newValue): string
     {
-        $parts = array_filter(array_map('trim', explode(',', $current)));
-        if (!in_array($newSlug, $parts, true)) $parts[] = $newSlug;
-        return implode(',', $parts);
+        $newValue = trim($newValue);
+        if ($newValue === '') return $current;
+        $parts = array_filter(array_map('trim', explode(',', $current)), fn($p) => $p !== '');
+        if (!in_array($newValue, $parts, true)) $parts[] = $newValue;
+        return implode(' ,', $parts);
     }
 
     private function uniqueSlug($db, string $slug): string
