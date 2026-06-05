@@ -641,10 +641,42 @@ class ImportController extends Controller
 
     private function slugify(string $text): string
     {
-        $text = mb_strtolower(trim($text));
-        $text = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $text);
-        $text = preg_replace('/[\s]+/', '-', $text);
+        $text = trim($text);
+        $text = $this->foldAccents($text);          // í→i, ñ→n, é→e, ü→u …
+        $text = mb_strtolower($text);
+        $text = preg_replace('/[^a-z0-9\s-]/u', '', $text); // ASCII-only now
+        $text = preg_replace('/[\s_]+/', '-', $text);
+        $text = preg_replace('/-+/', '-', $text);
         return trim($text, '-') ?: ('manga-' . substr(md5(uniqid('', true)), 0, 8));
+    }
+
+    /** Transliterate accented Latin chars to plain ASCII. */
+    private function foldAccents(string $text): string
+    {
+        // Fast path via iconv when available.
+        if (function_exists('iconv')) {
+            $conv = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+            if ($conv !== false && $conv !== '') {
+                // iconv can emit things like "'e"; strip non-letter residue later.
+                return $conv;
+            }
+        }
+        // Fallback map (covers Spanish + common Latin diacritics).
+        $map = [
+            'á'=>'a','à'=>'a','ä'=>'a','â'=>'a','ã'=>'a','å'=>'a',
+            'é'=>'e','è'=>'e','ë'=>'e','ê'=>'e',
+            'í'=>'i','ì'=>'i','ï'=>'i','î'=>'i',
+            'ó'=>'o','ò'=>'o','ö'=>'o','ô'=>'o','õ'=>'o',
+            'ú'=>'u','ù'=>'u','ü'=>'u','û'=>'u',
+            'ñ'=>'n','ç'=>'c','ý'=>'y','ÿ'=>'y',
+            'Á'=>'A','À'=>'A','Ä'=>'A','Â'=>'A','Ã'=>'A','Å'=>'A',
+            'É'=>'E','È'=>'E','Ë'=>'E','Ê'=>'E',
+            'Í'=>'I','Ì'=>'I','Ï'=>'I','Î'=>'I',
+            'Ó'=>'O','Ò'=>'O','Ö'=>'O','Ô'=>'O','Õ'=>'O',
+            'Ú'=>'U','Ù'=>'U','Ü'=>'U','Û'=>'U',
+            'Ñ'=>'N','Ç'=>'C',
+        ];
+        return strtr($text, $map);
     }
 
     /**
