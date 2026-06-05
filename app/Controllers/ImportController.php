@@ -65,10 +65,11 @@ class ImportController extends Controller
         $db = Database::connect();
         $sourceSlug = $this->slugify($data['slug'] ?? $data['name']);
 
-        // De-dup: if a manga with the same name OR same source-slug already
-        // exists, don't insert again — append the new source URL to its
-        // from_manga18fx field and return the existing record.
-        $existing = $this->findDuplicate($db, $data['name'], $sourceSlug);
+        // De-dup: if a manga with the same name, same source-slug, or whose
+        // from_manga18fx already contains this URL exists, don't insert
+        // again — append the new source URL to its from_manga18fx field and
+        // return the existing record.
+        $existing = $this->findDuplicate($db, $data['name'], $sourceSlug, $url);
         if ($existing) {
             $merged = $this->appendSource($existing['from_manga18fx'] ?? '', $url);
             if ($merged !== ($existing['from_manga18fx'] ?? '')) {
@@ -451,15 +452,17 @@ class ImportController extends Controller
     }
 
     /**
-     * Find an existing manga that matches by name (case-insensitive, trimmed)
-     * or by slug. Returns row + which field matched, or null.
+     * Find an existing manga matching by name (case-insensitive, trimmed),
+     * by slug, or whose from_manga18fx already contains the source URL.
+     * Returns row + which field matched, or null.
      */
-    private function findDuplicate($db, string $name, string $slug): ?array
+    private function findDuplicate($db, string $name, string $slug, string $sourceUrl): ?array
     {
         $name = trim($name);
         $slug = trim($slug);
+        $sourceUrl = trim($sourceUrl);
 
-        // Name match (case-insensitive)
+        // 1. Name match (case-insensitive)
         if ($name !== '') {
             $row = $db->table('manga')
                 ->select('id, name, slug, from_manga18fx')
@@ -468,13 +471,32 @@ class ImportController extends Controller
             if ($row) { $row['match_field'] = 'name'; return $row; }
         }
 
-        // Slug match (exact, or any "<slug>-<n>" variant produced by uniqueSlug)
+        // 2. Slug match (exact)
         if ($slug !== '') {
             $row = $db->table('manga')
                 ->select('id, name, slug, from_manga18fx')
                 ->where('slug', $slug)
                 ->limit(1)->get()->getRowArray();
             if ($row) { $row['match_field'] = 'slug'; return $row; }
+        }
+
+        // 3. from_manga18fx contains this exact URL (token match, so
+        //    "https://foo.com/a" doesn't accidentally match
+        //    "https://foo.com/a-very-long").
+        if ($sourceUrl !== '') {
+            $needle = '%' . $db->escapeLikeString($sourceUrl) . '%';
+            $candidates = $db->table('manga')
+                ->select('id, name, slug, from_manga18fx')
+                ->like('from_manga18fx', $sourceUrl, 'both', null, true)
+                ->limit(5)->get()->getResultArray();
+            foreach ($candidates as $cand) {
+                $parts = array_map('trim', explode(',', (string) ($cand['from_manga18fx'] ?? '')));
+                if (in_array($sourceUrl, $parts, true)) {
+                    $cand['match_field'] = 'from_manga18fx';
+                    return $cand;
+                }
+            }
+            unset($needle); // keep static analyzers quiet
         }
 
         return null;
