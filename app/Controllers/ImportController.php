@@ -98,12 +98,17 @@ class ImportController extends Controller
         $results = [];
         $created = 0; $updated = 0; $failed = 0;
         foreach ($rows as $u) {
-            $res = $this->processImport([
-                'url'             => $u,
-                'import_chapters' => $importChapters,
-                'download_cover'  => $downloadCover,
-                'is_public'       => $isPublic,
-            ]);
+            try {
+                $res = $this->processImport([
+                    'url'             => $u,
+                    'import_chapters' => $importChapters,
+                    'download_cover'  => $downloadCover,
+                    'is_public'       => $isPublic,
+                ]);
+            } catch (\Throwable $e) {
+                $res = ['ok' => false, 'error' => $e->getMessage()];
+                log_message('error', "import-csv row ({$u}) threw: " . $e->getMessage());
+            }
             if (!$res['ok'])                      $failed++;
             elseif (!empty($res['already_exists'])) $updated++;
             else                                    $created++;

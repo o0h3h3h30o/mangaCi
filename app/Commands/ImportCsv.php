@@ -75,13 +75,19 @@ class ImportCsv extends BaseCommand
                 continue;
             }
 
-            $t0  = microtime(true);
-            $res = $importer->processImport([
-                'url'             => $url,
-                'import_chapters' => $importChapters,
-                'download_cover'  => $downloadCover,
-                'is_public'       => $isPublic ? 1 : 0,
-            ]);
+            $t0 = microtime(true);
+            try {
+                $res = $importer->processImport([
+                    'url'             => $url,
+                    'import_chapters' => $importChapters,
+                    'download_cover'  => $downloadCover,
+                    'is_public'       => $isPublic ? 1 : 0,
+                ]);
+            } catch (\Throwable $e) {
+                // Never let one bad row kill the whole batch.
+                $res = ['ok' => false, 'error' => $e->getMessage()];
+                log_message('error', "import:csv row {$n} ({$url}) threw: " . $e->getMessage());
+            }
             $ms = round((microtime(true) - $t0) * 1000);
 
             if (!$res['ok']) {
