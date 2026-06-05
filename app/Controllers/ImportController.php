@@ -247,7 +247,7 @@ class ImportController extends Controller
             $a = $first('.//a[contains(@class,"chapter-link")]', $card);
             if (!$a) continue;
             $href  = $a->getAttribute('href');
-            $label = trim($a->textContent);                            // "Capítulo 1 :"
+            $label = trim(preg_replace('/\s+/u', ' ', $a->textContent)); // "Capítulo 1 :"
             // Extract number from "Capítulo 1.5" / "Capítulo 12 :"
             $number = null;
             if (preg_match('/Cap[ií]tulo\s+([\d.]+)/iu', $label, $m)) {
@@ -255,15 +255,25 @@ class ImportController extends Controller
             } elseif (preg_match('#/(\d+(?:\.\d+)?)(?:[/?]|$)#', $href, $m)) {
                 $number = (float) $m[1];
             }
-            // Name = anything after the ":" if present
+            // Title = text after the ":" if present. If empty, fall back to
+            // the full label ("Capítulo 1") so the chapter always has a name.
             $title = '';
             if (str_contains($label, ':')) {
-                $title = trim(substr($label, strpos($label, ':') + 1));
+                $title = trim(substr($label, strpos($label, ':') + 1), " :\t\n\r");
             }
+            if ($title === '') $title = trim(rtrim($label, ' :'));
+
+            // Created date — the time span inside the card, e.g. "04 Jun. 2026"
+            $dateEl  = $first('.//span[i[contains(@class,"glyphicon-time")]]', $card)
+                    ?: $first('.//i[contains(@class,"glyphicon-time")]/..', $card);
+            $dateRaw = $dateEl ? trim(preg_replace('/\s+/u', ' ', $dateEl->textContent)) : '';
+            $created = $this->parseSpanishDate($dateRaw);
+
             $chapters[] = [
-                'number' => $number,
-                'name'   => $title,
-                'url'    => $href,
+                'number'     => $number,
+                'name'       => $title,
+                'url'        => $href,
+                'created_at' => $created,   // 'Y-m-d H:i:s' or null
             ];
         }
 
@@ -277,6 +287,36 @@ class ImportController extends Controller
             'tags'        => array_values(array_unique($tags)),
             'chapters'    => $chapters,
         ];
+    }
+
+    /**
+     * Parse a Spanish short date like "04 Jun. 2026" into 'Y-m-d H:i:s'.
+     * Returns null if it can't be parsed.
+     */
+    private function parseSpanishDate(string $raw): ?string
+    {
+        $raw = mb_strtolower(trim($raw));
+        if ($raw === '') return null;
+
+        $months = [
+            'ene' => 1, 'feb' => 2, 'mar' => 3, 'abr' => 4, 'may' => 5, 'jun' => 6,
+            'jul' => 7, 'ago' => 8, 'sep' => 9, 'set' => 9, 'oct' => 10, 'nov' => 11, 'dic' => 12,
+        ];
+
+        // "04 jun. 2026" / "4 jun 2026"
+        if (preg_match('/(\d{1,2})\s+([a-záéíóú]{3,})\.?\s+(\d{4})/u', $raw, $m)) {
+            $day = (int) $m[1];
+            $mon = $months[substr($m[2], 0, 3)] ?? null;
+            $yr  = (int) $m[3];
+            if ($mon && $day >= 1 && $day <= 31) {
+                return sprintf('%04d-%02d-%02d 00:00:00', $yr, $mon, $day);
+            }
+        }
+        // ISO fallback "2026-06-04"
+        if (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $raw, $m)) {
+            return "{$m[1]}-{$m[2]}-{$m[3]} 00:00:00";
+        }
+        return null;
     }
 
     // ── Insert helpers ───────────────────────────────────────────
@@ -363,17 +403,22 @@ class ImportController extends Controller
             $exists = $db->table('chapter')->where('manga_id', $mangaId)->where('number', $number)->countAllResults() > 0;
             if ($exists) continue;
 
+            $insert = [
+                'manga_id'    => $mangaId,
+                'number'      => $number,
+                'slug'        => $slug,
+                'name'        => $name,
+                'is_show'     => 0,            // draft — admin reviews before publishing
+                'is_crawling' => 0,
+                'source_url'  => $c['url'] ?? '',
+                'view'        => 0,
+            ];
+            if (!empty($c['created_at'])) {
+                $insert['created_at'] = $c['created_at'];
+            }
+
             try {
-                $db->table('chapter')->insert([
-                    'manga_id'    => $mangaId,
-                    'number'      => $number,
-                    'slug'        => $slug,
-                    'name'        => $name,
-                    'is_show'     => 0,            // draft — admin reviews before publishing
-                    'is_crawling' => 0,
-                    'source_url'  => $c['url'] ?? '',
-                    'view'        => 0,
-                ]);
+                $db->table('chapter')->insert($insert);
                 $count++;
             } catch (\Throwable $e) {
                 log_message('error', 'Chapter insert failed: ' . $e->getMessage());
