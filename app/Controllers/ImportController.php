@@ -89,19 +89,33 @@ class ImportController extends Controller
         // return the existing record.
         $existing = $this->findDuplicate($db, $data['name'], $sourceSlug, $url);
         if ($existing) {
+            $existingId = (int) $existing['id'];
+
             $merged = $this->appendSource($existing['from_manga18fx'] ?? '', $url);
             if ($merged !== ($existing['from_manga18fx'] ?? '')) {
-                $db->table('manga')->where('id', $existing['id'])->update(['from_manga18fx' => $merged]);
+                $db->table('manga')->where('id', $existingId)->update(['from_manga18fx' => $merged]);
             }
+
+            // Still scan chapters: insert any that aren't in the DB yet
+            // (insertChapters skips existing manga_id+number pairs).
+            $newChapters = 0;
+            if ($importChapters && !empty($data['chapters'])) {
+                $newChapters = $this->insertChapters($db, $existingId, $data['chapters']);
+                if ($newChapters > 0) {
+                    $db->table('manga')->where('id', $existingId)->update(['update_at' => date('Y-m-d H:i:s')]);
+                }
+            }
+
             return $this->json([
                 'ok'             => true,
                 'already_exists' => true,
-                'duplicate_of'   => $existing['match_field'],   // "name" or "slug"
-                'manga_id'       => (int) $existing['id'],
+                'duplicate_of'   => $existing['match_field'],   // "name", "slug" or "from_manga18fx"
+                'manga_id'       => $existingId,
                 'slug'           => $existing['slug'],
                 'name'           => $existing['name'],
                 'from_manga18fx' => $merged,
-                'edit_url'       => '/admin/manga/' . (int) $existing['id'] . '/edit',
+                'new_chapters'   => $newChapters,
+                'edit_url'       => '/admin/manga/' . $existingId . '/edit',
             ]);
         }
 
