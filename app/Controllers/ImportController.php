@@ -30,23 +30,16 @@ class ImportController extends Controller
     /** Only these hosts (and their subdomains) may be fetched. */
     private const ALLOWED_HOSTS = ['submanhwa.com', 'submanhwa.net'];
 
-    /**
-     * HTTP proxy IPs (port = PROXY_PORT). Used to bypass Cloudflare IP
-     * blocking of the server's datacenter address. Credentials come from
-     * env (PROXY_USER / PROXY_PASS) — never hardcode secrets here.
-     */
-    private const PROXY_HOSTS = [
-        '87.98.97.14', '151.245.245.195', '62.192.172.221', '200.234.138.192',
-        '109.111.36.108', '109.111.37.190', '150.241.251.128', '216.180.245.224',
-        '146.103.51.77', '138.36.95.221', '138.36.93.13', '168.196.236.95',
-        '95.164.150.5', '89.19.59.88', '185.228.192.57', '95.164.206.102',
-        '151.247.124.155', '66.93.51.72', '66.93.162.187', '185.228.195.39',
-    ];
-    private const PROXY_PORT     = 50100; // HTTP; SOCKS would be 50101
-    private const PROXY_ATTEMPTS = 4;     // distinct proxies to try before giving up
-
     /** Diagnostic string from the most recent httpGet failure. */
     private string $lastFetchError = '';
+
+    /** Proxy config (app/Config/ImportProxy.php). Lazy-loaded. */
+    private ?\Config\ImportProxy $proxyCfg = null;
+
+    private function proxyCfg(): \Config\ImportProxy
+    {
+        return $this->proxyCfg ??= config('ImportProxy');
+    }
 
     /** CORS preflight for POST /api/admin/import-manga. */
     public function importOptions(): ResponseInterface
@@ -473,9 +466,9 @@ class ImportController extends Controller
         // proxies are disabled or all fail).
         $proxies = [];
         if ($this->proxyEnabled()) {
-            $pool = self::PROXY_HOSTS;
+            $pool = $this->proxyCfg()->hosts;
             shuffle($pool);
-            $proxies = array_slice($pool, 0, self::PROXY_ATTEMPTS);
+            $proxies = array_slice($pool, 0, max(1, $this->proxyCfg()->attempts));
         }
         $attempts = $proxies;
         $attempts[] = '';  // always try direct last
@@ -496,13 +489,25 @@ class ImportController extends Controller
         return null;
     }
 
+    private function proxyUser(): string
+    {
+        $u = trim((string) env('PROXY_USER', ''));
+        return $u !== '' ? $u : $this->proxyCfg()->user;
+    }
+
+    private function proxyPass(): string
+    {
+        $p = trim((string) env('PROXY_PASS', ''));
+        return $p !== '' ? $p : $this->proxyCfg()->pass;
+    }
+
     private function proxyEnabled(): bool
     {
-        if (filter_var(env('PROXY_ENABLED', true), FILTER_VALIDATE_BOOLEAN) === false) {
-            return false;
-        }
-        return trim((string) env('PROXY_USER', '')) !== ''
-            && trim((string) env('PROXY_PASS', '')) !== '';
+        // env override wins; otherwise the config flag.
+        $enabled = filter_var(env('PROXY_ENABLED', $this->proxyCfg()->enabled), FILTER_VALIDATE_BOOLEAN);
+        if (!$enabled) return false;
+        return !empty($this->proxyCfg()->hosts)
+            && $this->proxyUser() !== '' && $this->proxyPass() !== '';
     }
 
     /**
@@ -544,13 +549,9 @@ class ImportController extends Controller
         ];
 
         if ($proxyHost !== '') {
-            $opts[CURLOPT_PROXY]     = $proxyHost . ':' . self::PROXY_PORT;
-            $opts[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
-            $user = trim((string) env('PROXY_USER', ''));
-            $pass = trim((string) env('PROXY_PASS', ''));
-            if ($user !== '') {
-                $opts[CURLOPT_PROXYUSERPWD] = $user . ':' . $pass;
-            }
+            $opts[CURLOPT_PROXY]           = $proxyHost . ':' . $this->proxyCfg()->port;
+            $opts[CURLOPT_PROXYTYPE]       = CURLPROXY_HTTP;
+            $opts[CURLOPT_PROXYUSERPWD]    = $this->proxyUser() . ':' . $this->proxyPass();
             $opts[CURLOPT_HTTPPROXYTUNNEL] = true;
         }
 
