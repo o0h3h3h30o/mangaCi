@@ -63,8 +63,30 @@ class ImportController extends Controller
 
         // ── Insert ───────────────────────────────────────────────
         $db = Database::connect();
-        $slug = $this->slugify($data['slug'] ?? $data['name']);
-        $slug = $this->uniqueSlug($db, $slug);
+        $sourceSlug = $this->slugify($data['slug'] ?? $data['name']);
+
+        // De-dup: if a manga with the same name OR same source-slug already
+        // exists, don't insert again — append the new source identifier to
+        // its from_manga18fx field and return the existing record.
+        $existing = $this->findDuplicate($db, $data['name'], $sourceSlug);
+        if ($existing) {
+            $merged = $this->appendSource($existing['from_manga18fx'] ?? '', $sourceSlug);
+            if ($merged !== ($existing['from_manga18fx'] ?? '')) {
+                $db->table('manga')->where('id', $existing['id'])->update(['from_manga18fx' => $merged]);
+            }
+            return $this->json([
+                'ok'             => true,
+                'already_exists' => true,
+                'duplicate_of'   => $existing['match_field'],   // "name" or "slug"
+                'manga_id'       => (int) $existing['id'],
+                'slug'           => $existing['slug'],
+                'name'           => $existing['name'],
+                'from_manga18fx' => $merged,
+                'edit_url'       => '/admin/manga/' . (int) $existing['id'] . '/edit',
+            ]);
+        }
+
+        $slug = $this->uniqueSlug($db, $sourceSlug);
 
         $statusId = $this->mapStatus($db, $data['status_raw'] ?? '');
         $typeId   = $this->mapType($db, $data['type_raw'] ?? '');
@@ -426,6 +448,44 @@ class ImportController extends Controller
         $text = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $text);
         $text = preg_replace('/[\s]+/', '-', $text);
         return trim($text, '-') ?: ('manga-' . substr(md5(uniqid('', true)), 0, 8));
+    }
+
+    /**
+     * Find an existing manga that matches by name (case-insensitive, trimmed)
+     * or by slug. Returns row + which field matched, or null.
+     */
+    private function findDuplicate($db, string $name, string $slug): ?array
+    {
+        $name = trim($name);
+        $slug = trim($slug);
+
+        // Name match (case-insensitive)
+        if ($name !== '') {
+            $row = $db->table('manga')
+                ->select('id, name, slug, from_manga18fx')
+                ->where('LOWER(name)', mb_strtolower($name))
+                ->limit(1)->get()->getRowArray();
+            if ($row) { $row['match_field'] = 'name'; return $row; }
+        }
+
+        // Slug match (exact, or any "<slug>-<n>" variant produced by uniqueSlug)
+        if ($slug !== '') {
+            $row = $db->table('manga')
+                ->select('id, name, slug, from_manga18fx')
+                ->where('slug', $slug)
+                ->limit(1)->get()->getRowArray();
+            if ($row) { $row['match_field'] = 'slug'; return $row; }
+        }
+
+        return null;
+    }
+
+    /** Append a new source slug to a comma-separated from_manga18fx list, deduped. */
+    private function appendSource(string $current, string $newSlug): string
+    {
+        $parts = array_filter(array_map('trim', explode(',', $current)));
+        if (!in_array($newSlug, $parts, true)) $parts[] = $newSlug;
+        return implode(',', $parts);
     }
 
     private function uniqueSlug($db, string $slug): string
