@@ -234,6 +234,23 @@ $get = fn(string $k, string $d = '') => $s[$k] ?? $d;
     </div>
   </div>
 
+  <!-- Import API -->
+  <div class="a-panel" style="padding:1.25rem">
+    <h3 class="a-label" style="font-size:0.875rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#06b6d4">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+      </svg>
+      Import API
+    </h3>
+    <div>
+      <label class="a-label">API Key (for <code style="color:#6b7280">POST /api/admin/import-manga</code>)</label>
+      <input type="text" name="import_api_key" class="a-input"
+             value="<?= esc($get('import_api_key', '')) ?>"
+             placeholder="leave empty to disable key-based access (admin session still works)">
+      <p class="a-hint">Send as <code style="color:#6b7280">X-Api-Key: &lt;key&gt;</code> header or <code style="color:#6b7280">?api_key=…</code>.</p>
+    </div>
+  </div>
+
   <!-- Maintenance Mode -->
   <div class="a-panel" style="padding:1.25rem">
     <h3 class="a-label" style="font-size:0.875rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">

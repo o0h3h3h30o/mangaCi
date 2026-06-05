@@ -28,7 +28,7 @@ class Maintenance implements FilterInterface
         $uri = '/' . ltrim($request->getUri()->getPath(), '/');
 
         // Always let admin / auth routes through so the admin can toggle it off.
-        $bypassPrefixes = ['/admin', '/login', '/logout', '/install'];
+        $bypassPrefixes = ['/admin', '/login', '/logout', '/install', '/api/admin'];
         foreach ($bypassPrefixes as $prefix) {
             if ($uri === $prefix || strpos($uri, $prefix . '/') === 0) {
                 return;
