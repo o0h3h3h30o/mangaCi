@@ -495,18 +495,42 @@ class ImportController extends Controller
 
     private function findOrCreateCategory($db, string $name): int
     {
+        $name = trim($name);
+        if ($name === '') return 0;
+
         // Match case-insensitively to avoid duplicate genres differing only
         // in casing ("Smut" vs "smut").
         $existing = $db->table('category')
             ->where('LOWER(name)', mb_strtolower($name))
             ->get()->getRowArray();
         if ($existing) return (int) $existing['id'];
-        try {
-            $db->table('category')->insert(['name' => $name, 'slug' => $this->slugify($name)]);
-        } catch (\Throwable $e) {
-            $db->table('category')->insert(['name' => $name]);
+
+        // Build a slug; if another category already owns it (e.g. "+18" and
+        // "18" both fold to "18"), reuse that one rather than inserting a
+        // colliding/empty slug (which would hit category_slug_unique).
+        $slug = $this->slugify($name);
+        $bySlug = $db->table('category')->where('slug', $slug)->get()->getRowArray();
+        if ($bySlug) return (int) $bySlug['id'];
+
+        // Ensure uniqueness against the slug column before inserting.
+        $base = $slug; $i = 2;
+        while ($db->table('category')->where('slug', $slug)->countAllResults() > 0) {
+            $slug = $base . '-' . $i++;
+            if ($i > 50) { $slug = $base . '-' . substr(md5(uniqid('', true)), 0, 6); break; }
         }
-        return (int) $db->insertID();
+
+        try {
+            $db->table('category')->insert(['name' => $name, 'slug' => $slug]);
+            return (int) $db->insertID();
+        } catch (\Throwable $e) {
+            // Race / re-query: another request may have created it meanwhile.
+            $again = $db->table('category')
+                ->groupStart()->where('LOWER(name)', mb_strtolower($name))->orWhere('slug', $slug)->groupEnd()
+                ->get()->getRowArray();
+            if ($again) return (int) $again['id'];
+            log_message('error', 'findOrCreateCategory failed for "' . $name . '": ' . $e->getMessage());
+            return 0;
+        }
     }
 
     private function insertChapters($db, int $mangaId, array $chapters): int
