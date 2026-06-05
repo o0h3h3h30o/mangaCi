@@ -132,9 +132,11 @@ class ImportController extends Controller
     /**
      * Core import for a single URL. Returns a plain result array
      * (with an 'ok' flag and, on failure, 'error' + 'status'). Used by
-     * both the single-URL JSON endpoint and the CSV bulk importer.
+     * the single-URL JSON endpoint, the CSV bulk importer and the
+     * `import:csv` spark command. Self-contained (no $this->request/
+     * response), so it is safe to call from CLI.
      */
-    private function processImport(array $opts): array
+    public function processImport(array $opts): array
     {
         $url = trim((string) ($opts['url'] ?? ''));
         if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
@@ -264,7 +266,7 @@ class ImportController extends Controller
     }
 
     /** Read URLs from a CSV: "url" column if header present, else first column. */
-    private function readCsvUrls(string $path): array
+    public function readCsvUrls(string $path): array
     {
         $urls = [];
         if (($fh = @fopen($path, 'r')) === false) return $urls;
