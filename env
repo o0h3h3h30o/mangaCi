@@ -67,3 +67,14 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+#--------------------------------------------------------------------
+# IMPORT PROXY (manga import crawler)
+#--------------------------------------------------------------------
+# Used by ImportController to fetch source pages through rotating
+# proxies (bypasses Cloudflare IP blocking of the server). Set the
+# real credentials in your .env, not here.
+
+# PROXY_ENABLED = true
+# PROXY_USER = your-proxy-user
+# PROXY_PASS = your-proxy-pass

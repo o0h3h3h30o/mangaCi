@@ -30,6 +30,21 @@ class ImportController extends Controller
     /** Only these hosts (and their subdomains) may be fetched. */
     private const ALLOWED_HOSTS = ['submanhwa.com', 'submanhwa.net'];
 
+    /**
+     * HTTP proxy IPs (port = PROXY_PORT). Used to bypass Cloudflare IP
+     * blocking of the server's datacenter address. Credentials come from
+     * env (PROXY_USER / PROXY_PASS) — never hardcode secrets here.
+     */
+    private const PROXY_HOSTS = [
+        '87.98.97.14', '151.245.245.195', '62.192.172.221', '200.234.138.192',
+        '109.111.36.108', '109.111.37.190', '150.241.251.128', '216.180.245.224',
+        '146.103.51.77', '138.36.95.221', '138.36.93.13', '168.196.236.95',
+        '95.164.150.5', '89.19.59.88', '185.228.192.57', '95.164.206.102',
+        '151.247.124.155', '66.93.51.72', '66.93.162.187', '185.228.195.39',
+    ];
+    private const PROXY_PORT     = 50100; // HTTP; SOCKS would be 50101
+    private const PROXY_ATTEMPTS = 4;     // distinct proxies to try before giving up
+
     /** Diagnostic string from the most recent httpGet failure. */
     private string $lastFetchError = '';
 
@@ -452,6 +467,50 @@ class ImportController extends Controller
         }
 
         $this->lastFetchError = '';
+
+        // Build the proxy attempt list: a shuffled subset of the pool.
+        // Empty string = direct connection (used as a final fallback when
+        // proxies are disabled or all fail).
+        $proxies = [];
+        if ($this->proxyEnabled()) {
+            $pool = self::PROXY_HOSTS;
+            shuffle($pool);
+            $proxies = array_slice($pool, 0, self::PROXY_ATTEMPTS);
+        }
+        $attempts = $proxies;
+        $attempts[] = '';  // always try direct last
+
+        $lastErr = 'no attempts made';
+        foreach ($attempts as $proxyHost) {
+            [$body, $err] = $this->curlFetch($url, $binary, $proxyHost);
+            if ($body !== null) {
+                return $body;
+            }
+            $via = $proxyHost !== '' ? "proxy {$proxyHost}" : 'direct';
+            $lastErr = "{$via}: {$err}";
+            log_message('warning', "httpGet attempt via {$via} failed for {$url}: {$err}");
+        }
+
+        $this->lastFetchError = $lastErr;
+        log_message('error', "httpGet {$url} exhausted all attempts: {$lastErr}");
+        return null;
+    }
+
+    private function proxyEnabled(): bool
+    {
+        if (filter_var(env('PROXY_ENABLED', true), FILTER_VALIDATE_BOOLEAN) === false) {
+            return false;
+        }
+        return trim((string) env('PROXY_USER', '')) !== ''
+            && trim((string) env('PROXY_PASS', '')) !== '';
+    }
+
+    /**
+     * Single curl fetch. $proxyHost = '' means direct.
+     * Returns [body|null, errorString].
+     */
+    private function curlFetch(string $url, bool $binary, string $proxyHost): array
+    {
         $headers = $binary
             ? [
                 'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
@@ -471,7 +530,7 @@ class ImportController extends Controller
             ];
 
         $ch = curl_init($url);
-        curl_setopt_array($ch, [
+        $opts = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS      => 5,
@@ -482,29 +541,36 @@ class ImportController extends Controller
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
-        ]);
-        $body = curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $err  = curl_error($ch);
-        $errno= curl_errno($ch);
+        ];
+
+        if ($proxyHost !== '') {
+            $opts[CURLOPT_PROXY]     = $proxyHost . ':' . self::PROXY_PORT;
+            $opts[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
+            $user = trim((string) env('PROXY_USER', ''));
+            $pass = trim((string) env('PROXY_PASS', ''));
+            if ($user !== '') {
+                $opts[CURLOPT_PROXYUSERPWD] = $user . ':' . $pass;
+            }
+            $opts[CURLOPT_HTTPPROXYTUNNEL] = true;
+        }
+
+        curl_setopt_array($ch, $opts);
+        $body  = curl_exec($ch);
+        $code  = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $err   = curl_error($ch);
+        $errno = curl_errno($ch);
         curl_close($ch);
 
         if ($body === false || $errno !== 0) {
-            $this->lastFetchError = "curl error {$errno}: {$err}";
-            log_message('error', "httpGet {$url} failed: {$this->lastFetchError}");
-            return null;
+            return [null, "curl error {$errno}: {$err}"];
         }
         if ($code >= 400) {
-            $this->lastFetchError = "HTTP {$code}";
-            log_message('error', "httpGet {$url} failed: HTTP {$code}");
-            return null;
+            return [null, "HTTP {$code}"];
         }
-        if ($body === '' || $body === null) {
-            $this->lastFetchError = "empty body (HTTP {$code})";
-            log_message('error', "httpGet {$url} returned empty body: HTTP {$code}");
-            return null;
+        if ($body === '' ) {
+            return [null, "empty body (HTTP {$code})"];
         }
-        return $body;
+        return [$body, ''];
     }
 
     // ── Misc ─────────────────────────────────────────────────────
