@@ -24,6 +24,9 @@ class ImportController extends Controller
 {
     private const UA = 'Mozilla/5.0 (compatible; MangaCI-Importer/1.0)';
 
+    /** Only these hosts (and their subdomains) may be fetched. */
+    private const ALLOWED_HOSTS = ['submanhwa.com', 'submanhwa.net'];
+
     public function importManga(): ResponseInterface
     {
         // ── Input ─────────────────────────────────────────────────
@@ -32,19 +35,17 @@ class ImportController extends Controller
         if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
             return $this->json(['ok' => false, 'error' => 'A valid `url` is required.'], 400);
         }
+        if (!$this->isAllowedHost($url)) {
+            return $this->json(['ok' => false, 'error' => 'Only submanhwa.com URLs are allowed.'], 400);
+        }
 
         $importChapters = (bool) ($body['import_chapters'] ?? true);
         $downloadCover  = (bool) ($body['download_cover']  ?? true);
         $isPublic       = (int)  ($body['is_public']       ?? 0);
 
         // ── Dispatch to source-specific scraper ──────────────────
-        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
         try {
-            if (str_contains($host, 'submanhwa.com')) {
-                $data = $this->scrapeSubmanhwa($url);
-            } else {
-                return $this->json(['ok' => false, 'error' => "Source `{$host}` is not supported yet."], 400);
-            }
+            $data = $this->scrapeSubmanhwa($url);
         } catch (\Throwable $e) {
             log_message('error', 'Import scrape failed: ' . $e->getMessage());
             return $this->json(['ok' => false, 'error' => 'Scrape failed: ' . $e->getMessage()], 500);
@@ -407,8 +408,27 @@ class ImportController extends Controller
 
     // ── HTTP fetcher ─────────────────────────────────────────────
 
+    /** True if URL host is one of ALLOWED_HOSTS or a subdomain thereof. */
+    private function isAllowedHost(string $url): bool
+    {
+        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
+        if ($host === '') return false;
+        foreach (self::ALLOWED_HOSTS as $allowed) {
+            if ($host === $allowed || str_ends_with($host, '.' . $allowed)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function httpGet(string $url, bool $binary = false): ?string
     {
+        // SSRF guard: never fetch a host outside the whitelist.
+        if (!$this->isAllowedHost($url)) {
+            log_message('error', "httpGet blocked non-whitelisted host: {$url}");
+            return null;
+        }
+
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
