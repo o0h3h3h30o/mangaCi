@@ -52,41 +52,118 @@ class ImportController extends Controller
         // ── Input ─────────────────────────────────────────────────
         $body = $this->request->getJSON(true) ?? [];
         $url  = trim((string) ($body['url'] ?? ''));
+        $result = $this->processImport([
+            'url'             => $url,
+            'html'            => (string) ($body['html'] ?? ''),
+            'import_chapters' => (bool) ($body['import_chapters'] ?? true),
+            'download_cover'  => (bool) ($body['download_cover']  ?? true),
+            'is_public'       => (int)  ($body['is_public']       ?? 0),
+        ]);
+
+        return $this->json($result, $result['ok'] ? 200 : ($result['status'] ?? 400));
+    }
+
+    /**
+     * Bulk import from an uploaded CSV.
+     *
+     * POST /api/admin/import-csv  (multipart/form-data)
+     *   file:            the CSV (field name "file" or "csv")
+     *   import_chapters: 1/0  (default 1)
+     *   download_cover:  1/0  (default 1)
+     *   is_public:       1/0  (default 0)
+     *
+     * CSV format: one manga per row. The URL is taken from a column named
+     * "url" (case-insensitive) if a header row exists, otherwise from the
+     * first column. Blank lines and a leading header are skipped.
+     */
+    public function importCsv(): ResponseInterface
+    {
+        $file = $this->request->getFile('file') ?? $this->request->getFile('csv');
+        if (!$file || !$file->isValid()) {
+            return $this->json(['ok' => false, 'error' => 'Upload a CSV file in the `file` field.'], 400);
+        }
+
+        $rows = $this->readCsvUrls($file->getTempName());
+        if (empty($rows)) {
+            return $this->json(['ok' => false, 'error' => 'No URLs found in the CSV.'], 422);
+        }
+
+        $importChapters = $this->boolParam('import_chapters', true);
+        $downloadCover  = $this->boolParam('download_cover', true);
+        $isPublic       = $this->boolParam('is_public', false) ? 1 : 0;
+
+        // Avoid PHP timing out on big lists.
+        @set_time_limit(0);
+
+        $results = [];
+        $created = 0; $updated = 0; $failed = 0;
+        foreach ($rows as $u) {
+            $res = $this->processImport([
+                'url'             => $u,
+                'import_chapters' => $importChapters,
+                'download_cover'  => $downloadCover,
+                'is_public'       => $isPublic,
+            ]);
+            if (!$res['ok'])                      $failed++;
+            elseif (!empty($res['already_exists'])) $updated++;
+            else                                    $created++;
+
+            $results[] = [
+                'url'           => $u,
+                'ok'            => $res['ok'],
+                'manga_id'      => $res['manga_id']      ?? null,
+                'name'          => $res['name']          ?? null,
+                'already_exists'=> $res['already_exists'] ?? false,
+                'chapter_count' => $res['chapter_count'] ?? ($res['new_chapters'] ?? 0),
+                'error'         => $res['error']         ?? null,
+            ];
+        }
+
+        return $this->json([
+            'ok'      => true,
+            'total'   => count($rows),
+            'created' => $created,
+            'updated' => $updated,
+            'failed'  => $failed,
+            'results' => $results,
+        ]);
+    }
+
+    /**
+     * Core import for a single URL. Returns a plain result array
+     * (with an 'ok' flag and, on failure, 'error' + 'status'). Used by
+     * both the single-URL JSON endpoint and the CSV bulk importer.
+     */
+    private function processImport(array $opts): array
+    {
+        $url = trim((string) ($opts['url'] ?? ''));
         if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->json(['ok' => false, 'error' => 'A valid `url` is required.'], 400);
+            return ['ok' => false, 'status' => 400, 'error' => 'A valid `url` is required.'];
         }
         if (!$this->isAllowedHost($url)) {
-            return $this->json(['ok' => false, 'error' => 'Only submanhwa.com URLs are allowed.'], 400);
+            return ['ok' => false, 'status' => 400, 'error' => 'Only submanhwa.com URLs are allowed.'];
         }
 
-        $importChapters = (bool) ($body['import_chapters'] ?? true);
-        $downloadCover  = (bool) ($body['download_cover']  ?? true);
-        $isPublic       = (int)  ($body['is_public']       ?? 0);
-        // Optional: caller supplies the page HTML directly (e.g. from a
-        // browser/userscript), bypassing the server-side fetch which
-        // Cloudflare may 403 from a datacenter IP.
-        $html           = (string) ($body['html'] ?? '');
+        $importChapters = (bool) ($opts['import_chapters'] ?? true);
+        $downloadCover  = (bool) ($opts['download_cover']  ?? true);
+        $isPublic       = (int)  ($opts['is_public']       ?? 0);
+        $html           = (string) ($opts['html'] ?? '');
 
-        // ── Dispatch to source-specific scraper ──────────────────
         try {
             $data = $this->scrapeSubmanhwa($url, $html !== '' ? $html : null);
         } catch (\Throwable $e) {
             log_message('error', 'Import scrape failed: ' . $e->getMessage());
-            return $this->json(['ok' => false, 'error' => 'Scrape failed: ' . $e->getMessage()], 500);
+            return ['ok' => false, 'status' => 500, 'error' => 'Scrape failed: ' . $e->getMessage()];
         }
 
         if (empty($data['name'])) {
-            return $this->json(['ok' => false, 'error' => 'Could not extract manga name from page.'], 422);
+            return ['ok' => false, 'status' => 422, 'error' => 'Could not extract manga name from page.'];
         }
 
-        // ── Insert ───────────────────────────────────────────────
         $db = Database::connect();
         $sourceSlug = $this->slugify($data['slug'] ?? $data['name']);
 
-        // De-dup: if a manga with the same name, same source-slug, or whose
-        // from_manga18fx already contains this URL exists, don't insert
-        // again — append the new source URL to its from_manga18fx field and
-        // return the existing record.
+        // De-dup by name / slug / source URL.
         $existing = $this->findDuplicate($db, $data['name'], $sourceSlug, $url);
         if ($existing) {
             $existingId = (int) $existing['id'];
@@ -96,8 +173,6 @@ class ImportController extends Controller
                 $db->table('manga')->where('id', $existingId)->update(['from_manga18fx' => $merged]);
             }
 
-            // Still scan chapters: insert any that aren't in the DB yet
-            // (insertChapters skips existing manga_id+number pairs).
             $newChapters = 0;
             if ($importChapters && !empty($data['chapters'])) {
                 $newChapters = $this->insertChapters($db, $existingId, $data['chapters']);
@@ -106,25 +181,24 @@ class ImportController extends Controller
                 }
             }
 
-            return $this->json([
+            return [
                 'ok'             => true,
                 'already_exists' => true,
-                'duplicate_of'   => $existing['match_field'],   // "name", "slug" or "from_manga18fx"
+                'duplicate_of'   => $existing['match_field'],
                 'manga_id'       => $existingId,
                 'slug'           => $existing['slug'],
                 'name'           => $existing['name'],
                 'from_manga18fx' => $merged,
                 'new_chapters'   => $newChapters,
                 'edit_url'       => '/admin/manga/' . $existingId . '/edit',
-            ]);
+            ];
         }
 
-        $slug = $this->uniqueSlug($db, $sourceSlug);
-
+        $slug     = $this->uniqueSlug($db, $sourceSlug);
         $statusId = $this->mapStatus($db, $data['status_raw'] ?? '');
         $typeId   = $this->mapType($db, $data['type_raw'] ?? '');
 
-        $row = [
+        $db->table('manga')->insert([
             'name'           => $data['name'],
             'slug'           => $slug,
             'otherNames'     => $data['other_names'] ?? '',
@@ -138,24 +212,18 @@ class ImportController extends Controller
             'image'          => $downloadCover ? '' : ($data['cover_url'] ?? ''),
             'views'          => 0, 'view_day' => 0, 'view_month' => 0,
             'update_at'      => date('Y-m-d H:i:s'),
-        ];
-
-        $db->table('manga')->insert($row);
+        ]);
         $mangaId = (int) $db->insertID();
         if ($mangaId <= 0) {
-            return $this->json(['ok' => false, 'error' => 'Insert failed.'], 500);
+            return ['ok' => false, 'status' => 500, 'error' => 'Insert failed.'];
         }
 
         // Cover
         $coverSaved = false;
         if ($downloadCover && !empty($data['cover_url'])) {
             $coverSaved = $this->saveCover($mangaId, $data['cover_url']);
-            if ($coverSaved) {
-                $db->table('manga')->where('id', $mangaId)->update(['image' => '']);
-            } else {
-                // fall back to remote URL if download failed
-                $db->table('manga')->where('id', $mangaId)->update(['image' => $data['cover_url']]);
-            }
+            $db->table('manga')->where('id', $mangaId)
+               ->update(['image' => $coverSaved ? '' : $data['cover_url']]);
         }
 
         // Genres (categories)
@@ -181,7 +249,7 @@ class ImportController extends Controller
             }
         }
 
-        return $this->json([
+        return [
             'ok'           => true,
             'manga_id'     => $mangaId,
             'slug'         => $slug,
@@ -192,7 +260,45 @@ class ImportController extends Controller
             'cover_saved'  => $coverSaved,
             'chapter_count'=> $chapterCount,
             'edit_url'     => '/admin/manga/' . $mangaId . '/edit',
-        ]);
+        ];
+    }
+
+    /** Read URLs from a CSV: "url" column if header present, else first column. */
+    private function readCsvUrls(string $path): array
+    {
+        $urls = [];
+        if (($fh = @fopen($path, 'r')) === false) return $urls;
+
+        $urlCol = 0;
+        $first  = true;
+        while (($cols = fgetcsv($fh, 0, ',', '"', '')) !== false) {
+            if ($cols === [null] || $cols === false) continue; // blank line
+            // Detect header row + locate a "url" column.
+            if ($first) {
+                $first = false;
+                $lower = array_map(fn($c) => strtolower(trim((string) $c)), $cols);
+                $idx = array_search('url', $lower, true);
+                if ($idx !== false) {
+                    $urlCol = (int) $idx;
+                    continue; // skip header
+                }
+                // No header — fall through and treat this row as data.
+            }
+            $candidate = trim((string) ($cols[$urlCol] ?? ''));
+            if ($candidate === '') continue;
+            if (filter_var($candidate, FILTER_VALIDATE_URL)) {
+                $urls[] = $candidate;
+            }
+        }
+        fclose($fh);
+        return array_values(array_unique($urls));
+    }
+
+    private function boolParam(string $name, bool $default): bool
+    {
+        $v = $this->request->getPost($name);
+        if ($v === null) return $default;
+        return filter_var($v, FILTER_VALIDATE_BOOLEAN);
     }
 
     // ── Source scrapers ──────────────────────────────────────────

@@ -57,6 +57,8 @@ $routes->post('api/view',             'MangaStateController::trackView');
 // Manga import (open endpoint, CORS-enabled)
 $routes->post   ('api/admin/import-manga', 'ImportController::importManga');
 $routes->options('api/admin/import-manga', 'ImportController::importOptions');
+$routes->post   ('api/admin/import-csv',   'ImportController::importCsv');
+$routes->options('api/admin/import-csv',   'ImportController::importOptions');
 
 // Admin
 $routes->group('admin', function ($routes) {
