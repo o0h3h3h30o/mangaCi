@@ -144,16 +144,16 @@ class ImportController extends Controller
             }
         }
 
-        // Tags
-        $tagIds = [];
-        foreach (($data['tags'] ?? []) as $tagName) {
-            $tagName = trim((string) $tagName);
-            if ($tagName === '') continue;
-            $tId = $this->findOrCreateTag($db, $tagName);
-            if ($tId > 0) {
+        // Genres (categories)
+        $catIds = [];
+        foreach (($data['genres'] ?? []) as $genreName) {
+            $genreName = trim((string) $genreName);
+            if ($genreName === '') continue;
+            $cId = $this->findOrCreateCategory($db, $genreName);
+            if ($cId > 0) {
                 try {
-                    $db->table('manga_tag')->insert(['manga_id' => $mangaId, 'tag_id' => $tId]);
-                    $tagIds[] = $tId;
+                    $db->table('category_manga')->insert(['manga_id' => $mangaId, 'category_id' => $cId]);
+                    $catIds[] = $cId;
                 } catch (\Throwable $e) { /* duplicate, skip */ }
             }
         }
@@ -174,7 +174,7 @@ class ImportController extends Controller
             'name'         => $data['name'],
             'status_id'    => $statusId,
             'type_id'      => $typeId,
-            'tag_count'    => count($tagIds),
+            'genre_count'  => count($catIds),
             'cover_saved'  => $coverSaved,
             'chapter_count'=> $chapterCount,
             'edit_url'     => '/admin/manga/' . $mangaId . '/edit',
@@ -234,11 +234,11 @@ class ImportController extends Controller
         $typeRaw   = $detail('Type');
         $statusRaw = $detail('Estado');
 
-        // Tags
-        $tags = [];
+        // Genres (submanhwa renders them as "tag-pill" links)
+        $genres = [];
         foreach ($xp->query('//a[contains(@class,"tag-pill")]') as $a) {
             $t = trim($a->textContent);
-            if ($t !== '') $tags[] = $t;
+            if ($t !== '') $genres[] = $t;
         }
 
         // Chapters
@@ -284,7 +284,7 @@ class ImportController extends Controller
             'cover_url'   => $coverUrl,
             'status_raw'  => $statusRaw,
             'type_raw'    => $typeRaw,
-            'tags'        => array_values(array_unique($tags)),
+            'genres'      => array_values(array_unique($genres)),
             'chapters'    => $chapters,
         ];
     }
@@ -371,14 +371,18 @@ class ImportController extends Controller
         return null;
     }
 
-    private function findOrCreateTag($db, string $name): int
+    private function findOrCreateCategory($db, string $name): int
     {
-        $existing = $db->table('tag')->where('name', $name)->get()->getRowArray();
+        // Match case-insensitively to avoid duplicate genres differing only
+        // in casing ("Smut" vs "smut").
+        $existing = $db->table('category')
+            ->where('LOWER(name)', mb_strtolower($name))
+            ->get()->getRowArray();
         if ($existing) return (int) $existing['id'];
         try {
-            $db->table('tag')->insert(['name' => $name, 'slug' => $this->slugify($name)]);
+            $db->table('category')->insert(['name' => $name, 'slug' => $this->slugify($name)]);
         } catch (\Throwable $e) {
-            $db->table('tag')->insert(['name' => $name]);
+            $db->table('category')->insert(['name' => $name]);
         }
         return (int) $db->insertID();
     }
