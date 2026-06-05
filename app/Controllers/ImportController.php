@@ -22,10 +22,13 @@ use Config\Database;
  */
 class ImportController extends Controller
 {
-    private const UA = 'Mozilla/5.0 (compatible; MangaCI-Importer/1.0)';
+    private const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
     /** Only these hosts (and their subdomains) may be fetched. */
     private const ALLOWED_HOSTS = ['submanhwa.com', 'submanhwa.net'];
+
+    /** Diagnostic string from the most recent httpGet failure. */
+    private string $lastFetchError = '';
 
     public function importManga(): ResponseInterface
     {
@@ -162,7 +165,10 @@ class ImportController extends Controller
     private function scrapeSubmanhwa(string $url): array
     {
         $html = $this->httpGet($url);
-        if ($html === null) throw new \RuntimeException('Could not fetch page.');
+        if ($html === null) {
+            throw new \RuntimeException('Could not fetch page'
+                . ($this->lastFetchError !== '' ? ' (' . $this->lastFetchError . ')' : '') . '.');
+        }
 
         $doc = new \DOMDocument();
         $prev = libxml_use_internal_errors(true);
@@ -429,26 +435,57 @@ class ImportController extends Controller
             return null;
         }
 
+        $this->lastFetchError = '';
+        $headers = $binary
+            ? [
+                'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                'Accept-Language: es-ES,es;q=0.9,en;q=0.8',
+                'Referer: https://submanhwa.com/',
+            ]
+            : [
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language: es-ES,es;q=0.9,en;q=0.8',
+                'Upgrade-Insecure-Requests: 1',
+                'Sec-Fetch-Dest: document',
+                'Sec-Fetch-Mode: navigate',
+                'Sec-Fetch-Site: none',
+                'Sec-Fetch-User: ?1',
+                'Cache-Control: no-cache',
+                'Pragma: no-cache',
+            ];
+
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS      => 5,
-            CURLOPT_TIMEOUT        => 25,
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_CONNECTTIMEOUT => 15,
             CURLOPT_USERAGENT      => self::UA,
-            CURLOPT_HTTPHEADER     => [
-                'Accept: ' . ($binary ? 'image/*,*/*;q=0.8' : 'text/html,application/xhtml+xml'),
-                'Accept-Language: es,en;q=0.8',
-            ],
+            CURLOPT_ENCODING       => '',          // accept gzip/deflate/br
+            CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
         ]);
         $body = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $err  = curl_error($ch);
+        $errno= curl_errno($ch);
         curl_close($ch);
-        if ($body === false || $code >= 400) {
-            log_message('error', "httpGet {$url} failed: HTTP {$code} {$err}");
+
+        if ($body === false || $errno !== 0) {
+            $this->lastFetchError = "curl error {$errno}: {$err}";
+            log_message('error', "httpGet {$url} failed: {$this->lastFetchError}");
+            return null;
+        }
+        if ($code >= 400) {
+            $this->lastFetchError = "HTTP {$code}";
+            log_message('error', "httpGet {$url} failed: HTTP {$code}");
+            return null;
+        }
+        if ($body === '' || $body === null) {
+            $this->lastFetchError = "empty body (HTTP {$code})";
+            log_message('error', "httpGet {$url} returned empty body: HTTP {$code}");
             return null;
         }
         return $body;
