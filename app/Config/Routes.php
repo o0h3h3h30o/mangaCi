@@ -54,8 +54,9 @@ $routes->get ('api/rating/(:num)',     'RatingController::stats/$1');
 $routes->get('api/manga/(:num)/state', 'MangaStateController::index/$1');
 $routes->post('api/view',             'MangaStateController::trackView');
 
-// Manga import (admin or X-Api-Key)
-$routes->post('api/admin/import-manga', 'ImportController::importManga');
+// Manga import (open endpoint, CORS-enabled)
+$routes->post   ('api/admin/import-manga', 'ImportController::importManga');
+$routes->options('api/admin/import-manga', 'ImportController::importOptions');
 
 // Admin
 $routes->group('admin', function ($routes) {

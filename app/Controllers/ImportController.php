@@ -30,6 +30,12 @@ class ImportController extends Controller
     /** Diagnostic string from the most recent httpGet failure. */
     private string $lastFetchError = '';
 
+    /** CORS preflight for POST /api/admin/import-manga. */
+    public function importOptions(): ResponseInterface
+    {
+        return $this->cors($this->response)->setStatusCode(204);
+    }
+
     public function importManga(): ResponseInterface
     {
         // ── Input ─────────────────────────────────────────────────
@@ -576,9 +582,21 @@ class ImportController extends Controller
 
     private function json(array $payload, int $code = 200): ResponseInterface
     {
-        return $this->response
+        return $this->cors($this->response)
             ->setStatusCode($code)
             ->setContentType('application/json')
             ->setBody(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
+    /** Add permissive CORS headers to a response. */
+    private function cors(ResponseInterface $response): ResponseInterface
+    {
+        $origin = $this->request->getHeaderLine('Origin');
+        return $response
+            ->setHeader('Access-Control-Allow-Origin', $origin !== '' ? $origin : '*')
+            ->setHeader('Vary', 'Origin')
+            ->setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+            ->setHeader('Access-Control-Allow-Headers', 'Content-Type')
+            ->setHeader('Access-Control-Max-Age', '86400');
     }
 }
