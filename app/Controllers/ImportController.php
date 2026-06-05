@@ -10,7 +10,7 @@ use Config\Database;
  * Manga import API.
  *
  * POST /api/admin/import-manga
- *   Headers: X-Api-Key: <key>   (or be logged in as admin)
+ *   Auth: must be logged in as an admin user.
  *   Body (JSON):
  *     { "url": "https://submanhwa.com/serie/conexion-suave",
  *       "import_chapters": true,        // default true
@@ -524,33 +524,25 @@ class ImportController extends Controller
         return $slug;
     }
 
+    /** Admin session only. */
     private function authorize(): bool
     {
-        // 1) Admin session
         $session = session();
-        if ($session->get('isLoggedIn')) {
-            $userId = (int) $session->get('user_id');
-            if ($userId > 0) {
-                try {
-                    $isAdmin = Database::connect()
-                        ->table('users_groups ug')
-                        ->join('groups g', 'g.id = ug.group_id')
-                        ->where('ug.user_id', $userId)
-                        ->where('g.name', 'admin')
-                        ->countAllResults() > 0;
-                    if ($isAdmin) return true;
-                } catch (\Throwable $e) { /* fall through */ }
-            }
-        }
+        if (!$session->get('isLoggedIn')) return false;
 
-        // 2) API key
-        $expected = trim((string) site_setting('import_api_key', ''));
-        if ($expected === '') return false;
-        $provided = (string) ($this->request->getHeaderLine('X-Api-Key')
-            ?: $this->request->getGet('api_key')
-            ?: '');
-        if ($provided === '') return false;
-        return hash_equals($expected, $provided);
+        $userId = (int) $session->get('user_id');
+        if ($userId <= 0) return false;
+
+        try {
+            return Database::connect()
+                ->table('users_groups ug')
+                ->join('groups g', 'g.id = ug.group_id')
+                ->where('ug.user_id', $userId)
+                ->where('g.name', 'admin')
+                ->countAllResults() > 0;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     private function json(array $payload, int $code = 200): ResponseInterface
