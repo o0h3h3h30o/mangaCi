@@ -437,24 +437,8 @@ class ImportController extends Controller
         // Chapters
         $db->table('chapter')->where('manga_id', $id)->delete();
 
-        // Capture linked author / category ids BEFORE deleting the junctions,
-        // so we can clean up any that become orphaned.
-        $authorIds = [];
-        $catIds    = [];
-        try {
-            $authorIds = array_column(
-                $db->table('author_manga')->select('author_id')->where('manga_id', $id)->get()->getResultArray(),
-                'author_id'
-            );
-        } catch (\Throwable $e) {}
-        try {
-            $catIds = array_column(
-                $db->table('category_manga')->select('category_id')->where('manga_id', $id)->get()->getResultArray(),
-                'category_id'
-            );
-        } catch (\Throwable $e) {}
-
-        // Relations
+        // Relations — only the junction/link rows are removed; the shared
+        // author / category records themselves are kept.
         foreach ([
             ['category_manga', 'manga_id'],
             ['author_manga',   'manga_id'],
@@ -464,22 +448,6 @@ class ImportController extends Controller
             ['notifications',  'manga_id'],
         ] as [$table, $col]) {
             try { $db->table($table)->where($col, $id)->delete(); } catch (\Throwable $e) {}
-        }
-
-        // Delete authors / categories that are no longer used by ANY manga.
-        foreach (array_unique(array_map('intval', $authorIds)) as $aid) {
-            if ($aid <= 0) continue;
-            try {
-                $still = $db->table('author_manga')->where('author_id', $aid)->countAllResults();
-                if ($still === 0) $db->table('author')->where('id', $aid)->delete();
-            } catch (\Throwable $e) {}
-        }
-        foreach (array_unique(array_map('intval', $catIds)) as $cid) {
-            if ($cid <= 0) continue;
-            try {
-                $still = $db->table('category_manga')->where('category_id', $cid)->countAllResults();
-                if ($still === 0) $db->table('category')->where('id', $cid)->delete();
-            } catch (\Throwable $e) {}
         }
         try { $db->table('item_ratings')->where('item_id', $id)->delete(); } catch (\Throwable $e) {}
         try { $db->table('content_likes')->where('content_type', 'manga')->where('content_id', $id)->delete(); } catch (\Throwable $e) {}
