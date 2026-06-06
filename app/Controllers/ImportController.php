@@ -308,6 +308,157 @@ class ImportController extends Controller
         return filter_var($v, FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * Read full CSV rows keyed by header name (lowercased). Requires a
+     * header row. Returns e.g. [['title'=>..,'url'=>..,'type'=>..,'status'=>..], ...].
+     */
+    public function readCsvRows(string $path): array
+    {
+        $rows = [];
+        if (($fh = @fopen($path, 'r')) === false) return $rows;
+
+        $header = null;
+        while (($cols = fgetcsv($fh, 0, ',', '"', '')) !== false) {
+            if ($cols === [null] || $cols === false) continue;
+            if ($header === null) {
+                $header = array_map(fn($c) => strtolower(trim((string) $c)), $cols);
+                continue;
+            }
+            $row = [];
+            foreach ($header as $i => $key) {
+                $row[$key] = trim((string) ($cols[$i] ?? ''));
+            }
+            $rows[] = $row;
+        }
+        fclose($fh);
+        return $rows;
+    }
+
+    /**
+     * Purge manga (and their chapters + pages + relations) for every CSV
+     * row whose `type` indicates a Novel. Matches manga by source URL
+     * (from_manga18fx) or by slug derived from the URL.
+     *
+     * Returns a summary array with per-row outcomes.
+     */
+    public function purgeNovelsFromCsv(string $path): array
+    {
+        $rows = $this->readCsvRows($path);
+        if (empty($rows)) {
+            return ['ok' => false, 'error' => 'No rows (CSV needs a header row with url/type columns).'];
+        }
+
+        $db = Database::connect();
+        $deleted = 0; $notFound = 0; $scanned = 0;
+        $results = [];
+
+        foreach ($rows as $row) {
+            $type = (string) ($row['type'] ?? '');
+            $url  = (string) ($row['url'] ?? '');
+            if (!$this->isNovelType($type)) continue;   // only Novel rows
+            $scanned++;
+
+            $manga = $this->findMangaByUrl($db, $url);
+            if (!$manga) {
+                $notFound++;
+                $results[] = ['url' => $url, 'type' => $type, 'deleted' => false, 'reason' => 'not found'];
+                continue;
+            }
+
+            try {
+                $this->deleteMangaCascade($db, (int) $manga['id']);
+                $deleted++;
+                $results[] = ['url' => $url, 'type' => $type, 'deleted' => true,
+                              'manga_id' => (int) $manga['id'], 'name' => $manga['name']];
+            } catch (\Throwable $e) {
+                $results[] = ['url' => $url, 'type' => $type, 'deleted' => false,
+                              'manga_id' => (int) $manga['id'], 'reason' => $e->getMessage()];
+                log_message('error', 'purgeNovels delete failed #' . $manga['id'] . ': ' . $e->getMessage());
+            }
+        }
+
+        return [
+            'ok'         => true,
+            'novel_rows' => $scanned,
+            'deleted'    => $deleted,
+            'not_found'  => $notFound,
+            'results'    => $results,
+        ];
+    }
+
+    /** True if a CSV type cell denotes a novel (Novel / Novela / Light Novel …). */
+    public function isNovelType(string $type): bool
+    {
+        return (bool) preg_match('/\bnovel/i', $type) || (bool) preg_match('/novela/i', $type);
+    }
+
+    /** Locate a manga by its source URL (from_manga18fx token) or slug. */
+    private function findMangaByUrl($db, string $url): ?array
+    {
+        $url = trim($url);
+        if ($url === '') return null;
+
+        // 1. Slug from URL path (/serie/<slug>)
+        $slug = '';
+        if (preg_match('#/serie/([^/?#]+)#', parse_url($url, PHP_URL_PATH) ?? '', $m)) {
+            $slug = $this->slugify($m[1]);
+        }
+        if ($slug !== '') {
+            $row = $db->table('manga')->select('id, name, slug, from_manga18fx')
+                ->where('slug', $slug)->limit(1)->get()->getRowArray();
+            if ($row) return $row;
+        }
+
+        // 2. from_manga18fx contains the URL as a comma-separated token.
+        $candidates = $db->table('manga')->select('id, name, slug, from_manga18fx')
+            ->like('from_manga18fx', $url, 'both', null, true)
+            ->limit(10)->get()->getResultArray();
+        foreach ($candidates as $cand) {
+            $parts = array_map('trim', explode(',', (string) ($cand['from_manga18fx'] ?? '')));
+            if (in_array($url, $parts, true)) return $cand;
+        }
+        return null;
+    }
+
+    /** Delete a manga and all dependent rows (pages, chapters, relations …). */
+    private function deleteMangaCascade($db, int $id): void
+    {
+        $chapterIds = array_column(
+            $db->query('SELECT id FROM chapter WHERE manga_id = ?', [$id])->getResultArray(),
+            'id'
+        );
+
+        // Pages of all chapters
+        if ($chapterIds) {
+            $in = implode(',', array_map('intval', $chapterIds));
+            $db->query("DELETE FROM page WHERE chapter_id IN ({$in})");
+        }
+
+        // Chapters
+        $db->table('chapter')->where('manga_id', $id)->delete();
+
+        // Relations
+        foreach ([
+            ['category_manga', 'manga_id'],
+            ['author_manga',   'manga_id'],
+            ['manga_tag',      'manga_id'],
+            ['bookmarks',      'manga_id'],
+            ['comments',       'manga_id'],
+            ['notifications',  'manga_id'],
+        ] as [$table, $col]) {
+            try { $db->table($table)->where($col, $id)->delete(); } catch (\Throwable $e) {}
+        }
+        try { $db->table('item_ratings')->where('item_id', $id)->delete(); } catch (\Throwable $e) {}
+        try { $db->table('content_likes')->where('content_type', 'manga')->where('content_id', $id)->delete(); } catch (\Throwable $e) {}
+        if ($chapterIds) {
+            try { $db->table('content_likes')->where('content_type', 'chapter')->whereIn('content_id', $chapterIds)->delete(); } catch (\Throwable $e) {}
+            try { $db->table('chapter_reports')->whereIn('chapter_id', $chapterIds)->delete(); } catch (\Throwable $e) {}
+        }
+
+        // Manga
+        $db->table('manga')->where('id', $id)->delete();
+    }
+
     // ── Source scrapers ──────────────────────────────────────────
 
     private function scrapeSubmanhwa(string $url, ?string $html = null): array
