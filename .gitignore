@@ -125,3 +125,4 @@ sftp-config*.json
 
 /results/
 /phpunit*.xml
+writable/*.log
