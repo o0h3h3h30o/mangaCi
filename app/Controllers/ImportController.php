@@ -400,7 +400,7 @@ class ImportController extends Controller
 
         // 1. Slug from URL path (/serie/<slug>)
         $slug = '';
-        if (preg_match('#/serie/([^/?#]+)#', parse_url($url, PHP_URL_PATH) ?? '', $m)) {
+        if (preg_match('~/serie/([^/]+)~', parse_url($url, PHP_URL_PATH) ?? '', $m)) {
             $slug = $this->slugify($m[1]);
         }
         if ($slug !== '') {
